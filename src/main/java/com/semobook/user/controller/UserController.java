@@ -3,15 +3,15 @@ package com.semobook.user.controller;
 import com.semobook.user.dto.UserRequest;
 import com.semobook.user.dto.UserResponse;
 import com.semobook.user.service.UserService;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Log4j2
+@Slf4j
 @RestController
 @Tag(name = "UserController")
 @RequestMapping("/user")
@@ -30,16 +30,16 @@ public class UserController {
 
     //회원조회
     @Operation(description = "회원조회")
-    @PostMapping(value = "/getuser")
-    public ResponseEntity<UserResponse> getUser(@RequestBody UserRequest userRequest) {
-        log.info("==/getuser", userRequest.getUserId(), userRequest.getUserPassword());
-        return ResponseEntity.ok(userService.findByUserId(userRequest.getUserId()));
+    @GetMapping(value = "/user/{id}")
+    public ResponseEntity<UserResponse> getUser(@Parameter @PathVariable String id) {
+        log.info("==/getuser {}", id);
+        return ResponseEntity.ok(userService.findByUserId(id));
     }
 
     //로그인
     @Operation(description = "로그인")
     @PostMapping(value = "/signin")
-    public ResponseEntity<UserResponse> signIn(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserResponse> signIn(@Parameter @RequestBody UserRequest userRequest) {
         log.info("==/signin : userRequest : id{} pw{}==", userRequest.getUserId(), userRequest.getUserPassword());
         return ResponseEntity.ok(userService.signIn(userRequest));
     }
@@ -47,7 +47,7 @@ public class UserController {
     //    //회원가입
     @Operation(description = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signUp(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserResponse> signUp(@Parameter @RequestBody UserRequest userRequest) {
         log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", userRequest.getUserId(), userRequest.getUserPassword(), userRequest.getUserName());
         return ResponseEntity.ok(userService.signUp(userRequest));
     }

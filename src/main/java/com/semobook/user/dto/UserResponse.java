@@ -1,7 +1,7 @@
 package com.semobook.user.dto;
 
 import com.semobook.common.StatusEnum;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserResponse {
 
-    @ApiModelProperty(value = "성공 코드" , example = "성공 : hd1004")
+    @Schema(description = "성공 코드" , example = "성공 : hd1004")
     StatusEnum hCode;
-    @ApiModelProperty(value = "메시지")
+    @Schema(description = "메시지")
     String hMessage;
-    @ApiModelProperty(value = "데이터")
+    @Schema(description = "데이터")
     Object data;
 
     @Builder
