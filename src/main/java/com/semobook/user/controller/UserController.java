@@ -51,6 +51,8 @@ public class UserController {
         log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", userRequest.getUserId(), userRequest.getUserPassword(), userRequest.getUserName());
         return ResponseEntity.ok(userService.signUp(userRequest));
     }
+
+    //jiratest
 //
 //    //회원탈퇴
 //    @ApiOperation(value = "회원상태변경")
