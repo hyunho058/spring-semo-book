@@ -20,6 +20,7 @@ public class UserRequest {
     String userGender;
     @Schema(description = "유저생일" , example = "940810")
     String userBirth;
-//    String userStatus;
+    @Schema(hidden = true)
+    String userStatus;
 
 }
