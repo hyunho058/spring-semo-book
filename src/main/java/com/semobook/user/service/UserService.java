@@ -6,6 +6,7 @@ import com.semobook.user.domain.User;
 import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.UserRequest;
 import com.semobook.user.dto.UserResponse;
+import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
