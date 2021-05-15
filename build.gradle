@@ -31,6 +31,7 @@ dependencies {
 
     //camelcase를 위한 guava
     compile group: 'com.google.guava', name: 'guava', version: '30.0-jre'
+    //swagger
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.7'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
