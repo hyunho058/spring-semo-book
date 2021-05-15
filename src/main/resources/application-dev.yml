@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver  #h2 드라이버 설정
+#    url: jdbc:h2:file:~/Develop/Github/SpringBlogExam/test_db;AUTO_SERVER=TRUE  #접속 URL
+    username: su
+    password:
+
+    #for camelcase
+  jackson:
+    property-naming-strategy: com.semobook.config.CustomNamingStrategy
+    mapper:
+      use-std-bean-naming: true
+      #jap configuration
+  jpa:
+    open-in-view: false
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update

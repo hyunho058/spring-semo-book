@@ -1,4 +1,4 @@
-package com.semobook.user.service;
+package com.semobook.user.repository;
 
 
 import com.semobook.user.domain.User;
