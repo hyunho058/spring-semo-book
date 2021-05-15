@@ -21,20 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 20210513
  *
  */
-
-@Slf4j
-@RequiredArgsConstructor
-@Tag(name = "Board Controller")
-@RestController
+//
+//@Slf4j
+//@RequiredArgsConstructor
+//@Tag(name = "Board Controller")
+//@RestController
 public class BoardController {
-
-    private final BoardService boardService;
-
-    //create
-    @GetMapping("/")
-    public ResponseEntity<BoardResponse> writeBoard(@Parameter @RequestBody BoardRequest boardRequest){
-        return ResponseEntity.ok(boardService.addBoard(boardRequest));
-    }
+//
+//    private final BoardService boardService;
+//
+//    //create
+//    @GetMapping("/")
+//    public ResponseEntity<BoardResponse> writeBoard(@Parameter @RequestBody BoardRequest boardRequest){
+//        return ResponseEntity.ok(boardService.addBoard(boardRequest));
+//    }
 
     //read One
 
