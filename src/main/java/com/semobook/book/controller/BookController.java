@@ -46,7 +46,7 @@ public class BookController {
     **/
     @Operation(description = "책 조회")
     @GetMapping(value = "/book/{isbn}")
-    public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable Long isbn){
+    public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable String isbn){
         log.info("==/findBook {}", isbn);
         return ResponseEntity.ok(bookService.findBook(isbn));
     }

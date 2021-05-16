@@ -59,7 +59,7 @@ public class BookService {
      * @author khh
      * @since 2021/04/25
      **/
-    public BookResponse findBook(Long isbn) {
+    public BookResponse findBook(String isbn) {
         log.info("TEST================START {}", isbn);
 //        Optional<Book> book = bookRepository.findById(String.valueOf(isbn));
         Book book = bookRepository.findByIsbn(isbn);

@@ -1,4 +1,4 @@
-package com.semobook.recom;
+package com.semobook.recom.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,5 +38,6 @@ public class RecomController {
         return "";
     }
 
+    //유저가 보고싶다고 찜해놓은 책들
 
 }
