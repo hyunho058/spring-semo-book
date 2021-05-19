@@ -1,4 +1,4 @@
-package com.semobook.boardReview.dto;
+package com.semobook.bookReview.dto;
 
 import com.semobook.common.StatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;

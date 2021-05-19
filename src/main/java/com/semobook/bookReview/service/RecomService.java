@@ -1,15 +1,13 @@
-package com.semobook.recom.service;
+package com.semobook.bookReview.service;
 
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class RecomService {
@@ -29,19 +27,18 @@ public class RecomService {
      * @param boardRequest
      */
     public void updateRecom(BookReviewRequest boardRequest) {
-        log.info("updateRecom");
 
-//        //내가 읽은 책의 isbn
-//        String isbn = boardRequest.getBookReview().getIsbn();
-//        //책의 카테고리 가져온다.
-//        Book book = bookRepository.findByIsbn(isbn);
-//        String category = book.getCategory();
-//
-//        if (category != null) {
-//            //카테고리 같은 책들 가져오기
-//            List<Book> recomBookList = bookRepository.findAllByCategory(category);
+        //내가 읽은 책의 isbn
+        String isbn = boardRequest.getBookReview().getIsbn();
+        //책의 카테고리 가져온다.
+        Book book = bookRepository.findByIsbn(isbn);
+        String category = book.getCategory();
+
+        if (category != null) {
+            //카테고리 같은 책들 가져오기
+            List<Book> recomBookList = bookRepository.findAllByCategory(category);
         }
-
+    }
 
 
 

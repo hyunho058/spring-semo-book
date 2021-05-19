@@ -1,17 +1,14 @@
-package com.semobook.boardReview.controller;
+package com.semobook.bookReview.controller;
 
-import com.semobook.boardReview.dto.BookReviewRequest;
-import com.semobook.boardReview.dto.BookReviewResponse;
-import com.semobook.boardReview.service.BookReviewService;
+import com.semobook.bookReview.dto.BookReviewRequest;
+import com.semobook.bookReview.dto.BookReviewResponse;
+import com.semobook.bookReview.service.BookReviewService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 리뷰 crud 컨트롤러
@@ -31,31 +28,29 @@ public class BookReviewController {
     private final BookReviewService boardService;
 
     //create
-    @GetMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<BookReviewResponse> createBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.addBoard(boardRequest));
+        return ResponseEntity.ok(boardService.createReview(boardRequest));
     }
 
-    @GetMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<BookReviewResponse> updateBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.addBoard(boardRequest));
+        return ResponseEntity.ok(boardService.updateReview(boardRequest));
     }
 
-    //
-    @GetMapping("/read")
+    @PostMapping("/read/rating")
+    public ResponseEntity<BookReviewResponse> readRatingBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
+        return ResponseEntity.ok(boardService.readRatingReview(boardRequest));
+    }
+
+    @PostMapping("/read")
     public ResponseEntity<BookReviewResponse> readBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.addBoard(boardRequest));
+        return ResponseEntity.ok(boardService.readReview(boardRequest));
     }
 
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<BookReviewResponse> deleteBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.addBoard(boardRequest));
+        return ResponseEntity.ok(boardService.deleteReview(boardRequest));
     }
 
-
-    //read paging
-
-    //update
-
-    //delete
 }

@@ -14,7 +14,7 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        format_sql: true
+        format_sql: t6+6rue
 logging:
   level:
     org.hibernate.SQL: trace
