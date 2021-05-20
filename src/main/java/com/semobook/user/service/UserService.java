@@ -2,7 +2,7 @@ package com.semobook.user.service;
 
 
 import com.semobook.common.StatusEnum;
-import com.semobook.user.domain.User;
+import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.UserRequest;
 import com.semobook.user.dto.UserResponse;
@@ -30,14 +30,14 @@ public class UserService {
      */
     public UserResponse findByUserId(String userId) {
 
-        User user = userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL);
-        if (user == null) {
+        UserInfo userInfo = userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL);
+        if (userInfo == null) {
             hCode = StatusEnum.hd4444;
             hMessage = "유효하지 않은 회원정보";
         } else {
             hCode = StatusEnum.hd1004;
             hMessage = userId;
-            data = user;
+            data = userInfo;
         }
 
         return UserResponse.builder()
@@ -51,14 +51,14 @@ public class UserService {
     //    //로그인
     public UserResponse signIn(UserRequest userRequest) {
         log.info(":::로그인:::");
-        User signUser = userRepository.findByUserIdAndUserStatus(userRequest.getUserId(), UserStatus.GENERAL);
-        if (signUser == null) {
+        UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userRequest.getUserId(), UserStatus.GENERAL);
+        if (signUserInfo == null) {
             hCode = StatusEnum.hd4444;
             hMessage = "없는 USER";
         }
         //id가 있을 때
 
-        else if (!(userRequest.getUserPassword().equals(signUser.getUserPassword()))) {
+        else if (!(userRequest.getUserPassword().equals(signUserInfo.getUserPw()))) {
             hCode = StatusEnum.hd4444;
             hMessage = "로그인 실패";
             data = null;
@@ -78,11 +78,11 @@ public class UserService {
 
     public UserResponse signUp(UserRequest userRequest) {
 
-        User signUser = userRepository.findByUserId(userRequest.getUserId());
-        if (signUser == null) {
-            User user = userRepository.save(User.builder()
+        UserInfo signUserInfo = userRepository.findByUserId(userRequest.getUserId());
+        if (signUserInfo == null) {
+            UserInfo userInfo = userRepository.save(UserInfo.builder()
                     .userId(userRequest.getUserId())
-                    .userPassword(userRequest.getUserPassword())
+                    .userPw(userRequest.getUserPassword())
                     .userName(userRequest.getUserName())
                     .userGender(userRequest.getUserGender())
                     .userBirth(userRequest.getUserBirth())
@@ -90,7 +90,7 @@ public class UserService {
 
             hMessage = "생성완료";
             hCode = StatusEnum.hd1004;
-            data = user;
+            data = userInfo;
         }
         else{
             hMessage = "이미 있는 아이디";
