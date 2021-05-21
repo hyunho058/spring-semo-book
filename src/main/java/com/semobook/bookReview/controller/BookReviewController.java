@@ -33,6 +33,7 @@ public class BookReviewController {
         return ResponseEntity.ok(boardService.createReview(boardRequest));
     }
 
+    //update
     @PostMapping("/update")
     public ResponseEntity<BookReviewResponse> updateBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
         return ResponseEntity.ok(boardService.updateReview(boardRequest));

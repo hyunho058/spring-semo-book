@@ -13,6 +13,8 @@ import java.util.List;
 public interface BookReviewRepository extends JpaRepository<BookReview,String> {
     //저장
     BookReview save(BookReview board);
+
+    //find
     //내가 쓴 글 보기
     List<BookReview> findAllByUserNo(UserInfo UserNo, Pageable pageable);
     //이 책 리뷰 모두 보기
@@ -21,6 +23,9 @@ public interface BookReviewRepository extends JpaRepository<BookReview,String> {
     List<BookReview> findAllByCreateDateBefore(LocalDateTime createDate, Pageable pageable);
     //삭제
     BookReview deleteBookReviewByReviewNo(long reviewNo);
+
+    BookReview findByReviewNo(long reviewNo);
+
 
 
 }

@@ -3,6 +3,7 @@ package com.semobook.bookReview.domain;
 import com.semobook.user.domain.UserInfo;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.sound.midi.Patch;
@@ -35,6 +36,13 @@ public class BookReview {
      this.createDate = createDate;
      this.declaration = declaration;
 
+    }
+
+    public void changeBookReview(int rating,
+                                 String reviewContents
+    ){
+        this.rating = rating;
+        this.reviewContents = reviewContents;
     }
 
 }

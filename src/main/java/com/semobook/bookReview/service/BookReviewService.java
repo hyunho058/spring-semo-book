@@ -6,11 +6,9 @@ import com.semobook.bookReview.dto.BookReviewResponse;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
-import jdk.vm.ci.meta.Local;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,6 +39,7 @@ public class BookReviewService {
 
         try {
             BookReview bookReview = request.getBookReview();
+
             //글 등록을 하면 바로 redis에 관련 책 저장
             bookReviewRepository.save(BookReview.builder()
                     .userNo(bookReview.getUserNo())
@@ -152,18 +151,16 @@ public class BookReviewService {
 
         try {
             BookReview bookReview = request.getBookReview();
-            //글 등록을 하면 바로 redis에 관련 책 저장
-            bookReviewRepository.save(BookReview.builder()
-                    .userNo(bookReview.getUserNo())
-                    .rating(bookReview.getRating())
-                    .reviewContents(bookReview.getReviewContents())
-                    .createDate(bookReview.getCreateDate())
-                    .declaration(bookReview.getDeclaration())
-                    .build());
+            Long bookReviewNo = bookReview.getReviewNo();
+            BookReview bookReviewUpdate = bookReviewRepository.findByReviewNo(bookReviewNo);
+
+            bookReviewUpdate.changeBookReview(bookReview.getRating(), bookReview.getReviewContents());
+
             //평점  3점 이상이면 recom으로 추천 업뎃치기
             if(bookReview.getRating()>=3){
                 recomService.updateRecom(request);
             }
+
             hCode = StatusEnum.hd1004;
             hMessage = "글 수정완료";
             data = request;
