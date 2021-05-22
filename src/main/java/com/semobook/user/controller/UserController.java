@@ -28,11 +28,18 @@ public class UserController {
         return "user root page";
     }
 
+    //for Test search All Members
+    @Operation(description = "회원조회")
+    @GetMapping(value = "/all")
+    public ResponseEntity<UserResponse> getUserAll() {
+        return ResponseEntity.ok(userService.findAllUser());
+    }
+
+
     //회원조회
     @Operation(description = "회원조회")
-    @GetMapping(value = "/user/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<UserResponse> getUser(@Parameter @PathVariable String id) {
-        log.info("==/getuser {}", id);
         return ResponseEntity.ok(userService.findByUserId(id));
     }
 
@@ -40,7 +47,6 @@ public class UserController {
     @Operation(description = "로그인")
     @PostMapping(value = "/signin")
     public ResponseEntity<UserResponse> signIn(@Parameter @RequestBody UserRequest userRequest) {
-        log.info("==/signin : userRequest : id{} pw{}==", userRequest.getUserId(), userRequest.getUserPassword());
         return ResponseEntity.ok(userService.signIn(userRequest));
     }
 
@@ -48,7 +54,6 @@ public class UserController {
     @Operation(description = "회원가입")
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signUp(@Parameter @RequestBody UserRequest userRequest) {
-        log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", userRequest.getUserId(), userRequest.getUserPassword(), userRequest.getUserName());
         return ResponseEntity.ok(userService.signUp(userRequest));
     }
 
