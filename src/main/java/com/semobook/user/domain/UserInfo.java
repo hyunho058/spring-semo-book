@@ -33,9 +33,6 @@ public class UserInfo {
 
     private LocalDateTime lastConnection;
 
-    @OneToMany(mappedBy = "userNo")
-    private List<BookReview> bookReviews;
-
 
     @Builder
     public UserInfo(String userId, String userPw, String userName, String userGender, String userBirth, LocalDateTime lastConnection) {

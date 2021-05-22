@@ -11,16 +11,47 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 
+/**
+*
+*
+* @author hjjung
+* @since 2021-05-21
+**/
 public class UserService {
     String hMessage;
     StatusEnum hCode;
     Object data;
 
     private final UserRepository userRepository;
+
+    /**
+     * fild All User Id for Test
+     * @return
+     */
+    public UserResponse findAllUser() {
+
+        try {
+
+            List<UserInfo> list = userRepository.findAll();
+            data = list;
+
+        }catch (Exception e){
+            log.info(":: findAllUserId err :: {}" , e);
+        }
+
+        return UserResponse.builder()
+                .data(data)
+                .hcode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
+
 
     /**
      * 회원 조회

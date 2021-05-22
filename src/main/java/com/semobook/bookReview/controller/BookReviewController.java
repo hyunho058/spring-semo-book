@@ -45,8 +45,14 @@ public class BookReviewController {
     }
 
     @PostMapping("/read")
-    public ResponseEntity<BookReviewResponse> readBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
+    public ResponseEntity<BookReviewResponse> AllBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
         return ResponseEntity.ok(boardService.readReview(boardRequest));
+    }
+
+
+    @GetMapping("/all")
+    public ResponseEntity<BookReviewResponse> readBookReview(){
+        return ResponseEntity.ok(boardService.readReviewAll());
     }
 
     @PostMapping("/delete")

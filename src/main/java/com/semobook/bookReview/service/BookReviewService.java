@@ -84,8 +84,35 @@ public class BookReviewService {
 
         try {
             BookReview bookReview = request.getBookReview();
-            List<BookReview> bookReviewList = bookReviewRepository.findAllByUserNo(bookReview.getUserNo(),
-                    PageRequest.of(request.getStartPage(),request.getEndPage()));
+            List<BookReview> bookReviewList = bookReviewRepository.findAll();
+            log.info("bookReviewList : {}",bookReviewList.toString());
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "가져오기";
+            data = bookReviewList;
+
+        }catch (Exception e){
+            log.error("createReview err :: error msg : {}",e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "readReview 에러";
+            data = null;
+
+        }
+
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+        }
+
+
+        //모든 글
+    public BookReviewResponse readReviewAll() {
+        log.info("showReview");
+
+        try {
+            List<BookReview> bookReviewList = bookReviewRepository.findAll();
             log.info("bookReviewList : {}",bookReviewList.toString());
 
             hCode = StatusEnum.hd1004;

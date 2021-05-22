@@ -26,6 +26,8 @@ public interface BookReviewRepository extends JpaRepository<BookReview,String> {
 
     BookReview findByReviewNo(long reviewNo);
 
+    List<BookReview> findAll();
+
 
 
 }

@@ -6,8 +6,12 @@ import com.semobook.user.domain.UserStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface UserRepository extends CrudRepository<UserInfo, String> {
+public interface UserRepository extends CrudRepository<UserInfo, Long> {
+
+    List<UserInfo> findAll();
 
     //회원 조회 (휴먼, 정지, 탈퇴 제외)
     UserInfo findByUserIdAndUserStatus(String userId, Enum<UserStatus> status);
