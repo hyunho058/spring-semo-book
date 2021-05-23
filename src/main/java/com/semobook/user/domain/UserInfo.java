@@ -1,7 +1,9 @@
 package com.semobook.user.domain;
 
-import com.semobook.bookReview.domain.BookReview;
-import lombok.*;
+import com.semobook.user.dto.UserChangeUserInfoRequest;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -39,6 +41,10 @@ public class UserInfo {
 
 
 
+    private String deleteReason;
+
+    private LocalDateTime delDate;
+
 
     @Builder
     public UserInfo(String userId, String userPw, String userName, String userGender, String userBirth, LocalDateTime lastConnection) {
@@ -50,5 +56,23 @@ public class UserInfo {
         this.userStatus = UserStatus.GENERAL;
         this.lastConnection = lastConnection;
     }
+
+    public void changeUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void delUser(String deleteReason, LocalDateTime delDate) {
+        this.userStatus = UserStatus.DELETE;
+        this.deleteReason = deleteReason;
+        this.delDate = delDate;
+    }
+
+    public void changeUserInfo(UserChangeUserInfoRequest userInfo) {
+        this.userPw = userInfo.getUserPassword();
+        this.userName = userInfo.getUserName();
+        this.userGender = userInfo.getUserGender();
+        this.userBirth = userInfo.getUserBirth();
+    }
+
 
 }

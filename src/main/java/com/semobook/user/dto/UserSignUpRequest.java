@@ -7,9 +7,8 @@ import lombok.Setter;
 
 
 @Getter
-@Setter
 @NoArgsConstructor
-public class UserRequest {
+public class UserSignUpRequest {
     @Schema(description = "유저아이디" , example = "0")
     String userId;
     @Schema(description = "유저패스워드" , example = "0")
