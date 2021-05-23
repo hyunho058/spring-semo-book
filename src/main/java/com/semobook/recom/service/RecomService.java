@@ -47,17 +47,22 @@ public class RecomService {
      * @param boardRequest
      */
     public void updateRecom(BookReviewRequest boardRequest) {
-
-        //내가 읽은 책의 isbn
-        String isbn = boardRequest.getBookReview().getIsbn();
-        //책의 카테고리 가져온다.
-        Book book = bookRepository.findByIsbn(isbn);
-        String category = book.getCategory();
-
-        if (category != null) {
-            //카테고리 같은 책들 가져오기
-            List<Book> recomBookList = bookRepository.findAllByCategory(category);
-        }
+        /**
+        * Book <-> BookReview 연관관계 변경하면서 ISBN값(FK) 가져오는 부분 수정해야해서 주석처리 하였습니다.
+        *
+        * @author hyunho
+        * @since 2021/05/23
+        **/
+//        //내가 읽은 책의 isbn
+//        String isbn = boardRequest.getBookReview().getIsbn();
+//        //책의 카테고리 가져온다.
+//        Book book = bookRepository.findByIsbn(isbn);
+//        String category = book.getCategory();
+//
+//        if (category != null) {
+//            //카테고리 같은 책들 가져오기
+//            List<Book> recomBookList = bookRepository.findAllByCategory(category);
+//        }
     }
 
 

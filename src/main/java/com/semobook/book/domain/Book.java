@@ -1,8 +1,11 @@
 package com.semobook.book.domain;
 
+import com.semobook.bookReview.domain.BookReview;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +35,9 @@ public class Book {
 
     @Column(name = "BOOK_IMAGE")
     private String img;
+
+    @OneToMany(mappedBy = "book")
+    private List<BookReview> bookReviewList = new ArrayList<>();
 
     @Builder
     public Book(Long isbn, String bookName, String author, String publisher, String kdc, String category, String keyword, String img) {
