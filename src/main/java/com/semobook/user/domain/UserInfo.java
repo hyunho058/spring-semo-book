@@ -1,5 +1,6 @@
 package com.semobook.user.domain;
 
+import com.semobook.bookReview.domain.BookReview;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
 import lombok.Builder;
 import lombok.Getter;
