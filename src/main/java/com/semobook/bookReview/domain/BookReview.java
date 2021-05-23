@@ -1,11 +1,10 @@
 package com.semobook.bookReview.domain;
 
+import com.semobook.user.domain.UserInfo;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,18 +15,23 @@ public class BookReview {
     private long reviewNo;
     private String isbn;
 
-    private long userNo;
-
     private int rating;
     private String reviewContents;
     private LocalDateTime createDate;
     private int declaration;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_no")
+    private UserInfo userInfo;
+
+    protected BookReview(){
+
+    }
+
     @Builder
-    public BookReview(String isbn, long userNo, int rating,
+    public BookReview(String isbn,  int rating,
                       String reviewContents, LocalDateTime createDate, int declaration){
      this.isbn = isbn;
-     this.userNo = userNo;
      this.rating = rating;
      this.reviewContents = reviewContents;
      this.createDate = createDate;

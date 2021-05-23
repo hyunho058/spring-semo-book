@@ -42,7 +42,6 @@ public class BookReviewService {
 
             //글 등록을 하면 바로 redis에 관련 책 저장
             bookReviewRepository.save(BookReview.builder()
-                    .userNo(bookReview.getUserNo())
                     .rating(bookReview.getRating())
                     .reviewContents(bookReview.getReviewContents())
                     .createDate(bookReview.getCreateDate())

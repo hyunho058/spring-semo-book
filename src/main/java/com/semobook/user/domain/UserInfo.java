@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,11 @@ public class UserInfo {
     private String userBirth;
 
     private LocalDateTime lastConnection;
+
+    @OneToMany(mappedBy = "userInfo")
+    private List<BookReview> bookReviews = new ArrayList<>();
+
+
 
 
     @Builder

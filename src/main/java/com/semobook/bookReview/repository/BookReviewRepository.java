@@ -16,9 +16,10 @@ public interface BookReviewRepository extends JpaRepository<BookReview,String> {
 
     //find
     //내가 쓴 글 보기
-    List<BookReview> findAllByUserNo(UserInfo UserNo, Pageable pageable);
+//    List<BookReview> findAllByUserNo(UserInfo userNo, Pageable pageable);
+    List<BookReview> findAllByUserInfo(UserInfo userInfo, Pageable pageable);
     //이 책 리뷰 모두 보기
-    List<BookReview> findAllByIsbn(String Isbn, Pageable pageable);
+    List<BookReview> findAllByIsbn(String isbn, Pageable pageable);
 //    //모든 리뷰 보기
     List<BookReview> findAllByCreateDateBefore(LocalDateTime createDate, Pageable pageable);
     //삭제
