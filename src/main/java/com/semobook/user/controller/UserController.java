@@ -1,7 +1,6 @@
 package com.semobook.user.controller;
 
-import com.semobook.user.dto.UserRequest;
-import com.semobook.user.dto.UserResponse;
+import com.semobook.user.dto.*;
 import com.semobook.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,63 +21,50 @@ public class UserController {
     private final
     UserService userService;
 
-
-    @GetMapping(value = "/")
-    public String userrootpage() {
-        return "user root page";
-    }
-
-    //for Test search All Members
-    @Operation(description = "회원조회")
+    //모든 회원 조회
+    @Operation(description = "모든 회원조회")
     @GetMapping(value = "/all")
     public ResponseEntity<UserResponse> getUserAll() {
         return ResponseEntity.ok(userService.findAllUser());
     }
 
 
-    //회원조회
+    //id로 회원조회
     @Operation(description = "회원조회")
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserResponse> getUser(@Parameter @PathVariable String id) {
+    public ResponseEntity<UserResponse> getUserByUserId(@Parameter @PathVariable String id) {
         return ResponseEntity.ok(userService.findByUserId(id));
     }
 
     //로그인
     @Operation(description = "로그인")
     @PostMapping(value = "/signin")
-    public ResponseEntity<UserResponse> signIn(@Parameter @RequestBody UserRequest userRequest) {
-        return ResponseEntity.ok(userService.signIn(userRequest));
+    public ResponseEntity<UserResponse> signInCon(@Parameter @RequestBody UserSignInRequest userSignInRequest) {
+        return ResponseEntity.ok(userService.signIn(userSignInRequest));
     }
 
-    //    //회원가입
+    //회원가입
     @Operation(description = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signUp(@Parameter @RequestBody UserRequest userRequest) {
-        return ResponseEntity.ok(userService.signUp(userRequest));
+    public ResponseEntity<UserResponse> signUpCon(@Parameter @RequestBody UserSignUpRequest userSignUpRequest) {
+        return ResponseEntity.ok(userService.signUp(userSignUpRequest));
     }
 
-    //jiratest
-//
-//    //회원탈퇴
-//    @ApiOperation(value = "회원상태변경")
-//    @PostMapping("/withdraw")
-//    public ResponseEntity<UserResponse> deleteUser(@RequestBody UserRequest userRequest) {
-//        log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", userRequest.getUserId(), userRequest.getUserPassword(), userRequest.getUserName());
-//        return ResponseEntity.ok(userService.deleteUser(userRequest));
-//    }
-//
-//
-//    private void chkValidation(UserRequest request) {
-//
-//        if (request.getUserId() == null) {
-//            /**
-//             * TODO :
-//             *  실패메시지 보내고 빈값 return하기
-//             *  controller들 보내기 전에 chkValidation 하고 서비스 보내기
-//             */
-//            return;
-//        }
-//
-//    }
+    //회원탈퇴
+    @Operation(description = "회원탈퇴")
+    @PostMapping("/delete")
+    public ResponseEntity<UserResponse> deleteUserCon(@Parameter @RequestBody UserDeleteRequest userDeleteRequest) {
+        return ResponseEntity.ok(userService.deleteUser(userDeleteRequest));
+    }
+
+    //회원정보 수정
+    @Operation(description = "회원정보수정")
+    @PostMapping("/update")
+    public ResponseEntity<UserResponse> updateUserCon(@Parameter @RequestBody UserChangeUserInfoRequest updateUser) {
+        return ResponseEntity.ok(userService.updateUser(updateUser));
+    }
+
+
+
 
 }
