@@ -1,6 +1,7 @@
 package com.semobook.book.service;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookDeleteRequest;
 import com.semobook.book.dto.BookRequest;
 import com.semobook.book.dto.BookResponse;
 import com.semobook.book.repository.BookRepository;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +86,32 @@ public class BookService {
                 .data(books)
                 .hCode(hCode)
                 .hMessage(hMessage)
+                .build();
+    }
+
+
+    /**
+     * delete book
+     *
+     * @author hyunho
+     * @since 2021/05/26
+    **/
+    @Transactional
+    public BookResponse deleteBook(String isbn){
+        try {
+            log.info(":: deleteBook  :: book is {}", isbn);
+            bookRepository.deleteBookByIsbn(isbn);
+            hCode = StatusEnum.hd1004;
+            hMessage = "삭제 성공";
+        }catch (Exception e){
+            log.info(":: deleteBook err :: error is {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "삭제 실패";
+        }
+        return BookResponse.builder()
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .data(data)
                 .build();
     }
 }

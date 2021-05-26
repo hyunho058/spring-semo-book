@@ -1,6 +1,7 @@
 package com.semobook.book.controller;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookDeleteRequest;
 import com.semobook.book.dto.BookRequest;
 import com.semobook.book.dto.BookResponse;
 import com.semobook.book.service.BookService;
@@ -38,6 +39,14 @@ public class BookController {
         return ResponseEntity.ok(bookService.addBook(bookRequest));
     }
 
+
+    @Operation(description = "도서 삭제")
+    @PostMapping("/delete")
+    public ResponseEntity<BookResponse> deleteBookCon(@Parameter @RequestParam String isbn){
+        log.info(":: deleteBookCon  :: isbn is {}", isbn);
+        return ResponseEntity.ok(bookService.deleteBook(isbn));
+    }
+
     /**
      * 책 검색
      *
@@ -64,4 +73,7 @@ public class BookController {
         //TODO:패이지 처리
         return ResponseEntity.ok(bookService.findAll());
     }
+
+
+
 }

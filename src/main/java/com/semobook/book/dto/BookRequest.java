@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BookRequest {
     @Schema(description = "책 고유번호" , example = "111111")
-    Long isbn;
+    String isbn;
     @Schema(description = "첵 이름", example = "세모책")
     String bookName;
     @Schema(description = "저자",example = "세모")
