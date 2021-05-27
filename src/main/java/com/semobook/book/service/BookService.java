@@ -18,6 +18,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookService {
     String hMessage;
     StatusEnum hCode;
@@ -62,12 +63,25 @@ public class BookService {
      * @since 2021/04/25
      **/
     public BookResponse findBook(String isbn) {
-        log.info("TEST================START {}", isbn);
+        log.info(":: findBook  :: book is {}", isbn);
 //        Optional<Book> book = bookRepository.findById(String.valueOf(isbn));
-        Book book = bookRepository.findByIsbn(isbn);
-        log.info("TEST================END {}",book);
+        try {
+            Book book = bookRepository.findByIsbn(isbn);
+            if (book == null){
+                hCode = StatusEnum.hd4444;
+                hMessage = "검색된 도서가 없습니다.";
+            }else {
+                data = book;
+                hCode = StatusEnum.hd1004;
+                hMessage = "도서 조회 성공";
+            }
+        }catch (Exception e){
+            log.info(":: deleteBook err :: error is {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "검색 실패";
+        }
         return BookResponse.builder()
-                .data(book)
+                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
