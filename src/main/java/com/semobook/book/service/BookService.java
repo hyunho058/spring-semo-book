@@ -32,22 +32,28 @@ public class BookService {
      *
      * @author khh
      * @since 2021/04/25
-    **/
+     **/
     public BookResponse addBook(BookRequest bookRequest) {
-        Book book = bookRepository.save(Book.builder()
-                .isbn(bookRequest.getIsbn())
-                .bookName(bookRequest.getBookName())
-                .author(bookRequest.getAuthor())
-                .publisher(bookRequest.getPublisher())
-                .kdc(bookRequest.getKdc())
-                .category(bookRequest.getCategory())
-                .keyword(bookRequest.getKeyword())
-                .img(bookRequest.getImg())
-                .build());
+        try {
+            Book book = bookRepository.save(Book.builder()
+                    .isbn(bookRequest.getIsbn())
+                    .bookName(bookRequest.getBookName())
+                    .author(bookRequest.getAuthor())
+                    .publisher(bookRequest.getPublisher())
+                    .kdc(bookRequest.getKdc())
+                    .category(bookRequest.getCategory())
+                    .keyword(bookRequest.getKeyword())
+                    .img(bookRequest.getImg())
+                    .build());
 
-        hMessage = "생성완료";
-        hCode = StatusEnum.hd1004;
-        data = book;
+            hMessage = "생성완료";
+            hCode = StatusEnum.hd1004;
+            data = book;
+        } catch (Exception e) {
+            log.info(":: addBook err :: error is {}", e);
+            hMessage = "책 저장 실패";
+            hCode = StatusEnum.hd1004;
+        }
 
         return BookResponse.builder()
                 .hCode(hCode)
@@ -67,15 +73,15 @@ public class BookService {
 //        Optional<Book> book = bookRepository.findById(String.valueOf(isbn));
         try {
             Book book = bookRepository.findByIsbn(isbn);
-            if (book == null){
+            if (book == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "검색된 도서가 없습니다.";
-            }else {
+            } else {
                 data = book;
                 hCode = StatusEnum.hd1004;
                 hMessage = "도서 조회 성공";
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info(":: deleteBook err :: error is {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "검색 실패";
@@ -93,8 +99,8 @@ public class BookService {
      *
      * @author khh
      * @since 2021/04/25
-    **/
-    public BookResponse findAll(){
+     **/
+    public BookResponse findAll() {
         Iterable<Book> books = bookRepository.findAll();
         return BookResponse.builder()
                 .data(books)
@@ -109,15 +115,15 @@ public class BookService {
      *
      * @author hyunho
      * @since 2021/05/26
-    **/
+     **/
     @Transactional
-    public BookResponse deleteBook(String isbn){
+    public BookResponse deleteBook(String isbn) {
         try {
             log.info(":: deleteBook  :: book is {}", isbn);
             bookRepository.deleteBookByIsbn(isbn);
             hCode = StatusEnum.hd1004;
             hMessage = "삭제 성공";
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info(":: deleteBook err :: error is {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "삭제 실패";

@@ -40,6 +40,12 @@ public class BookController {
     }
 
 
+    /**
+     * delete book
+     *
+     * @author hyunho
+     * @since 2021/05/27
+    **/
     @Operation(description = "도서 삭제")
     @PostMapping("/delete")
     public ResponseEntity<BookResponse> deleteBookCon(@Parameter @RequestParam String isbn){
