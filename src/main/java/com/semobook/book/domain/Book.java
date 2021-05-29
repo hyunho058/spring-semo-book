@@ -13,7 +13,7 @@ import java.util.List;
 public class Book {
     @Id
     @Column(name = "ISBN")
-    private Long isbn;
+    private String isbn;
 
     @Column(name = "BOOK_NAME")
     private String bookName;
@@ -40,7 +40,7 @@ public class Book {
     private List<BookReview> bookReviewList = new ArrayList<>();
 
     @Builder
-    public Book(Long isbn, String bookName, String author, String publisher, String kdc, String category, String keyword, String img) {
+    public Book(String isbn, String bookName, String author, String publisher, String kdc, String category, String keyword, String img) {
         this.isbn = isbn;
         this.bookName = bookName;
         this.author = author;
