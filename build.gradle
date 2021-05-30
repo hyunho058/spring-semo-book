@@ -42,7 +42,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.7'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
-
+    compile('org.springframework.boot:spring-boot-starter-data-redis')
 }
 
 
