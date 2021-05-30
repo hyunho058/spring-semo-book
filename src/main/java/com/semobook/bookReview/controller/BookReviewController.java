@@ -2,6 +2,8 @@ package com.semobook.bookReview.controller;
 
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.dto.BookReviewResponse;
+import com.semobook.bookReview.dto.BookSearchRequest;
+import com.semobook.bookReview.dto.BookUpdateRequest;
 import com.semobook.bookReview.service.BookReviewService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,13 +37,13 @@ public class BookReviewController {
 
     //update
     @PostMapping("/update")
-    public ResponseEntity<BookReviewResponse> updateBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.updateReview(boardRequest));
+    public ResponseEntity<BookReviewResponse> updateBookReview(@Parameter @RequestBody BookUpdateRequest request){
+        return ResponseEntity.ok(boardService.updateReview(request));
     }
 
     @PostMapping("/read/rating")
-    public ResponseEntity<BookReviewResponse> readRatingBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.readRatingReview(boardRequest));
+    public ResponseEntity<BookReviewResponse> readRatingBookReview(@Parameter @RequestBody BookSearchRequest request){
+        return ResponseEntity.ok(boardService.readRatingReview(request));
     }
 
     @PostMapping("/read")
@@ -56,8 +58,10 @@ public class BookReviewController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<BookReviewResponse> deleteBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.deleteReview(boardRequest));
+    public ResponseEntity<BookReviewResponse> deleteBookReview(@Parameter @RequestBody long reviewNo){
+        return ResponseEntity.ok(boardService.deleteReview(reviewNo));
     }
+
+    // TODO: 2021-05-29 신고하기 기능 추가 필요
 
 }

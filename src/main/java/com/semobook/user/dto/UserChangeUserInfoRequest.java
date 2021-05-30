@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserChangeUserInfoRequest {
     @Schema(description = "유저No" , example = "12")
-    String userNo;
+    long userNo;
     @Schema(description = "유저패스워드" , example = "0")
     String userPassword;
     @Schema(description = "유저이름" , example = "0")

@@ -18,9 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class UserService {
-    String hMessage;
-    StatusEnum hCode;
-    Object data;
+
 
     private final UserRepository userRepository;
 
@@ -30,6 +28,9 @@ public class UserService {
 * @since 2021-05-23
 **/
     public UserResponse findAllUser() {
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data= null;
         try {
             List<UserInfo> list = userRepository.findAll();
             data = list;
@@ -52,6 +53,9 @@ public class UserService {
 * @since 2021-05-23
 **/
     public UserResponse findByUserId(String userId) {
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data= null;
 
         try {
             UserInfo userInfo = userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL);
@@ -83,6 +87,9 @@ public class UserService {
 * @since 2021-05-23
 **/
     public UserResponse signIn(UserSignInRequest userSignUpRequest) {
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data= null;
         try {
             UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
             if (signUserInfo == null) {
@@ -97,6 +104,7 @@ public class UserService {
                 data = null;
             } else {
                 hCode = StatusEnum.hd1004;
+                data = signUserInfo;
                 hMessage = "로그인 성공";
             }
         }
@@ -120,7 +128,9 @@ public class UserService {
     * @since 2021-05-23
     **/
     public UserResponse signUp(UserSignUpRequest userSignUpRequest) {
-
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data= null;
         UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
         if (signUserInfo == null) {
             UserInfo userInfo = userRepository.save(UserInfo.builder()
@@ -155,7 +165,9 @@ public class UserService {
     * @since 2021-05-23
     **/
     public UserResponse deleteUser(UserDeleteRequest userDeleteRequest) {
-
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data= null;
         try {
             //기존 유저
             UserInfo user = userRepository.findByUserNoAndUserStatus(userDeleteRequest.getUserNo(), UserStatus.GENERAL);
@@ -167,6 +179,7 @@ public class UserService {
                 user.delUser(userDeleteRequest.getDeleteReason(), LocalDateTime.now());
                 userRepository.save(user);
                 hCode = StatusEnum.hd1004;
+                data = user;
                 hMessage = "탈퇴 성공";
             }
 
@@ -189,26 +202,28 @@ public class UserService {
     * @since 2021-05-23
     **/
     public UserResponse updateUser(UserChangeUserInfoRequest updateUser) {
-
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data= null;
         try {
             //기존 유저
-            UserInfo beforeUser = userRepository.findByUserIdAndUserStatus(updateUser.getUserNo(), UserStatus.GENERAL);
+            UserInfo beforeUser = userRepository.findByUserNoAndUserStatus(updateUser.getUserNo(), UserStatus.GENERAL);
 
-            if (beforeUser == null) {
+             if (beforeUser == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "조회되는 회원이 없음";
             } else {
-                beforeUser.changeUserStatus(UserStatus.DELETE);
                 beforeUser.changeUserInfo(updateUser);
                 userRepository.save(beforeUser);
                 hCode = StatusEnum.hd1004;
-                hMessage = "탈퇴 성공";
+                data = beforeUser;
+                hMessage = "정보 수정 성공";
             }
 
         } catch (Exception e) {
-            log.info(":: deleteUser err :: error is {} ", e);
+            log.info(":: updateUser err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
-            hMessage = "탈퇴 실패";
+            hMessage = "정보 수정 실패";
         }
         return UserResponse.builder()
                 .hcode(hCode)
