@@ -3,6 +3,7 @@ package com.semobook.bookReview.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookReview.domain.BookReviewDto;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.dto.BookReviewResponse;
 import com.semobook.bookReview.dto.BookSearchRequest;
@@ -11,6 +12,7 @@ import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class BookReviewService {
     private final BookReviewRepository bookReviewRepository;
     private final RecomService recomService;
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
 
     //글 등록
@@ -50,23 +53,38 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
-            Book reviewBook = bookRepository.findByIsbn(request.getIsbn());
-
-            bookReviewRepository.save(BookReview.builder()
-                    .book(reviewBook)
-                    .rating(request.getRating())
-                    .reviewContents(request.getReviewContents())
-                    .createDate(LocalDateTime.now())
-                    .declaration(0)
-                    .build());
-            //평점  3점 이상이면 recom으로 추천 업뎃치기
-            if (request.getRating() >= 3) {
-                recomService.updateRecom(request.getIsbn());
+            Book resultBook = bookRepository.findByIsbn(request.getIsbn());
+            log.info("createReview :: resultBook is {}", resultBook.getBookName());
+            UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+            log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
+            if (resultBook != null && resultUserInfo != null){
+                bookReviewRepository.save(BookReview.builder()
+                        .rating(request.getRating())
+                        .reviewContents(request.getReviewContents())
+                        .createDate(LocalDateTime.now())
+                        .declaration(0)
+                        .book(resultBook)
+                        .userInfo(resultUserInfo)
+                        .build());
+                //평점  3점 이상이면 recom으로 추천 업뎃치기
+                if (request.getRating() >= 3) {
+                    recomService.updateRecom(request.getIsbn());
+                }
+                hCode = StatusEnum.hd1004;
+                hMessage = "저장완료";
+                data = request;
+            }else {
+                hCode = StatusEnum.hd4444;
+                hMessage = "저장실패";
+                data = null;
             }
-            hCode = StatusEnum.hd1004;
-            hMessage = "저장완료";
-            data = request;
-
+//            bookReviewRepository.save(BookReview.builder()
+//                    .book(reviewBook)
+//                    .rating(request.getRating())
+//                    .reviewContents(request.getReviewContents())
+//                    .createDate(LocalDateTime.now())
+//                    .declaration(0)
+//                    .build());
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
@@ -124,13 +142,14 @@ public class BookReviewService {
 
 
     //모든 글
+
     /**
      * 모든 글
      * reference - https://www.inflearn.com/questions/14559
      *
      * @author hyejinzz, hyunho
      * @since 2021/05/30
-    **/
+     **/
     public BookReviewResponse readReviewAll() {
         log.info("showReview");
         String hMessage = null;
@@ -139,11 +158,14 @@ public class BookReviewService {
 
         try {
             List<BookReview> bookReviewList = bookReviewRepository.findAll();
-            log.info("bookReviewList : {}", bookReviewList.toString());
+            List<BookReviewDto> result = bookReviewList.stream()
+                    .map(r -> new BookReviewDto(r))
+                    .collect(Collectors.toList());
+            log.info("bookReviewList : {}", result.toString());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = bookReviewList;
+            data = result;
 
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
@@ -160,24 +182,24 @@ public class BookReviewService {
                 .build();
     }
 
-    @Data
-    static class BookReviewDto{
-        private int rating;
-        private String reviewContents;
-        private LocalDateTime createDate;
-        private int declaration;
-        private Book book;
-        private UserInfo userInfo;
-
-        public BookReviewDto(BookReview bookReview){
-            rating = bookReview.getRating();
-            reviewContents = bookReview.getReviewContents();
-            createDate = bookReview.getCreateDate();
-            declaration = bookReview.getDeclaration();
-            book = bookReview.getBook();
-            userInfo = bookReview.getUserInfo();
-        }
-    }
+//    @Data
+//    static class BookReviewDto {
+//        private int rating;
+//        private String reviewContents;
+//        private LocalDateTime createDate;
+//        private int declaration;
+//        private Book book;
+//        private UserInfo userInfo;
+//
+//        public BookReviewDto(BookReview bookReview) {
+//            rating = bookReview.getRating();
+//            reviewContents = bookReview.getReviewContents();
+//            createDate = bookReview.getCreateDate();
+//            declaration = bookReview.getDeclaration();
+//            book = bookReview.getBook();
+//            userInfo = bookReview.getUserInfo();
+//        }
+//    }
 
     /**
      * TODO
