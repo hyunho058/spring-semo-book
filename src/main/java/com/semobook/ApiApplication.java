@@ -12,9 +12,9 @@ public class ApiApplication {
         SpringApplication.run(ApiApplication.class, args);
     }
 
-    @Bean
-    Hibernate5Module hibernate5Module(){
-        Hibernate5Module hibernate5Module = new Hibernate5Module();
-        return hibernate5Module;
-    }
+//    @Bean
+//    Hibernate5Module hibernate5Module(){
+//        Hibernate5Module hibernate5Module = new Hibernate5Module();
+//        return hibernate5Module;
+//    }
 }
