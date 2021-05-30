@@ -102,6 +102,7 @@ public class BookService {
      **/
     public BookResponse findAll() {
         Iterable<Book> books = bookRepository.findAll();
+
         return BookResponse.builder()
                 .data(books)
                 .hCode(hCode)

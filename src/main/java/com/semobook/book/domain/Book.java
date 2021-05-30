@@ -36,7 +36,7 @@ public class Book {
     @Column(name = "BOOK_IMAGE")
     private String img;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "book")
     private List<BookReview> bookReviewList = new ArrayList<>();
 
     @Builder
