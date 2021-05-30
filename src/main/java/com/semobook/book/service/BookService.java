@@ -6,6 +6,8 @@ import com.semobook.book.dto.BookRequest;
 import com.semobook.book.dto.BookResponse;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.common.StatusEnum;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -73,6 +75,7 @@ public class BookService {
 //        Optional<Book> book = bookRepository.findById(String.valueOf(isbn));
         try {
             Book book = bookRepository.findByIsbn(isbn);
+
             if (book == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "검색된 도서가 없습니다.";

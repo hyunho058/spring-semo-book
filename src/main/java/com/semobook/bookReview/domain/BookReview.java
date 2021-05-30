@@ -2,6 +2,7 @@ package com.semobook.bookReview.domain;
 
 import com.semobook.book.domain.Book;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.domain.UserStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,10 @@ public class BookReview {
     private LocalDateTime createDate;
     private int declaration;
 
+    //NORMAl, BLIND
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no")
     private UserInfo userInfo;
@@ -32,12 +37,13 @@ public class BookReview {
 
 
     @Builder
-    public BookReview(Book book, int rating, String reviewContents, LocalDateTime createDate, int declaration) {
-        this.book = book;
+    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration, Book book, UserInfo userInfo) {
         this.rating = rating;
         this.reviewContents = reviewContents;
         this.createDate = createDate;
         this.declaration = declaration;
+        this.book = book;
+        this.userInfo = userInfo;
 
     }
 

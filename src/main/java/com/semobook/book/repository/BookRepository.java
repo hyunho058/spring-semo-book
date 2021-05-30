@@ -11,11 +11,13 @@ import java.util.List;
 @Repository
 //@Transactional(readOnly = true)
 public interface BookRepository extends CrudRepository<Book, String> {
+
+    @Query("select b from Book b join fetch b.bookReviewList")
     Book findByIsbn(String isbn);
+
     List<Book> findAllByCategory(String category);
 
     int deleteBookByIsbn (String isbn);
-
 
 //    @Query("select b from Book b join fetch b.bookReviewList")
     @Query("select b from Book b join fetch b.bookReviewList")

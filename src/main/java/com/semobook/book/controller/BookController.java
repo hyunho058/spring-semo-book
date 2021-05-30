@@ -73,13 +73,10 @@ public class BookController {
      * @since 2021/04/25
     **/
     @Operation(description = "모든 책 조회")
-    @GetMapping("/books")
+    @GetMapping("/v1/books")
     public ResponseEntity<BookResponse> findAll(){
         log.info("==/findAll");
-        //TODO:패이지 처리
+        //TODO[hyunho]:패이지 처리
         return ResponseEntity.ok(bookService.findAll());
     }
-
-
-
 }

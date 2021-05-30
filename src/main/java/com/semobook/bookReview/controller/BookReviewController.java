@@ -47,8 +47,8 @@ public class BookReviewController {
     }
 
     @PostMapping("/read")
-    public ResponseEntity<BookReviewResponse> AllBookReview(@Parameter @RequestBody BookReviewRequest boardRequest){
-        return ResponseEntity.ok(boardService.readReview(boardRequest));
+    public ResponseEntity<BookReviewResponse> AllBookReview(@Parameter @RequestBody BookSearchRequest boardRequest){
+        return ResponseEntity.ok(boardService.readMyReview(boardRequest));
     }
 
 
