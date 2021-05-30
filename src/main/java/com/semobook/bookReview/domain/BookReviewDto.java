@@ -12,7 +12,8 @@ public class BookReviewDto {
     private String reviewContents;
     private LocalDateTime createDate;
     private int declaration;
-//    private Book book;
+    private String isbn;
+    private String userName;
 //    private UserInfo userInfo;
 
     public BookReviewDto(BookReview bookReview) {
@@ -20,6 +21,8 @@ public class BookReviewDto {
         reviewContents = bookReview.getReviewContents();
         createDate = bookReview.getCreateDate();
         declaration = bookReview.getDeclaration();
+        isbn = bookReview.getBook().getIsbn();
+        userName = bookReview.getUserInfo().getUserName();
 //        book = bookReview.getBook();
 //        userInfo = bookReview.getUserInfo();
     }
