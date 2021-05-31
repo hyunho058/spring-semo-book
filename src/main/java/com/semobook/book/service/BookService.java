@@ -2,6 +2,7 @@ package com.semobook.book.service;
 
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookDeleteRequest;
+import com.semobook.book.dto.BookListDto;
 import com.semobook.book.dto.BookRequest;
 import com.semobook.book.dto.BookResponse;
 import com.semobook.book.repository.BookRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -104,10 +106,13 @@ public class BookService {
      * @since 2021/04/25
      **/
     public BookResponse findAll() {
-        Iterable<Book> books = bookRepository.findAll();
+        List<Book> books = bookRepository.findAll();
+        List<BookListDto> result = books.stream()
+                .map(b -> new BookListDto(b))
+                .collect(Collectors.toList());
 
         return BookResponse.builder()
-                .data(books)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();

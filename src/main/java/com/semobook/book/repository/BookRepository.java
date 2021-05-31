@@ -20,7 +20,6 @@ public interface BookRepository extends CrudRepository<Book, String> {
     int deleteBookByIsbn (String isbn);
 
 //    @Query("select b from Book b join fetch b.bookReviewList")
-    @Query("select b from Book b join fetch b.bookReviewList")
     List<Book> findAll();
 
 
