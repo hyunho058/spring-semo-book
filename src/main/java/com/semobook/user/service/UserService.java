@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,18 +23,22 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-/**
-* 모든회원 조회(테스트용)
-* @author hyejinzz
-* @since 2021-05-23
-**/
+    /**
+     * 모든회원 조회(테스트용)
+     *
+     * @author hyejinzz
+     * @since 2021-05-23
+     **/
     public UserResponse findAllUser() {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data= null;
+        Object data = null;
         try {
             List<UserInfo> list = userRepository.findAll();
-            data = list;
+            List<UserInfoListDto> result = list.stream()
+                    .map(r -> new UserInfoListDto(r))
+                    .collect(Collectors.toList());
+            data = result;
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;
             hMessage = "회원조회 실패";
@@ -47,15 +52,16 @@ public class UserService {
     }
 
 
-/**
-* userId로 회원조회
-* @author hyejinzz
-* @since 2021-05-23
-**/
+    /**
+     * userId로 회원조회
+     *
+     * @author hyejinzz
+     * @since 2021-05-23
+     **/
     public UserResponse findByUserId(String userId) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data= null;
+        Object data = null;
 
         try {
             UserInfo userInfo = userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL);
@@ -67,7 +73,7 @@ public class UserService {
                 hMessage = userId;
                 data = userInfo;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             hCode = StatusEnum.hd4444;
             hMessage = "회원조회 실패";
             log.info(":: findByUserId err :: error is {} ", e);
@@ -81,15 +87,16 @@ public class UserService {
     }
 
 
-/**
-* 로그인
-* @author hyejinzz
-* @since 2021-05-23
-**/
+    /**
+     * 로그인
+     *
+     * @author hyejinzz
+     * @since 2021-05-23
+     **/
     public UserResponse signIn(UserSignInRequest userSignUpRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data= null;
+        Object data = null;
         try {
             UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
             if (signUserInfo == null) {
@@ -107,8 +114,7 @@ public class UserService {
                 data = signUserInfo;
                 hMessage = "로그인 성공";
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             hCode = StatusEnum.hd4444;
             hMessage = "로그인 실패";
             log.info(":: signIn err :: error is {} ", e);
@@ -123,14 +129,15 @@ public class UserService {
 
 
     /**
-    * 회원가입
-    * @author hyejinzz
-    * @since 2021-05-23
-    **/
+     * 회원가입
+     *
+     * @author hyejinzz
+     * @since 2021-05-23
+     **/
     public UserResponse signUp(UserSignUpRequest userSignUpRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data= null;
+        Object data = null;
         UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
         if (signUserInfo == null) {
             UserInfo userInfo = userRepository.save(UserInfo.builder()
@@ -160,14 +167,15 @@ public class UserService {
 
 
     /**
-    * 회원탈퇴
-    * @author hyejinzz
-    * @since 2021-05-23
-    **/
+     * 회원탈퇴
+     *
+     * @author hyejinzz
+     * @since 2021-05-23
+     **/
     public UserResponse deleteUser(UserDeleteRequest userDeleteRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data= null;
+        Object data = null;
         try {
             //기존 유저
             UserInfo user = userRepository.findByUserNoAndUserStatus(userDeleteRequest.getUserNo(), UserStatus.GENERAL);
@@ -197,19 +205,20 @@ public class UserService {
 
 
     /**
-    * 회원정보 수정
-    * @author hyejinzz
-    * @since 2021-05-23
-    **/
+     * 회원정보 수정
+     *
+     * @author hyejinzz
+     * @since 2021-05-23
+     **/
     public UserResponse updateUser(UserChangeUserInfoRequest updateUser) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data= null;
+        Object data = null;
         try {
             //기존 유저
             UserInfo beforeUser = userRepository.findByUserNoAndUserStatus(updateUser.getUserNo(), UserStatus.GENERAL);
 
-             if (beforeUser == null) {
+            if (beforeUser == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "조회되는 회원이 없음";
             } else {
@@ -231,8 +240,6 @@ public class UserService {
                 .data(data)
                 .build();
     }
-
-
 
 
 }
