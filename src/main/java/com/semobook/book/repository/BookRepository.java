@@ -12,7 +12,7 @@ import java.util.List;
 //@Transactional(readOnly = true)
 public interface BookRepository extends CrudRepository<Book, String> {
 
-//    @Query("select b from Book b join fetch b.bookReviewList")
+    @Query("select b from Book b join fetch b.bookReviewList br join fetch br.userInfo")
     Book findByIsbn(String isbn);
 
     List<Book> findAllByCategory(String category);
