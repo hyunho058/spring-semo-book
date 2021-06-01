@@ -1,9 +1,7 @@
 package com.semobook.book.service;
 
 import com.semobook.book.domain.Book;
-import com.semobook.book.dto.BookDeleteRequest;
-import com.semobook.book.dto.BookRequest;
-import com.semobook.book.dto.BookResponse;
+import com.semobook.book.dto.*;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.common.StatusEnum;
 import lombok.AllArgsConstructor;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -72,15 +71,15 @@ public class BookService {
      **/
     public BookResponse findBook(String isbn) {
         log.info(":: findBook  :: book is {}", isbn);
-//        Optional<Book> book = bookRepository.findById(String.valueOf(isbn));
         try {
             Book book = bookRepository.findByIsbn(isbn);
+            BookDto bookDto =  new BookDto(book);
 
             if (book == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "검색된 도서가 없습니다.";
             } else {
-                data = book;
+                data = bookDto;
                 hCode = StatusEnum.hd1004;
                 hMessage = "도서 조회 성공";
             }
@@ -104,10 +103,13 @@ public class BookService {
      * @since 2021/04/25
      **/
     public BookResponse findAll() {
-        Iterable<Book> books = bookRepository.findAll();
+        List<Book> books = bookRepository.findAll();
+        List<BookListDto> result = books.stream()
+                .map(b -> new BookListDto(b))
+                .collect(Collectors.toList());
 
         return BookResponse.builder()
-                .data(books)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
