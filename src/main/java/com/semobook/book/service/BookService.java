@@ -3,14 +3,19 @@ package com.semobook.book.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.*;
 import com.semobook.book.repository.BookRepository;
+import com.semobook.bookReview.domain.BookReview;
 import com.semobook.common.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +47,7 @@ public class BookService {
                     .author(bookRequest.getAuthor())
                     .publisher(bookRequest.getPublisher())
                     .kdc(bookRequest.getKdc())
-                    .category(bookRequest.getCategory())
+                    .category(bookRequest.getCategoryy())
                     .keyword(bookRequest.getKeyword())
                     .img(bookRequest.getImg())
                     .build());
@@ -62,6 +67,8 @@ public class BookService {
                 .data(data)
                 .build();
     }
+
+
 
     /**
      * 도서 조회
@@ -115,6 +122,29 @@ public class BookService {
                 .build();
     }
 
+    /**
+     * Book List Page
+     *
+     * @author hyunho
+     * @since 2021/06/03
+    **/
+//    public BookResponse pageBookList(){
+//        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "bookName"));
+//        Page<Book> books = bookRepository.findALl(pageRequest);
+//
+//        List<Book> content = books.getContent();
+//
+////        List<BookListDto> result = books.stream()
+////                .map(b -> new BookListDto(b))
+////                .collect(Collectors.toList());
+//
+//        return BookResponse.builder()
+//                .data(content)
+//                .hCode(hCode)
+//                .hMessage(hMessage)
+//                .build();
+//    }
+
 
     /**
      * delete book
@@ -140,6 +170,30 @@ public class BookService {
                 .data(data)
                 .build();
     }
+
+
+    /**
+     * book 패이징 처리 with bookReview
+     *
+     * @author hyunho
+     * @since 2021/06/02
+    **/
+//    public BookResponse findAllWithReview(@RequestParam(value = "offset", defaultValue = "0") int offset,
+//                                          @RequestParam(value = "limit", defaultValue = "100") int limit)
+//    {
+//        List<Book> books = bookRepository.findAll();
+//        List<BookWithReviewDto> result = books.stream()
+//                .map(b -> new BookWithReviewDto(b))
+//                .collect(Collectors.toList());
+//
+//        return BookResponse.builder()
+//                .data(result)
+//                .hCode(hCode)
+//                .hMessage(hMessage)
+//                .build();
+//    }
+
+
 }
 
 

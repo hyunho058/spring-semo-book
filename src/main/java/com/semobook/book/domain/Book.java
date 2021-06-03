@@ -28,7 +28,7 @@ public class Book {
     @Column(name = "KDC")
     private String kdc;
 
-    @Column(name = "CATEGORYy")
+    @Column(name = "CATEGORY")
     private String category;
 
     @Column(name = "KEYWORD")

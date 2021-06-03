@@ -79,4 +79,27 @@ public class BookController {
         //TODO[hyunho]:패이지 처리
         return ResponseEntity.ok(bookService.findAll());
     }
+
+//    @Operation(description = "모든 책 조회")
+//    @GetMapping("/v1/page/books")
+//    public ResponseEntity<BookResponse> pageFindAll(){
+//        log.info("==/findAll");
+//        return ResponseEntity.ok(bookService.pageBookList());
+//    }
+
+
+
+
+    /**
+     * 리뷰가 포함된 책 검색(All)
+     *
+     * @author hyunho
+     * @since 2021/06/02
+    **/
+//    @Operation(description = "리뷰가 포함된 책 조회")
+//    @GetMapping("/bookWithReviews")
+//    public ResponseEntity<BookResponse> findAllWithReview(){
+//        log.info("==/findAllWithReview");
+//        return ResponseEntity.ok(bookService.findAllWithReview());
+//    }
 }
