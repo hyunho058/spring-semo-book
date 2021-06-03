@@ -2,9 +2,10 @@ package com.semobook.recom.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.Id;
+
 
 /**
 * 유저가 쓴 리뷰와 관련된 장르의 책을 추천해준다

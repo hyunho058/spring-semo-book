@@ -44,7 +44,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
     compile('org.springframework.boot:spring-boot-starter-data-redis')
 
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5" //Hibernate5Module
+//    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5" //Hibernate5Module
 
 }
 

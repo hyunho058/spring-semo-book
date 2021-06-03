@@ -3,10 +3,7 @@ package com.semobook.bookReview.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
-import com.semobook.bookReview.dto.BookReviewRequest;
-import com.semobook.bookReview.dto.BookReviewResponse;
-import com.semobook.bookReview.dto.BookSearchRequest;
-import com.semobook.bookReview.dto.BookUpdateRequest;
+import com.semobook.bookReview.dto.*;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
@@ -67,7 +64,7 @@ public class BookReviewService {
                         .build());
                 //평점  3점 이상이면 recom으로 추천 업뎃치기
                 if (request.getRating() >= 3) {
-                    recomService.updateRecom(request.getIsbn());
+                    recomService.updateUserReviewRecom(request.getIsbn());
                 }
                 hCode = StatusEnum.hd1004;
                 hMessage = "저장완료";
@@ -254,7 +251,7 @@ public class BookReviewService {
 
             //평점  3점 이상이면 recom으로 추천 업뎃치기
             if (bookReview.getRating() >= 3) {
-                recomService.updateUserReviewRecom(bookReview.getBook().getIsbn(),bookReview.getUserInfo().getUserNo());
+                recomService.updateUserReviewRecom(bookReview.getBook().getIsbn());
             }
 
             hCode = StatusEnum.hd1004;

@@ -2,9 +2,9 @@ package com.semobook.recom.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.Id;
 
 /**
 * 유저가 종합적으로 준 평점 기반 추천 (배치)

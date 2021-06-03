@@ -2,9 +2,9 @@ package com.semobook.recom.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.Id;
 
 /**
 * 유저정보 (나이, 성별) 기반 추천 (배치)
