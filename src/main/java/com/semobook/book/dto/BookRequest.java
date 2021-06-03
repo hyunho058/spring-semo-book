@@ -19,7 +19,7 @@ public class BookRequest {
     @Schema(description = "KDC",example = "kdc11111")
     String kdc;
     @Schema(description = "책 분류",example = "소설")
-    String category;
+    String categoryy;
     @Schema(description = "책 키워드",example = "청소년 소설")
     String keyword;
     @Schema(description = "책 이미지",example = "http://image.kyobobook.co.kr/images/book/xlarge/267/x9788936434267.jpg")

@@ -1,5 +1,6 @@
 package com.semobook.book.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.semobook.bookReview.domain.BookReview;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class Book {
     @Column(name = "KDC")
     private String kdc;
 
-    @Column(name = "CATEGORYy")
+    @Column(name = "CATEGORY")
     private String category;
 
     @Column(name = "KEYWORD")
@@ -36,6 +37,7 @@ public class Book {
     @Column(name = "BOOK_IMAGE")
     private String img;
 
+//    @JsonIgnore //bookReviewList 를 호회하지 않는다..... 쓰면 좋지 않다..... 쓰지마라
     @OneToMany(mappedBy = "book")
     private List<BookReview> bookReviewList = new ArrayList<>();
 

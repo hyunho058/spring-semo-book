@@ -24,7 +24,7 @@ public class UserInfo {
     private String userId;
 
     private String userPw;
-//GENERAL(일반),PAUSE(정지),SLEEP(휴먼),DELETE(삭제),ADMIN(관리자)',
+    //GENERAL(일반),PAUSE(정지),SLEEP(휴먼),DELETE(삭제),ADMIN(관리자)',
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
@@ -39,8 +39,6 @@ public class UserInfo {
 
     @OneToMany(mappedBy = "userInfo")
     private List<BookReview> bookReviews = new ArrayList<>();
-
-
 
     private String deleteReason;
 

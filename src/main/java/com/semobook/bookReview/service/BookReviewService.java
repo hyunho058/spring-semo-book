@@ -1,62 +1,92 @@
 package com.semobook.bookReview.service;
 
+import com.semobook.book.domain.Book;
+import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookReview.domain.BookReviewDto;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.dto.BookReviewResponse;
+import com.semobook.bookReview.dto.BookSearchRequest;
+import com.semobook.bookReview.dto.BookUpdateRequest;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
+import com.semobook.user.domain.UserInfo;
+import com.semobook.user.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
-*
  * 리뷰 서비스
-*
-* @author hjjung
-* @since 2021-05-16
-**/
+ *
+ * @author hjjung
+ * @since 2021-05-16
+ **/
 @RequiredArgsConstructor
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class BookReviewService {
-    String hMessage;
-    StatusEnum hCode;
-    Object data;
 
     private final BookReviewRepository bookReviewRepository;
     private final RecomService recomService;
+    private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
 
     //글 등록
+    @Transactional
     public BookReviewResponse createReview(BookReviewRequest request) {
         log.info("createReview");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
 
         try {
-            BookReview bookReview = request.getBookReview();
-
-            //글 등록을 하면 바로 redis에 관련 책 저장
-            bookReviewRepository.save(BookReview.builder()
-                    .rating(bookReview.getRating())
-                    .reviewContents(bookReview.getReviewContents())
-                    .createDate(bookReview.getCreateDate())
-                    .declaration(bookReview.getDeclaration())
-                    .build());
-            //평점  3점 이상이면 recom으로 추천 업뎃치기
-            if(bookReview.getRating()>=3){
-                recomService.updateRecom(request);
+            Book resultBook = bookRepository.findByIsbn(request.getIsbn());
+            log.info("createReview :: resultBook is {}", resultBook.getBookName());
+            UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+            log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
+            if (resultBook != null && resultUserInfo != null){
+                bookReviewRepository.save(BookReview.builder()
+                        .rating(request.getRating())
+                        .reviewContents(request.getReviewContents())
+                        .createDate(LocalDateTime.now())
+                        .declaration(0)
+                        .book(resultBook)
+                        .userInfo(resultUserInfo)
+                        .build());
+                //평점  3점 이상이면 recom으로 추천 업뎃치기
+                if (request.getRating() >= 3) {
+                    recomService.updateRecom(request.getIsbn());
+                }
+                hCode = StatusEnum.hd1004;
+                hMessage = "저장완료";
+                data = request;
+            }else {
+                hCode = StatusEnum.hd4444;
+                hMessage = "저장실패";
+                data = null;
             }
-            hCode = StatusEnum.hd1004;
-            hMessage = "저장완료";
-            data = request;
-
-        }catch (Exception e){
-            log.error("createReview err :: error msg : {}",e);
+//            bookReviewRepository.save(BookReview.builder()
+//                    .book(reviewBook)
+//                    .rating(request.getRating())
+//                    .reviewContents(request.getReviewContents())
+//                    .createDate(LocalDateTime.now())
+//                    .declaration(0)
+//                    .build());
+        } catch (Exception e) {
+            log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "createReview 에러";
             data = null;
@@ -70,30 +100,35 @@ public class BookReviewService {
                 .build();
     }
 
+
     /**
-     * TODO
-     *  페이징처리가 필요합니다
-     * @param request
-     * @return
-     */
+     * 내 글 보여주기
+     *
+     * @author hyejinzz
+     * @since 2021-05-29
+     **/
 
     //내 글 보여주기
-    public BookReviewResponse readReview(BookReviewRequest request) {
+    public BookReviewResponse readMyReview(BookSearchRequest request) {
         log.info("showReview");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
 
         try {
-            BookReview bookReview = request.getBookReview();
-            List<BookReview> bookReviewList = bookReviewRepository.findAll();
-            log.info("bookReviewList : {}",bookReviewList.toString());
+            int start = request.getStartPage();
+            long userNo = request.getUserNo();
+
+            List<BookReview> allRevice = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = bookReviewList;
+            data = allRevice;
 
-        }catch (Exception e){
-            log.error("createReview err :: error msg : {}",e);
+        } catch (Exception e) {
+            log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
-            hMessage = "readReview 에러";
+            hMessage = "readMyReview 에러";
             data = null;
 
         }
@@ -103,23 +138,37 @@ public class BookReviewService {
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
-        }
+    }
 
 
-        //모든 글
+    //모든 글
+
+    /**
+     * 모든 글
+     * reference - https://www.inflearn.com/questions/14559
+     *
+     * @author hyejinzz, hyunho
+     * @since 2021/05/30
+     **/
     public BookReviewResponse readReviewAll() {
         log.info("showReview");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
 
         try {
             List<BookReview> bookReviewList = bookReviewRepository.findAll();
-            log.info("bookReviewList : {}",bookReviewList.toString());
+            List<BookReviewDto> result = bookReviewList.stream()
+                    .map(r -> new BookReviewDto(r))
+                    .collect(Collectors.toList());
+            log.info("bookReviewList : {}", result.toString());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = bookReviewList;
+            data = result;
 
-        }catch (Exception e){
-            log.error("createReview err :: error msg : {}",e);
+        } catch (Exception e) {
+            log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "readReview 에러";
             data = null;
@@ -131,32 +180,53 @@ public class BookReviewService {
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
-        }
+    }
 
-
+//    @Data
+//    static class BookReviewDto {
+//        private int rating;
+//        private String reviewContents;
+//        private LocalDateTime createDate;
+//        private int declaration;
+//        private Book book;
+//        private UserInfo userInfo;
+//
+//        public BookReviewDto(BookReview bookReview) {
+//            rating = bookReview.getRating();
+//            reviewContents = bookReview.getReviewContents();
+//            createDate = bookReview.getCreateDate();
+//            declaration = bookReview.getDeclaration();
+//            book = bookReview.getBook();
+//            userInfo = bookReview.getUserInfo();
+//        }
+//    }
 
     /**
      * TODO
-     *  페이징처리가 필요합니다
+     * 페이징처리가 필요합니다
+     *
      * @param request
      * @return
      */
 
     //모든 사람 글 보여주기
-    public BookReviewResponse readRatingReview(BookReviewRequest request) {
+    public BookReviewResponse readRatingReview(BookSearchRequest request) {
         log.info("readRatingReview");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
 
         try {
             LocalDateTime today = LocalDateTime.now();
-            List<BookReview> bookReviewList = bookReviewRepository.findAllByCreateDateBefore(today,PageRequest.of(request.getStartPage(),request.getEndPage()));
-            log.info("bookReviewList : {}",bookReviewList.toString());
+            List<BookReview> bookReviewList = bookReviewRepository.findAllByCreateDateBefore(today, PageRequest.of(request.getStartPage(), 5));
+            log.info("bookReviewList : {}", bookReviewList.toString());
 
             hCode = StatusEnum.hd1004;
             hMessage = "모든 사람 글 가져오기";
             data = bookReviewList;
 
-        }catch (Exception e){
-            log.error("readRatingReview err :: error msg : {}",e);
+        } catch (Exception e) {
+            log.error("readRatingReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "readRatingReview 에러";
             data = null;
@@ -172,27 +242,29 @@ public class BookReviewService {
 
 
     //글 수정
-    public BookReviewResponse updateReview(BookReviewRequest request) {
+    @Transactional
+    public BookReviewResponse updateReview(BookUpdateRequest request) {
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
+
         log.info("updateReview");
 
         try {
-            BookReview bookReview = request.getBookReview();
-            Long bookReviewNo = bookReview.getReviewNo();
-            BookReview bookReviewUpdate = bookReviewRepository.findByReviewNo(bookReviewNo);
-
-            bookReviewUpdate.changeBookReview(bookReview.getRating(), bookReview.getReviewContents());
+            BookReview bookReview = bookReviewRepository.findByReviewNo(request.getReviewNo());
+            bookReview.changeBookReview(request.getRating(), request.getReviewContents());
 
             //평점  3점 이상이면 recom으로 추천 업뎃치기
-            if(bookReview.getRating()>=3){
-                recomService.updateRecom(request);
+            if (bookReview.getRating() >= 3) {
+                recomService.updateRecom(bookReview.getBook().getIsbn());
             }
 
             hCode = StatusEnum.hd1004;
             hMessage = "글 수정완료";
             data = request;
 
-        }catch (Exception e){
-            log.error("updateReview err :: error msg : {}",e);
+        } catch (Exception e) {
+            log.error("updateReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "updateReview 에러";
             data = null;
@@ -207,34 +279,36 @@ public class BookReviewService {
     }
 
     //글 삭제
-    public BookReviewResponse deleteReview(BookReviewRequest request) {
-        String hCode;
+    @Transactional
+    public BookReviewResponse deleteReview(long reviewNo) {
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
         try {
-            BookReview bookReview = request.getBookReview();
-            bookReviewRepository.deleteBookReviewByReviewNo(bookReview.getReviewNo());
-
-        }catch (Exception e){
-            log.error("addBoard err :: error msg : {}",e);
+            bookReviewRepository.deleteBookReviewByReviewNo(reviewNo);
+            hCode = StatusEnum.hd1004;
+            hMessage = "삭제 완료";
+        } catch (Exception e) {
+            log.error("addBoard err :: error msg : {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "삭제 중 오류";
         }
-        finally {
-            return BookReviewResponse.builder().build();
-        }
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
     }
 
     //평가 등록
 
 
-
-
-
-
-        //1. db에서 관련도서 항목꺼내기
-        //2. null 이면 카테고리 꺼내기
-        //   2-1 카테고리가 일치하고
-        //        평균 평점이 높은 순, 최신순으로 50개 가져옴
-        //  이용자가 보기싫다고 한 데이터 삭제작업
-        //  20개 이상이면 추천 업데이트
-
+    //1. db에서 관련도서 항목꺼내기
+    //2. null 이면 카테고리 꺼내기
+    //   2-1 카테고리가 일치하고
+    //        평균 평점이 높은 순, 최신순으로 50개 가져옴
+    //  이용자가 보기싫다고 한 데이터 삭제작업
+    //  20개 이상이면 추천 업데이트
 
 
 }

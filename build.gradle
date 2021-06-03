@@ -8,6 +8,13 @@ group = 'com.semobook'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
+
+bootJar{
+    archivesBaseName = 'semoapi'
+    archiveFileName = 'semoapi.jar'
+    archiveVersion = "0.0.1"
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -35,6 +42,8 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.7'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5" //Hibernate5Module
 
 }
 

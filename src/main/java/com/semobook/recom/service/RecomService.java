@@ -46,7 +46,7 @@ public class RecomService {
      * 책과 관련된 장르의 책을 추천
      * @param boardRequest
      */
-    public void updateRecom(BookReviewRequest boardRequest) {
+    public void updateRecom(String isbn) {
         /**
         * Book <-> BookReview 연관관계 변경하면서 ISBN값(FK) 가져오는 부분 수정해야해서 주석처리 하였습니다.
         *

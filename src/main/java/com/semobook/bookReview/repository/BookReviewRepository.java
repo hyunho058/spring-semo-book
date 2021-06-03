@@ -5,6 +5,8 @@ import com.semobook.bookReview.domain.BookReview;
 import com.semobook.user.domain.UserInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ public interface BookReviewRepository extends JpaRepository<BookReview,String> {
     **/
     //find
     //내가 쓴 글 보기
-//    List<BookReview> findAllByUserNo(UserInfo userNo, Pageable pageable);
+    List<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo")long userNo, Pageable pageable);
     List<BookReview> findAllByUserInfo(UserInfo userInfo, Pageable pageable);
     //이 책 리뷰 모두 보기
 //    List<BookReview> findAllByIsbn(String isbn, Pageable pageable);
@@ -34,12 +36,27 @@ public interface BookReviewRepository extends JpaRepository<BookReview,String> {
 
 //    //모든 리뷰 보기
     List<BookReview> findAllByCreateDateBefore(LocalDateTime createDate, Pageable pageable);
+
     //삭제
     BookReview deleteBookReviewByReviewNo(long reviewNo);
 
     BookReview findByReviewNo(long reviewNo);
 
+
+
+    /**
+     * test select all bookReview data
+     * "select o from Order o join fetch o.member m join fetch o.delivery d"
+     * @Query("select b from Book b join fetch b.bookReviewList")
+     *
+     * @author hyunho
+     * @since 2021/05/30
+    *
+     * @return*/
+           //select o from Order o join fetch o.member m join fetch o.delivery d
+    @Query("select r from BookReview r join fetch r.userInfo u join fetch r.book b")
     List<BookReview> findAll();
+
 
 
 

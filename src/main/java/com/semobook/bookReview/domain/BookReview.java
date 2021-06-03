@@ -2,14 +2,17 @@ package com.semobook.bookReview.domain;
 
 import com.semobook.book.domain.Book;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.domain.UserStatus;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class BookReview {
     @Id
     @GeneratedValue
@@ -20,6 +23,10 @@ public class BookReview {
     private LocalDateTime createDate;
     private int declaration;
 
+    //NORMAl, BLIND
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no")
     private UserInfo userInfo;
@@ -28,22 +35,21 @@ public class BookReview {
     @JoinColumn(name = "isbn")
     private Book book;
 
-    protected BookReview(){
-
-    }
 
     @Builder
-    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration){
-     this.rating = rating;
-     this.reviewContents = reviewContents;
-     this.createDate = createDate;
-     this.declaration = declaration;
+    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration, Book book, UserInfo userInfo) {
+        this.rating = rating;
+        this.reviewContents = reviewContents;
+        this.createDate = createDate;
+        this.declaration = declaration;
+        this.book = book;
+        this.userInfo = userInfo;
 
     }
 
     public void changeBookReview(int rating,
                                  String reviewContents
-    ){
+    ) {
         this.rating = rating;
         this.reviewContents = reviewContents;
     }

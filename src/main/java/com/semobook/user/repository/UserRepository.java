@@ -23,6 +23,14 @@ public interface UserRepository extends CrudRepository<UserInfo, Long> {
    //회원조회(모두)
     UserInfo findByUserId(String userId);
 
+    /**
+     * find user by userNo
+     *
+     * @author hyunho
+     * @since 2021/05/30
+    **/
+    UserInfo findByUserNo(long userNo);
+
     //회원가입
     UserInfo save(UserInfo userInfo);
 
