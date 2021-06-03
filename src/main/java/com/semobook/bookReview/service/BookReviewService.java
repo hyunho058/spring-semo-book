@@ -115,11 +115,13 @@ public class BookReviewService {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
 
-            List<BookReview> allRevice = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
-
+//            List<BookReview> allReview = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
+            UserInfo userInfo = userRepository.findByUserNo(userNo);
+            UserWithReviewsDto userWithReviewsDto = new UserWithReviewsDto(userInfo);
+            //TODO[hyunho]: paging
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = allRevice;
+            data = userWithReviewsDto;
 
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
