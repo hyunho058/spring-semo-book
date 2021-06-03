@@ -27,7 +27,7 @@ public interface BookRepository extends JpaRepository<Book, String> {
 //    @Query("select b from Book b join fetch b.bookReviewList")
     List<Book> findAll();
 
-    Page<Book> findALl(Pageable pageable);
+//    Page<Book> findALl(Pageable pageable);
 //
 //    Page<Book> findAll(String isbn, Pageable pageable);
 
