@@ -3,7 +3,6 @@ package com.semobook.bookReview.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
-import com.semobook.bookReview.domain.BookReviewDto;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.dto.BookReviewResponse;
 import com.semobook.bookReview.dto.BookSearchRequest;
@@ -15,12 +14,12 @@ import com.semobook.user.domain.UserInfo;
 import com.semobook.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -142,7 +141,6 @@ public class BookReviewService {
 
 
     //모든 글
-
     /**
      * 모든 글
      * reference - https://www.inflearn.com/questions/14559
@@ -256,7 +254,7 @@ public class BookReviewService {
 
             //평점  3점 이상이면 recom으로 추천 업뎃치기
             if (bookReview.getRating() >= 3) {
-                recomService.updateRecom(bookReview.getBook().getIsbn());
+                recomService.updateUserReviewRecom(bookReview.getBook().getIsbn(),bookReview.getUserInfo().getUserNo());
             }
 
             hCode = StatusEnum.hd1004;

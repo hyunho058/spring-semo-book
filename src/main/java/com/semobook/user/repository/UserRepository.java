@@ -3,6 +3,7 @@ package com.semobook.user.repository;
 
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +13,7 @@ import java.util.List;
 public interface UserRepository extends CrudRepository<UserInfo, Long> {
 
     //모든 유저 찾기
+    @Query("select b from UserInfo b join fetch b.bookReviews")
     List<UserInfo> findAll();
 
     //유저no로 회원 조회 (휴먼, 정지, 탈퇴 제외)
