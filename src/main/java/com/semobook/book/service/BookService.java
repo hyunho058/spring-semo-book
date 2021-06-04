@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,11 +110,16 @@ public class BookService {
      * @author khh
      * @since 2021/04/25
      **/
-    public BookResponse findAll() {
-        List<Book> books = bookRepository.findAll();
-        List<BookListDto> result = books.stream()
+    public BookResponse findAll(int pageNum) {
+        //page처리 적용
+        PageRequest pageRequest = PageRequest.of(pageNum, 5);
+        Page<Book> page = bookRepository.findAll(pageRequest);
+//        Slice<Book> slicePage = bookRepository.findAll(pageRequest);  client 단에ㅓ 더보기 기능을 사용할때 slice 를 사용하면 좋다.
+        List<BookListDto> result = page.getContent().stream()
                 .map(b -> new BookListDto(b))
                 .collect(Collectors.toList());
+
+
 
         return BookResponse.builder()
                 .data(result)

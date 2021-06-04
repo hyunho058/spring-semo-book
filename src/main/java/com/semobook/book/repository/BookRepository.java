@@ -3,6 +3,7 @@ package com.semobook.book.repository;
 import com.semobook.book.domain.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -25,11 +26,11 @@ public interface BookRepository extends JpaRepository<Book, String> {
     int deleteBookByIsbn (String isbn);
 
 //    @Query("select b from Book b join fetch b.bookReviewList")
-    List<Book> findAll();
+//    List<Book> findAll();
 
-//    Page<Book> findALl(Pageable pageable);
-//
-//    Page<Book> findAll(String isbn, Pageable pageable);
+    @Query(value = "select b from Book b left join b.bookReviewList br", countQuery = "select count(b.bookName) from Book b")
+    Page<Book> findAll(Pageable pageable);
+    //Slice<Book> findAll(Pageable pageable); // Slice
 
 
 //    "select o from Order o join fetch o.member m join fetch o.delivery d"
