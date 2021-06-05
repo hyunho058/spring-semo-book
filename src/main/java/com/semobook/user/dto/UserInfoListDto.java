@@ -1,6 +1,6 @@
 package com.semobook.user.dto;
 
-import com.semobook.bookReview.dto.BookReviewDto;
+import com.semobook.bookReview.dto.BookReviewWithBookDto;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class UserInfoListDto {
     private String userGender;
     private String userBirth;
     private LocalDateTime lastConnection;
-    private List<BookReviewDto> bookReviewDtoList;
+    private List<BookReviewWithBookDto> bookReviewWithBookDtoList;
 
     public UserInfoListDto(UserInfo userInfo) {
         this.userNo = userInfo.getUserNo();
@@ -31,8 +31,8 @@ public class UserInfoListDto {
         this.userGender = userInfo.getUserGender();
         this.userBirth = userInfo.getUserBirth();
         this.lastConnection = userInfo.getLastConnection();
-        this.bookReviewDtoList = userInfo.getBookReviews().stream()
-                .map(r->new BookReviewDto(r))
+        this.bookReviewWithBookDtoList = userInfo.getBookReviews().stream()
+                .map(r->new BookReviewWithBookDto(r))
                 .collect(Collectors.toList());
     }
 

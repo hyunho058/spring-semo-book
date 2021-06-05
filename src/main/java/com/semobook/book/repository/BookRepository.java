@@ -1,6 +1,7 @@
 package com.semobook.book.repository;
 
 import com.semobook.book.domain.Book;
+import com.semobook.user.domain.UserInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -17,18 +18,18 @@ import java.util.List;
 public interface BookRepository extends CrudRepository<Book, String> {
     //search only book
 //    @Query("select b from Book b join fetch b.bookReviewList")
+    @Query("select b from Book b join fetch b.bookReviewList br")
     Book findByIsbn(String isbn);
 
 
     //search book with bookReview
-//    @Query("select b from Book b join fetch b.bookReviewList br")
-    @Query("select b from Book b join fetch b.bookReviewList br")
-    Book findByIsbnWithReview(String isbn);
+//    @Query("select b from Book b join fetch b.bookReviewList br join fetch br.userInfo")
+//    Book findByIsbnWithReview(String isbn);
 
 
     List<Book> findAllByCategory(String category);
 
-    Book save(Book bOok);
+    Book save(Book book);
 
     int deleteBookByIsbn (String isbn);
 

@@ -1,7 +1,6 @@
 package com.semobook.bookReview.service;
 
 import com.semobook.book.domain.Book;
-import com.semobook.book.dto.BookDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
@@ -10,9 +9,6 @@ import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.dto.UserInfoDto;
-import com.semobook.user.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +47,9 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
-            BookDto bookDto = new BookDto(bookRepository.findByIsbn(request.getIsbn()));
-            log.info("createReview :: resultBook is {}", bookDto.getBookName());
+//            BookDto bookDto = new BookDto(bookRepository.findByIsbn(request.getIsbn()));
+            Book bookDto = bookRepository.findByIsbn(request.getIsbn());
+//            log.info("createReview :: resultBook is {}", bookDto.getBookName());
             UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
 //            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserNo(request.getUserNo()))
             log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
@@ -62,7 +59,7 @@ public class BookReviewService {
                         .reviewContents(request.getReviewContents())
                         .createDate(LocalDateTime.now())
                         .declaration(0)
-                        .bookDto(bookDto)
+                        .book(bookDto)
                         .userInfo(resultUserInfo)
                         .build());
                 //평점  3점 이상이면 recom으로 추천 업뎃치기
@@ -109,17 +106,16 @@ public class BookReviewService {
 
     //내 글 보여주기
     public BookReviewResponse readMyReview(BookSearchRequest request) {
-        log.info("showReview");
-        String hMessage = null;
+        log.info(":: readMyReview() :: request is {}", request.getUserNo());
+        String hMessage = "";
         Object data = null;
         StatusEnum hCode = null;
 
         try {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
-
 //            List<BookReview> allReview = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
-            UserInfo userInfo = userRepository.findByUserNo(userNo);
+            UserInfo userInfo = userRepository.findByUserNoWithReview(userNo);
             UserWithReviewsDto userWithReviewsDto = new UserWithReviewsDto(userInfo);
             //TODO[hyunho]: paging
             hCode = StatusEnum.hd1004;
@@ -158,8 +154,8 @@ public class BookReviewService {
 
         try {
             List<BookReview> bookReviewList = bookReviewRepository.findAll();
-            List<BookReviewDto> result = bookReviewList.stream()
-                    .map(r -> new BookReviewDto(r))
+            List<BookReviewWithBookDto> result = bookReviewList.stream()
+                    .map(r -> new BookReviewWithBookDto(r))
                     .collect(Collectors.toList());
             log.info("bookReviewList : {}", result.toString());
 

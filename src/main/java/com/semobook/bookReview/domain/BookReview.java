@@ -39,12 +39,12 @@ public class BookReview {
 
 
     @Builder
-    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration, BookDto bookDto, UserInfo userInfo) {
+    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration, Book book, UserInfo userInfo) {
         this.rating = rating;
         this.reviewContents = reviewContents;
         this.createDate = createDate;
         this.declaration = declaration;
-        this.book = new Book(bookDto);
+        this.book = book;
         this.userInfo = userInfo;
 
     }

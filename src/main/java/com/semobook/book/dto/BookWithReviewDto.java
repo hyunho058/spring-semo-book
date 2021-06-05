@@ -1,11 +1,9 @@
 package com.semobook.book.dto;
 
 import com.semobook.book.domain.Book;
-import com.semobook.bookReview.dto.BookReviewDto;
+import lombok.Data;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+@Data
 public class BookWithReviewDto {
 
     private String isbn;
@@ -16,7 +14,7 @@ public class BookWithReviewDto {
     private String category;
     private String keyword;
     private String img;
-    private List<BookReviewDto> bookReviewDtoList;
+//    private List<BookReviewDto> bookReviews;
 
     public BookWithReviewDto(Book book) {
         this.isbn = book.getIsbn();
@@ -27,8 +25,8 @@ public class BookWithReviewDto {
         this.category = book.getCategory();
         this.keyword = book.getKeyword();
         this.img = book.getImg();
-        this.bookReviewDtoList = book.getBookReviewList().stream()
-                .map(bookReview -> new BookReviewDto(bookReview))
-                .collect(Collectors.toList());
+//        this.bookReviews = book.getBookReviewList().stream()
+//                .map(bookReview -> new BookReviewDto(bookReview))
+//                .collect(Collectors.toList());
     }
 }

@@ -53,15 +53,15 @@ public class Book {
         this.keyword = keyword;
         this.img = img;
     }
-    @Builder
-    public Book(BookDto bookDto) {
-        this.isbn = bookDto.getIsbn();
-        this.bookName = bookDto.getBookName();
-        this.author = bookDto.getAuthor();
-        this.publisher = bookDto.getPublisher();
-        this.kdc = bookDto.getKdc();
-        this.category = bookDto.getCategory();
-        this.keyword = bookDto.getKeyword();
-        this.img = bookDto.getImg();
-    }
+//    @Builder
+//    public Book(BookDto bookDto) {
+//        this.isbn = bookDto.getIsbn();
+//        this.bookName = bookDto.getBookName();
+//        this.author = bookDto.getAuthor();
+//        this.publisher = bookDto.getPublisher();
+//        this.kdc = bookDto.getKdc();
+//        this.category = bookDto.getCategory();
+//        this.keyword = bookDto.getKeyword();
+//        this.img = bookDto.getImg();
+//    }
 }

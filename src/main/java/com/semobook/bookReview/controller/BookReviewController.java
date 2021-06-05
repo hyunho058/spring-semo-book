@@ -7,6 +7,7 @@ import com.semobook.bookReview.dto.BookUpdateRequest;
 import com.semobook.bookReview.service.BookReviewService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,7 @@ public class BookReviewController {
 
     @PostMapping("/read")
     public ResponseEntity<BookReviewResponse> AllBookReview(@Parameter @RequestBody BookSearchRequest boardRequest){
+        log.info(":: AllBookReview() :: boardRequest is {}", boardRequest.getUserNo());
         return ResponseEntity.ok(boardService.readMyReview(boardRequest));
     }
 

@@ -72,7 +72,8 @@ public class BookController {
     @GetMapping(value = "/bookWithReview/{isbn}")
     public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn){
         log.info("==/findBookWithReview {}", isbn);
-        return ResponseEntity.ok(bookService.findBookWithReview(isbn));
+//        return ResponseEntity.ok(bookService.findBookWithReview(isbn));
+        return null;
     }
 
     /**
