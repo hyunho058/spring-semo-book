@@ -1,8 +1,10 @@
 package com.semobook.bookReview.domain;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookDto;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
+import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,19 +39,17 @@ public class BookReview {
 
 
     @Builder
-    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration, Book book, UserInfo userInfo) {
+    public BookReview(int rating, String reviewContents, LocalDateTime createDate, int declaration, BookDto bookDto, UserInfo userInfo) {
         this.rating = rating;
         this.reviewContents = reviewContents;
         this.createDate = createDate;
         this.declaration = declaration;
-        this.book = book;
+        this.book = new Book(bookDto);
         this.userInfo = userInfo;
 
     }
 
-    public void changeBookReview(int rating,
-                                 String reviewContents
-    ) {
+    public void changeBookReview(int rating, String reviewContents) {
         this.rating = rating;
         this.reviewContents = reviewContents;
     }

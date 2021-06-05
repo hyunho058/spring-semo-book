@@ -17,6 +17,7 @@ public interface UserRepository extends CrudRepository<UserInfo, Long> {
     List<UserInfo> findAll();
 
     //유저no로 회원 조회 (휴먼, 정지, 탈퇴 제외)
+    @Query("select u from UserInfo u join fetch u.bookReviews ur join fetch ur.userInfo")
     UserInfo findByUserIdAndUserStatus(String userId, Enum<UserStatus> status);
 
     //유저id로 회원조회 찾기 (휴먼, 정지, 탈퇴 제외)
@@ -31,6 +32,7 @@ public interface UserRepository extends CrudRepository<UserInfo, Long> {
      * @author hyunho
      * @since 2021/05/30
     **/
+    @Query("select u from UserInfo u join fetch u.bookReviews")
     UserInfo findByUserNo(long userNo);
 
     //회원가입

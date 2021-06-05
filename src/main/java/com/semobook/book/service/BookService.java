@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookService {
-    String hMessage;
-    StatusEnum hCode;
-    Object data;
+//    String hMessage;
+//    StatusEnum hCode;
+//    Object data;
 
     private final BookRepository bookRepository;
 
@@ -41,6 +41,9 @@ public class BookService {
      * @since 2021/04/25
      **/
     public BookResponse addBook(BookRequest bookRequest) {
+        String hMessage = null;
+        StatusEnum hCode = null;
+        Object data = null;
         try {
             Book book = bookRepository.save(Book.builder()
                     .isbn(bookRequest.getIsbn())
@@ -48,7 +51,7 @@ public class BookService {
                     .author(bookRequest.getAuthor())
                     .publisher(bookRequest.getPublisher())
                     .kdc(bookRequest.getKdc())
-                    .category(bookRequest.getCategoryy())
+                    .category(bookRequest.getCategory())
                     .keyword(bookRequest.getKeyword())
                     .img(bookRequest.getImg())
                     .build());
@@ -79,6 +82,11 @@ public class BookService {
      **/
     public BookResponse findBook(String isbn) {
         log.info(":: findBook  :: book is {}", isbn);
+
+        String hMessage = null;
+        StatusEnum hCode = null;
+        Object data = null;
+
         try {
             Book book = bookRepository.findByIsbn(isbn);
             BookDto bookDto =  new BookDto(book);
@@ -105,12 +113,55 @@ public class BookService {
 
 
     /**
+     *
+     *
+     * @author hyunho
+     * @since 2021/06/05
+    **/
+    public BookResponse findBookWithReview(String isbn) {
+        log.info(":: findBookWithReview  :: book is {}", isbn);
+
+        String hMessage = null;
+        StatusEnum hCode = null;
+        Object data = null;
+
+        try {
+            Book book = bookRepository.findByIsbnWithReview(isbn);
+            BookDto bookDto =  new BookDto(book);
+
+            if (book == null) {
+                hCode = StatusEnum.hd4444;
+                hMessage = "검색된 도서가 없습니다.";
+            } else {
+                data = bookDto;
+                hCode = StatusEnum.hd1004;
+                hMessage = "도서 조회 성공";
+            }
+        } catch (Exception e) {
+            log.info("findBookWithReview :: deleteBook err :: error is {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "검색 실패";
+        }
+        return BookResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
+
+
+    /**
      * 전체 도서 조회
      *
      * @author khh
      * @since 2021/04/25
      **/
     public BookResponse findAll(int pageNum) {
+
+        String hMessage = null;
+        StatusEnum hCode = null;
+        Object data = null;
+
         //page처리 적용
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
         Page<Book> page = bookRepository.findAll(pageRequest);
@@ -160,6 +211,11 @@ public class BookService {
      **/
     @Transactional
     public BookResponse deleteBook(String isbn) {
+
+        String hMessage = null;
+        StatusEnum hCode = null;
+        Object data = null;
+
         try {
             log.info(":: deleteBook  :: book is {}", isbn);
             bookRepository.deleteBookByIsbn(isbn);

@@ -14,10 +14,17 @@ import java.util.List;
 
 @Repository
 //@Transactional(readOnly = true)
-public interface BookRepository extends JpaRepository<Book, String> {
-
-    @Query("select b from Book b join fetch b.bookReviewList br join fetch br.userInfo")
+public interface BookRepository extends CrudRepository<Book, String> {
+    //search only book
+//    @Query("select b from Book b join fetch b.bookReviewList")
     Book findByIsbn(String isbn);
+
+
+    //search book with bookReview
+//    @Query("select b from Book b join fetch b.bookReviewList br")
+    @Query("select b from Book b join fetch b.bookReviewList br")
+    Book findByIsbnWithReview(String isbn);
+
 
     List<Book> findAllByCategory(String category);
 

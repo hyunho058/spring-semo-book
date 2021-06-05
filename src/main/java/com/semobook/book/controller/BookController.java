@@ -66,6 +66,15 @@ public class BookController {
         return ResponseEntity.ok(bookService.findBook(isbn));
     }
 
+
+
+    @Operation(description = "책 조회(리뷰 포함)")
+    @GetMapping(value = "/bookWithReview/{isbn}")
+    public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn){
+        log.info("==/findBookWithReview {}", isbn);
+        return ResponseEntity.ok(bookService.findBookWithReview(isbn));
+    }
+
     /**
      * 책 검색(ALL)
      *

@@ -2,6 +2,7 @@ package com.semobook.user.domain;
 
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
+import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,6 +56,17 @@ public class UserInfo {
         this.userStatus = UserStatus.GENERAL;
         this.lastConnection = lastConnection;
     }
+//
+//    @Builder
+//    public UserInfo(UserInfoDto userInfoDto, LocalDateTime lastConnection) {
+//        this.userId = userInfoDto.getUserId();
+//        this.userPw = userInfoDto.getUserPw();
+//        this.userName = userInfoDto.getUserName();
+//        this.userGender = userInfoDto.getUserGender();
+//        this.userBirth = userInfoDto.getUserBirth();
+//        this.userStatus = UserStatus.GENERAL;
+//        this.lastConnection = lastConnection;
+//    }
 
     public void changeUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;

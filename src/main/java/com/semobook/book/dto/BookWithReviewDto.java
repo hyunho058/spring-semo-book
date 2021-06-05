@@ -1,7 +1,7 @@
 package com.semobook.book.dto;
 
 import com.semobook.book.domain.Book;
-import com.semobook.bookReview.domain.BookReviewDto;
+import com.semobook.bookReview.dto.BookReviewDto;
 
 import java.util.List;
 import java.util.stream.Collectors;

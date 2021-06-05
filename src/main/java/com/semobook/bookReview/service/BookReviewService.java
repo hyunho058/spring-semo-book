@@ -1,6 +1,7 @@
 package com.semobook.bookReview.service;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
@@ -8,6 +9,7 @@ import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,23 +45,24 @@ public class BookReviewService {
     //글 등록
     @Transactional
     public BookReviewResponse createReview(BookReviewRequest request) {
-        log.info("createReview");
+        log.info("createReview ::");
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
 
         try {
-            Book resultBook = bookRepository.findByIsbn(request.getIsbn());
-            log.info("createReview :: resultBook is {}", resultBook.getBookName());
+            BookDto bookDto = new BookDto(bookRepository.findByIsbn(request.getIsbn()));
+            log.info("createReview :: resultBook is {}", bookDto.getBookName());
             UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserNo(request.getUserNo()))
             log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
-            if (resultBook != null && resultUserInfo != null){
+            if (bookDto != null && resultUserInfo != null){
                 bookReviewRepository.save(BookReview.builder()
                         .rating(request.getRating())
                         .reviewContents(request.getReviewContents())
                         .createDate(LocalDateTime.now())
                         .declaration(0)
-                        .book(resultBook)
+                        .bookDto(bookDto)
                         .userInfo(resultUserInfo)
                         .build());
                 //평점  3점 이상이면 recom으로 추천 업뎃치기

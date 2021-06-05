@@ -34,6 +34,7 @@ public class UserService {
         StatusEnum hCode = null;
         Object data = null;
         try {
+            //TODO[hyunho]: cascade 적용 또는 페이지 처리 해야함. => 현재 조회를 하면 리스트가 중복되서 보여짐(@oneToMany를 호출시 흔히 발생하는 현상)
             List<UserInfo> list = userRepository.findAll();
             List<UserInfoListDto> result = list.stream()
                     .map(r -> new UserInfoListDto(r))
@@ -64,14 +65,14 @@ public class UserService {
         Object data = null;
 
         try {
-            UserInfo userInfo = userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL);
-            if (userInfo == null) {
+            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL));
+            if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "유효하지 않은 회원정보";
             } else {
                 hCode = StatusEnum.hd1004;
                 hMessage = userId;
-                data = userInfo;
+                data = userInfoDto;
             }
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;
