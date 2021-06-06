@@ -1,6 +1,5 @@
 package com.semobook.recom.repository;
 
-import com.semobook.recom.domain.RecomUserInfo;
 import com.semobook.recom.domain.RecomUserReview;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

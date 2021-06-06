@@ -7,7 +7,6 @@ import com.semobook.bookReview.dto.BookUpdateRequest;
 import com.semobook.bookReview.service.BookReviewService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

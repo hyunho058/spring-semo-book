@@ -100,7 +100,7 @@ public class BookService {
                 hMessage = "도서 조회 성공";
             }
         } catch (Exception e) {
-            log.info(":: deleteBook err :: error is {}", e);
+            log.info(":: findBook err :: error is {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "검색 실패";
         }

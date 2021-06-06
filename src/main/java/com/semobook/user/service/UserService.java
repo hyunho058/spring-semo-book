@@ -36,8 +36,8 @@ public class UserService {
         try {
             //TODO[hyunho]: cascade 적용 또는 페이지 처리 해야함. => 현재 조회를 하면 리스트가 중복되서 보여짐(@oneToMany를 호출시 흔히 발생하는 현상)
             List<UserInfo> list = userRepository.findAll();
-            List<UserInfoListDto> result = list.stream()
-                    .map(r -> new UserInfoListDto(r))
+            List<UserInfoDto> result = list.stream()
+                    .map(r -> new UserInfoDto(r))
                     .collect(Collectors.toList());
             data = result;
         } catch (Exception e) {
