@@ -47,19 +47,16 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
-//            BookDto bookDto = new BookDto(bookRepository.findByIsbn(request.getIsbn()));
-            Book bookDto = bookRepository.findByIsbn(request.getIsbn());
-//            log.info("createReview :: resultBook is {}", bookDto.getBookName());
+            Book book = bookRepository.findByIsbn(request.getIsbn());
             UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserNo(request.getUserNo()))
             log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
-            if (bookDto != null && resultUserInfo != null){
+            if (book != null && resultUserInfo != null){
                 bookReviewRepository.save(BookReview.builder()
                         .rating(request.getRating())
                         .reviewContents(request.getReviewContents())
                         .createDate(LocalDateTime.now())
                         .declaration(0)
-                        .book(bookDto)
+                        .book(book)
                         .userInfo(resultUserInfo)
                         .build());
                 //평점  3점 이상이면 recom으로 추천 업뎃치기
@@ -74,13 +71,6 @@ public class BookReviewService {
                 hMessage = "저장실패";
                 data = null;
             }
-//            bookReviewRepository.save(BookReview.builder()
-//                    .book(reviewBook)
-//                    .rating(request.getRating())
-//                    .reviewContents(request.getReviewContents())
-//                    .createDate(LocalDateTime.now())
-//                    .declaration(0)
-//                    .build());
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
@@ -177,25 +167,6 @@ public class BookReviewService {
                 .hMessage(hMessage)
                 .build();
     }
-
-//    @Data
-//    static class BookReviewDto {
-//        private int rating;
-//        private String reviewContents;
-//        private LocalDateTime createDate;
-//        private int declaration;
-//        private Book book;
-//        private UserInfo userInfo;
-//
-//        public BookReviewDto(BookReview bookReview) {
-//            rating = bookReview.getRating();
-//            reviewContents = bookReview.getReviewContents();
-//            createDate = bookReview.getCreateDate();
-//            declaration = bookReview.getDeclaration();
-//            book = bookReview.getBook();
-//            userInfo = bookReview.getUserInfo();
-//        }
-//    }
 
     /**
      * TODO
