@@ -38,7 +38,7 @@ public class UserInfo {
 
     private LocalDateTime lastConnection;
 
-    @OneToMany(mappedBy = "userInfo")
+    @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL )
     private List<BookReview> bookReviews = new ArrayList<>();
 
     private String deleteReason;

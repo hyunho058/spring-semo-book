@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 
+import org.springframework.data.annotation.Id;
 /**
 * 유저정보 (나이, 성별) 기반 추천 (배치)
  *  RECOM_USER_INFO_M_10 : 10대남성..
