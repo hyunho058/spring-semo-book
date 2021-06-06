@@ -2,6 +2,7 @@ package com.semobook.book.repository;
 
 import com.semobook.book.domain.Book;
 import com.semobook.user.domain.UserInfo;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,8 +19,8 @@ import java.util.List;
 public interface BookRepository extends CrudRepository<Book, String> {
     //search only book
 //    @Query("select b from Book b join fetch b.bookReviewList")
-    @Query("select b from Book b join fetch b.bookReviewList br")
-    Book findByIsbn(String isbn);
+    @Query(value = "select b from Book b left join fetch b.bookReviewList br left join fetch br.userInfo where b.isbn = :isbn")
+    Book findByIsbn(@Param("isbn") String isbn);
 
 
     //search book with bookReview
