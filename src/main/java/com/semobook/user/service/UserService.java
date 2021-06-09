@@ -100,19 +100,20 @@ public class UserService {
         Object data = null;
         try {
             UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
-            if (signUserInfo == null) {
+            UserInfoDto userInfoDto = new UserInfoDto(signUserInfo);
+            if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "없는 USER";
             }
             //id가 있을 때
 
-            else if (!(userSignUpRequest.getUserPassword().equals(signUserInfo.getUserPw()))) {
+            else if (!(userSignUpRequest.getUserPassword().equals(userInfoDto.getUserPw()))) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "로그인 실패";
                 data = null;
             } else {
                 hCode = StatusEnum.hd1004;
-                data = signUserInfo;
+                data = userInfoDto;
                 hMessage = "로그인 성공";
             }
         } catch (Exception e) {
