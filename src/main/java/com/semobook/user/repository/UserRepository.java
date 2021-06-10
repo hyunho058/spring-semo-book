@@ -5,6 +5,7 @@ import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,8 +33,8 @@ public interface UserRepository extends CrudRepository<UserInfo, Long> {
      * @author hyunho
      * @since 2021/05/30
     **/
-    @Query("select u from UserInfo u left join fetch u.bookReviews br")
-    UserInfo findByUserNo(long userNo);
+    @Query("select u from UserInfo u left join fetch u.bookReviews br where u.userNo = :userNo")
+    UserInfo findByUserNo(@Param("userNo") long userNo);
 
     @Query("select u from UserInfo u join fetch u.bookReviews br join fetch br.book")
     UserInfo findByUserNoWithReview(long userNo);
