@@ -1,6 +1,7 @@
 package com.semobook.bookReview.service;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookListDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
@@ -12,6 +13,7 @@ import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,13 +112,15 @@ public class BookReviewService {
         try {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
-//            List<BookReview> allReview = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
-            UserInfo userInfo = userRepository.findByUserNoWithReview(userNo);
-            UserWithReviewsDto userWithReviewsDto = new UserWithReviewsDto(userInfo);
-            //TODO[hyunho]: paging
+
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
+            List<BookReviewDto> allReview = page.getContent().stream()
+                    .map(bookReview -> new BookReviewDto(bookReview))
+                    .collect(Collectors.toList());
+
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = userWithReviewsDto;
+            data = allReview;
 
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
