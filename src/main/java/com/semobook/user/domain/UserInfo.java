@@ -1,6 +1,7 @@
 package com.semobook.user.domain;
 
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookwant.domain.BookWant;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
 import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
@@ -40,6 +41,9 @@ public class UserInfo {
 
     @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL )
     private List<BookReview> bookReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL)
+    private List<BookWant> bookWants = new ArrayList<>();
 
     private String deleteReason;
 

@@ -1,14 +1,14 @@
 package com.semobook.bookwant.domain;
 
+import com.semobook.book.domain.Book;
+import com.semobook.user.domain.UserInfo;
 import lombok.Builder;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
 *
@@ -26,14 +26,20 @@ public class BookWant {
     @GeneratedValue
     private int wantNo;
     private String preference;
-    private String isbn;
-    private int userNo;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_no")
+    private UserInfo userInfo;
+
+    @OneToOne
+    @JoinColumn(name = "isbn" )
+    private Book book;
 
     @Builder
-    public BookWant(String preference, String isbn, int userNo){
+    public BookWant(String preference, UserInfo userInfo, Book book){
         this.preference = preference;
-        this.isbn = isbn;
-        this.userNo = userNo;
+        this.userInfo = userInfo;
+        this.book = book;
 
     }
 
