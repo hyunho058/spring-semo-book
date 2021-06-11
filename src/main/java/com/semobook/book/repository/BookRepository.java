@@ -19,6 +19,11 @@ public interface BookRepository extends CrudRepository<Book, String> {
             "left join fetch br.userInfo where b.isbn = :isbn")
     Book findByIsbn(@Param("isbn") String isbn);
 
+    @Query(value = "select b from Book b " +
+            "left join fetch b.bookReviewList br " +
+            "left join fetch br.userInfo where b.isbn = :isbn")
+    Book findByIsbnWithReview(@Param("isbn")String isbn);
+
     @Query(value = "select b from Book b left join b.bookReviewList br",
             countQuery = "select count(b.bookName) from Book b")
     Page<Book> findAll(Pageable pageable);

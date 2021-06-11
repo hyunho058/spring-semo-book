@@ -41,9 +41,9 @@ public class BookService {
      * @since 2021/04/25
      **/
     public BookResponse addBook(BookRequest bookRequest) {
-//        String hMessage = null;
-//        StatusEnum hCode = null;
-//        Object data = null;
+        hMessage = null;
+        hCode = null;
+        data = null;
         try {
             Book book = bookRepository.save(Book.builder()
                     .isbn(bookRequest.getIsbn())
@@ -83,9 +83,9 @@ public class BookService {
     public BookResponse findBook(String isbn) {
         log.info(":: findBook  :: book is {}", isbn);
 
-//        String hMessage = null;
-//        StatusEnum hCode = null;
-//        Object data = null;
+        hMessage = null;
+        hCode = null;
+        data = null;
 
         try {
             Book book = bookRepository.findByIsbn(isbn);
@@ -118,37 +118,34 @@ public class BookService {
      * @author hyunho
      * @since 2021/06/05
     **/
-//    public BookResponse findBookWithReview(String isbn) {
-//        log.info(":: findBookWithReview  :: book is {}", isbn);
-////        String hMessage = null;
-////        StatusEnum hCode = null;
-////        Object data = null;
-//        try {
-////            Book book = bookRepository.findByIsbnWithReview(isbn);
-////            BookWithReviewDto bookWithReviewDto =  new BookWithReviewDto(bookRepository.findByIsbn(isbn));
-//
-//            Book book = bookRepository.findByIsbn(isbn);
-//            BookDto bookWithReviewDto =  new BookDto(book);
-//
-//            if (bookWithReviewDto == null) {
-//                hCode = StatusEnum.hd4444;
-//                hMessage = "검색된 도서가 없습니다.";
-//            } else {
-//                data = bookWithReviewDto;
-//                hCode = StatusEnum.hd1004;
-//                hMessage = "도서 조회 성공";
-//            }
-//        } catch (Exception e) {
-//            log.info("findBookWithReview :: deleteBook err :: error is {}", e);
-//            hCode = StatusEnum.hd4444;
-//            hMessage = "검색 실패";
-//        }
-//        return BookResponse.builder()
-//                .data(data)
-//                .hCode(hCode)
-//                .hMessage(hMessage)
-//                .build();
-//    }
+    public BookResponse findBookWithReview(String isbn) {
+        log.info(":: findBookWithReview  :: book is {}", isbn);
+        hMessage = null;
+        hCode = null;
+        data = null;
+        try {
+//            Book book = bookRepository.findByIsbnWithReview(isbn);
+            BookWithReviewDto bookWithReviewDto =  new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
+
+            if (bookWithReviewDto == null) {
+                hCode = StatusEnum.hd4444;
+                hMessage = "검색된 도서가 없습니다.";
+            } else {
+                data = bookWithReviewDto;
+                hCode = StatusEnum.hd1004;
+                hMessage = "도서 조회 성공";
+            }
+        } catch (Exception e) {
+            log.info("findBookWithReview :: deleteBook err :: error is {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "검색 실패";
+        }
+        return BookResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
 
 
     /**
@@ -159,9 +156,9 @@ public class BookService {
      **/
     public BookResponse findAll(int pageNum) {
 
-//        String hMessage = null;
-//        StatusEnum hCode = null;
-//        Object data = null;
+        hMessage = null;
+        hCode = null;
+        data = null;
 
         //page처리 적용
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
@@ -213,9 +210,9 @@ public class BookService {
     @Transactional
     public BookResponse deleteBook(String isbn) {
 
-//        String hMessage = null;
-//        StatusEnum hCode = null;
-//        Object data = null;
+        hMessage = null;
+        hCode = null;
+        data = null;
 
         try {
             log.info(":: deleteBook  :: book is {}", isbn);
