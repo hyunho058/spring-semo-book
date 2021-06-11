@@ -14,9 +14,6 @@ import java.util.List;
 
 public interface BookRepository extends CrudRepository<Book, String> {
 
-    @Query(value = "select b from Book b " +
-            "left join fetch b.bookReviewList br " +
-            "left join fetch br.userInfo where b.isbn = :isbn")
     Book findByIsbn(@Param("isbn") String isbn);
 
     @Query(value = "select b from Book b " +
