@@ -146,17 +146,21 @@ public class BookReviewService {
      * @author hyejinzz, hyunho
      * @since 2021/05/30
      **/
-    public BookReviewResponse readReviewAll() {
+    public BookReviewResponse readReviewAll(int pageNum) {
         log.info("showReview");
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
 
         try {
-            List<BookReview> bookReviewList = bookReviewRepository.findAll();
-            List<BookReviewWithBookDto> result = bookReviewList.stream()
-                    .map(r -> new BookReviewWithBookDto(r))
+
+            Page<BookReview> page = bookReviewRepository.findAll(PageRequest.of(pageNum, 5));
+            List<BookReviewWithBookDto> result = page.getContent().stream()
+                    .map(bookReview -> new BookReviewWithBookDto(bookReview))
                     .collect(Collectors.toList());
+//            List<BookReviewWithBookDto> result = bookReviewList.stream()
+//                    .map(r -> new BookReviewWithBookDto(r))
+//                    .collect(Collectors.toList());
             log.info("bookReviewList : {}", result.toString());
 
             hCode = StatusEnum.hd1004;

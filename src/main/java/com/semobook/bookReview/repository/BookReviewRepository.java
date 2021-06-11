@@ -58,9 +58,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview,String> 
      * @since 2021/05/30
     *
      * @return*/
-           //select o from Order o join fetch o.member m join fetch o.delivery d
-    @Query("select r from BookReview r join fetch r.userInfo u join fetch r.book b")
-    List<BookReview> findAll();
+    Page<BookReview> findAll(Pageable pageable);
 
 
 
