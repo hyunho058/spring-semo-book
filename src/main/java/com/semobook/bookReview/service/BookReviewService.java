@@ -114,8 +114,8 @@ public class BookReviewService {
             long userNo = request.getUserNo();
 
             Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
-            List<BookReviewDto> allReview = page.getContent().stream()
-                    .map(bookReview -> new BookReviewDto(bookReview))
+            List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
+                    .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
 
             hCode = StatusEnum.hd1004;
@@ -197,13 +197,6 @@ public class BookReviewService {
 //        }
 //    }
 
-    /**
-     * TODO
-     * 페이징처리가 필요합니다
-     *
-     * @param request
-     * @return
-     */
 
     //모든 사람 글 보여주기
     public BookReviewResponse readRatingReview(BookSearchRequest request) {

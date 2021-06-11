@@ -29,7 +29,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview,String> 
     **/
     //find
     //내가 쓴 글 보기
-    @Query(value = "select br from BookReview br left join fetch br.userInfo ui where ui.userNo = :userNo",
+    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book where ui.userNo = :userNo",
             countQuery = "select count(br.reviewNo) from BookReview  br")
     Page<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo")long userNo, Pageable pageable);
 
