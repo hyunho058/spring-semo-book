@@ -30,15 +30,15 @@ public class BookWantController {
     }
 
     //성향 삭제
-    @DeleteMapping("/delete")
-    public ResponseEntity<BookWantResponse> deleteBookWant(@Parameter @RequestBody BookWantCreateRequest bookWantCreateRequest) {
-        return ResponseEntity.ok(bookWantService.deletePreference(bookWantCreateRequest));
+    @DeleteMapping("/{wantNo}")
+    public ResponseEntity<BookWantResponse> deleteBookWant(@Parameter @PathVariable Long wantNo) {
+        return ResponseEntity.ok(bookWantService.deletePreference(wantNo));
     }
 
     //id별 성향 가져오기
-    @GetMapping("/{id}")
-    public ResponseEntity<BookWantResponse> getBookWant(@Parameter @PathVariable String id){
-        return ResponseEntity.ok(bookWantService.getPreference(id));
+    @GetMapping("/{userId}")
+    public ResponseEntity<BookWantResponse> getBookWant(@Parameter @PathVariable Long userId){
+        return ResponseEntity.ok(bookWantService.getPreference(userId));
     }
 
 }
