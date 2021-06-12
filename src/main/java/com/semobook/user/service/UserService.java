@@ -1,6 +1,8 @@
 package com.semobook.user.service;
 
 
+import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookReview.dto.BookReviewWithIsbnDto;
 import com.semobook.common.StatusEnum;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
@@ -8,6 +10,8 @@ import com.semobook.user.dto.*;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,16 +33,17 @@ public class UserService {
      * @author hyejinzz
      * @since 2021-05-23
      **/
-    public UserResponse findAllUser() {
+    public UserResponse findAllUser(int pageNum) {
         String hMessage = "";
         StatusEnum hCode = null;
         Object data = null;
         try {
             //TODO[hyunho]: cascade 적용 또는 페이지 처리 해야함. => 현재 조회를 하면 리스트가 중복되서 보여짐(@oneToMany를 호출시 흔히 발생하는 현상)
-            List<UserInfo> list = userRepository.findAll();
-            List<UserInfoDto> result = list.stream()
+            Page<UserInfo> page = userRepository.findAll(PageRequest.of(pageNum, 5));
+            List<UserInfoDto> result = page.getContent().stream()
                     .map(r -> new UserInfoDto(r))
                     .collect(Collectors.toList());
+
             data = result;
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;

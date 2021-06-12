@@ -23,9 +23,9 @@ public class UserController {
 
     //모든 회원 조회
     @Operation(description = "모든 회원조회")
-    @GetMapping(value = "/all")
-    public ResponseEntity<UserResponse> getUserAll() {
-        return ResponseEntity.ok(userService.findAllUser());
+    @GetMapping(value = "/all{page}")
+    public ResponseEntity<UserResponse> getUserAll(@Parameter @PathVariable int page) {
+        return ResponseEntity.ok(userService.findAllUser(page));
     }
 
 
