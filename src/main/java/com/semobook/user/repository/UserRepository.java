@@ -3,7 +3,6 @@ package com.semobook.user.repository;
 
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
-import com.semobook.user.dto.UserInfoDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
