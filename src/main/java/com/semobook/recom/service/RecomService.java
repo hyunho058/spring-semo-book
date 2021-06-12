@@ -64,7 +64,6 @@ public class RecomService {
     }
 
 
-
     /**
      * 유저가 리뷰를 등록하면 관련도서 추천을 함
      * 1. 책에 keyword 있으면 keyword 같은 키워드 탐색
@@ -92,11 +91,11 @@ public class RecomService {
 
 //        //내가 읽은 책의 카테고리 가져온다.
         ;
-        if (book.getKeyword() !=null){
+        if (book.getKeyword() != null) {
             List<Book> recomBookList = bookRepository.findAllByKeyword(category);
             bookList.addAll(recomBookList);
         }
-        if (category != null && bookList.size()<20) {
+        if (category != null && bookList.size() < 20) {
             //카테고리 같은 책들 가져오기
             List<Book> recomBookList = bookRepository.findAllByCategory(category);
             bookList.addAll(recomBookList);
@@ -122,12 +121,44 @@ public class RecomService {
 
 
     /**
-    * 이용자가 추천받고 싶지 않은 책들을 필터함
-    * @author hyejinzz
-    * @since 2021-06-03
-    **/
+     * Redis애 있던 종합 베스트셀러 값 가져오기
+     * RECOM_BEST_SELLER:A_1
+     *
+     * @author hyejinzz
+     * @since 2021/06/12
+     **/
+    public RecomResponse bestSellerRecom() {
+        Object data = null;
+        StatusEnum hCode = null;
+        String hMessage = null;
+        try {
+            List<Book> bookList = new ArrayList<>();
 
-   private List<Book> recomfilter(List<Book> recomList) {
+            //TODO[jhj]:Redis에서 데이터 가져오기
+//            bookList = bestSellerRepository.findAllById("RECOM_BEST_SELLER");
+
+
+        } catch (Exception e) {
+
+        }
+        return RecomResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+
+
+    }
+
+
+    /**
+     * 이용자가 추천받고 싶지 않은 책들을 필터함
+     *
+     * @author hyejinzz
+     * @since 2021-06-03
+     **/
+
+    private List<Book> recomfilter(List<Book> recomList) {
 
 //       recomList.stream().filter(i->)
 

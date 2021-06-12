@@ -18,8 +18,6 @@ public class BookDto {
     private String category;
     private String keyword;
     private String img;
-    private List<BookReviewWithBookDto> bookReviews;
-
 
     public BookDto(Book book){
         isbn = book.getIsbn();
@@ -30,9 +28,6 @@ public class BookDto {
         category = book.getCategory();
         keyword = book.getKeyword();
         img = book.getImg();
-        bookReviews = book.getBookReviewList().stream()
-                .map(bookReview -> new BookReviewWithBookDto(bookReview))
-                .collect(Collectors.toList());
     }
 
 

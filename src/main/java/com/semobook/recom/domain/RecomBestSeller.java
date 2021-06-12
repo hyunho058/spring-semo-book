@@ -17,7 +17,7 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash("RECOM_BEST_SELLER")
 public class RecomBestSeller {
     @Id
-    private int rank;
+    private String rank;
     private String isbn;
     private String bookName;
     private String author;
@@ -29,7 +29,7 @@ public class RecomBestSeller {
 
 
     @Builder
-    public RecomBestSeller(int rank, String isbn, String bookName, String author,String publisher,
+    public RecomBestSeller(String rank, String isbn, String bookName, String author,String publisher,
                            String kdc, String category, String keyword, String img){
         this.rank = rank;
         this.isbn = isbn;

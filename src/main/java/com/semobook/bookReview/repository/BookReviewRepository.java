@@ -3,6 +3,7 @@ package com.semobook.bookReview.repository;
 import com.semobook.book.domain.Book;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.user.domain.UserInfo;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +29,10 @@ public interface BookReviewRepository extends CrudRepository<BookReview,String> 
     **/
     //find
     //내가 쓴 글 보기
-    List<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo")long userNo, Pageable pageable);
+    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book where ui.userNo = :userNo",
+            countQuery = "select count(br.reviewNo) from BookReview  br")
+    Page<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo")long userNo, Pageable pageable);
+
     List<BookReview> findAllByUserInfo(UserInfo userInfo, Pageable pageable);
     //이 책 리뷰 모두 보기
 //    List<BookReview> findAllByIsbn(String isbn, Pageable pageable);
@@ -54,9 +58,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview,String> 
      * @since 2021/05/30
     *
      * @return*/
-           //select o from Order o join fetch o.member m join fetch o.delivery d
-    @Query("select r from BookReview r join fetch r.userInfo u join fetch r.book b")
-    List<BookReview> findAll();
+    Page<BookReview> findAll(Pageable pageable);
 
 
 

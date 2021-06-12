@@ -1,7 +1,6 @@
 package com.semobook.bookwant.domain;
 
 import com.semobook.book.domain.Book;
-import com.semobook.bookwant.dto.Preference;
 import com.semobook.user.domain.UserInfo;
 import lombok.Builder;
 import lombok.Generated;
@@ -25,24 +24,23 @@ public class BookWant {
 
     @Id
     @GeneratedValue
-    private long wantNo;
-    //LIKE,DISLIKE
-    @Enumerated(EnumType.STRING)
-    private Preference preference;
+    private int wantNo;
+    private String preference;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "isbn" )
-    private Book book;
-
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_no")
     private UserInfo userInfo;
 
+    @OneToOne
+    @JoinColumn(name = "isbn" )
+    private Book book;
+
     @Builder
-    public BookWant(Preference preference, Book book, UserInfo userInfo){
+    public BookWant(String preference, UserInfo userInfo, Book book){
         this.preference = preference;
-        this.book = book;
         this.userInfo = userInfo;
+        this.book = book;
+
     }
 
 }

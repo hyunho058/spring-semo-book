@@ -54,11 +54,11 @@ public class RecomController {
 //
 //
 //    //베스트 셀러
-//    @Operation(description = "베스트 셀러 추천")
-//    @PostMapping("/bestseller")
-//    public String bestsellerRecom(){
-//        return "";
-//    }
+    @Operation(description = "베스트 셀러 추천")
+    @GetMapping("/bestseller")
+    public ResponseEntity<RecomResponse> bestsellerRecom(){
+        return ResponseEntity.ok(recomService.bestSellerRecom());
+    }
 //
 //    @Operation(description = "베스트 셀러 추천")
 //    @PostMapping("/bestseller")

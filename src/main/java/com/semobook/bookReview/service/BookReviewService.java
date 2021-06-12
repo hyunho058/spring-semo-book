@@ -1,6 +1,7 @@
 package com.semobook.bookReview.service;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookListDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
@@ -12,6 +13,7 @@ import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +49,11 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
+//            BookDto bookDto = new BookDto(bookRepository.findByIsbn(request.getIsbn()));
             Book book = bookRepository.findByIsbn(request.getIsbn());
+//            log.info("createReview :: resultBook is {}", bookDto.getBookName());
             UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserNo(request.getUserNo()))
             log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
             //Todo isbn이 없으면 저장을 못하는 상황임, 책이 db에 없으면 외부api 요청해서 정보 가져오고 책에 isbn만 넣어서 insert를 함
             // TODO: 같은 책은 글을 더 쓰지 못하도록 처리해야한다.
@@ -107,13 +112,15 @@ public class BookReviewService {
         try {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
-//            List<BookReview> allReview = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
-            UserInfo userInfo = userRepository.findByUserNoWithReview(userNo);
-            UserWithReviewsDto userWithReviewsDto = new UserWithReviewsDto(userInfo);
-            //TODO[hyunho]: paging
+
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
+            List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
+                    .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
+                    .collect(Collectors.toList());
+
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = userWithReviewsDto;
+            data = allReview;
 
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
@@ -130,6 +137,8 @@ public class BookReviewService {
                 .build();
     }
 
+
+    //모든 글
     /**
      * 모든 글
      * reference - https://www.inflearn.com/questions/14559
@@ -137,17 +146,21 @@ public class BookReviewService {
      * @author hyejinzz, hyunho
      * @since 2021/05/30
      **/
-    public BookReviewResponse readReviewAll() {
+    public BookReviewResponse readReviewAll(int pageNum) {
         log.info("showReview");
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
 
         try {
-            List<BookReview> bookReviewList = bookReviewRepository.findAll();
-            List<BookReviewWithBookDto> result = bookReviewList.stream()
-                    .map(r -> new BookReviewWithBookDto(r))
+
+            Page<BookReview> page = bookReviewRepository.findAll(PageRequest.of(pageNum, 5));
+            List<BookReviewWithBookDto> result = page.getContent().stream()
+                    .map(bookReview -> new BookReviewWithBookDto(bookReview))
                     .collect(Collectors.toList());
+//            List<BookReviewWithBookDto> result = bookReviewList.stream()
+//                    .map(r -> new BookReviewWithBookDto(r))
+//                    .collect(Collectors.toList());
             log.info("bookReviewList : {}", result.toString());
 
             hCode = StatusEnum.hd1004;
@@ -169,13 +182,25 @@ public class BookReviewService {
                 .build();
     }
 
-    /**
-     * TODO
-     * 페이징처리가 필요합니다
-     *
-     * @param request
-     * @return
-     */
+//    @Data
+//    static class BookReviewDto {
+//        private int rating;
+//        private String reviewContents;
+//        private LocalDateTime createDate;
+//        private int declaration;
+//        private Book book;
+//        private UserInfo userInfo;
+//
+//        public BookReviewDto(BookReview bookReview) {
+//            rating = bookReview.getRating();
+//            reviewContents = bookReview.getReviewContents();
+//            createDate = bookReview.getCreateDate();
+//            declaration = bookReview.getDeclaration();
+//            book = bookReview.getBook();
+//            userInfo = bookReview.getUserInfo();
+//        }
+//    }
+
 
     //모든 사람 글 보여주기
     public BookReviewResponse readRatingReview(BookSearchRequest request) {

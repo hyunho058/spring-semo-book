@@ -3,8 +3,10 @@ package com.semobook.user.repository;
 
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
+import com.semobook.user.dto.UserInfoDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +19,9 @@ public interface UserRepository extends CrudRepository<UserInfo, Long> {
     List<UserInfo> findAll();
 
     //유저no로 회원 조회 (휴먼, 정지, 탈퇴 제외)
-    @Query("select u from UserInfo u join fetch u.bookReviews ur join fetch ur.userInfo")
-    UserInfo findByUserIdAndUserStatus(String userId, Enum<UserStatus> status);
+//    @Query("select distinct u from UserInfo u join fetch u.bookReviews ur join fetch ur.userInfo")
+//    UserInfo findByUserIdAndUserStatus(@Param("userId") String userId, Enum<UserStatus> status);
+    UserInfo findByUserIdAndUserStatus( String userId, Enum<UserStatus> status);
 
     //유저id로 회원조회 찾기 (휴먼, 정지, 탈퇴 제외)
     UserInfo findByUserNoAndUserStatus(long userNo, Enum<UserStatus> status);
@@ -32,8 +35,8 @@ public interface UserRepository extends CrudRepository<UserInfo, Long> {
      * @author hyunho
      * @since 2021/05/30
     **/
-    @Query("select u from UserInfo u left join fetch u.bookReviews br")
-    UserInfo findByUserNo(long userNo);
+    @Query("select u from UserInfo u left join fetch u.bookReviews br where u.userNo = :userNo")
+    UserInfo findByUserNo(@Param("userNo") long userNo);
 
     @Query("select u from UserInfo u join fetch u.bookReviews br join fetch br.book")
     UserInfo findByUserNoWithReview(long userNo);

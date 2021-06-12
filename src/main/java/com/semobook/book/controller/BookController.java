@@ -60,20 +60,18 @@ public class BookController {
      * @since 2021/04/25
     **/
     @Operation(description = "책 조회")
-    @GetMapping(value = "/book/{isbn}")
+    @GetMapping(value = "/{isbn}")
     public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable String isbn){
         log.info("==/findBook {}", isbn);
         return ResponseEntity.ok(bookService.findBook(isbn));
     }
 
 
-
     @Operation(description = "책 조회(리뷰 포함)")
     @GetMapping(value = "/bookWithReview/{isbn}")
     public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn){
         log.info("==/findBookWithReview {}", isbn);
-//        return ResponseEntity.ok(bookService.findBookWithReview(isbn));
-        return null;
+        return ResponseEntity.ok(bookService.findBookWithReview(isbn));
     }
 
     /**

@@ -26,16 +26,15 @@ public class UserInfo {
     private String userId;
 
     private String userPw;
-
     //GENERAL(일반),PAUSE(정지),SLEEP(휴먼),DELETE(삭제),ADMIN(관리자)',
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
     private String userName;
 
-    //'성별, W : 여자 /  M : 남자',
     private String userGender;
 
+    //'성별, W : 여자 /  M : 남자',
     private String userBirth;
 
     private LocalDateTime lastConnection;
@@ -43,7 +42,7 @@ public class UserInfo {
     @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL )
     private List<BookReview> bookReviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL )
+    @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL)
     private List<BookWant> bookWants = new ArrayList<>();
 
     private String deleteReason;
@@ -61,6 +60,17 @@ public class UserInfo {
         this.userStatus = UserStatus.GENERAL;
         this.lastConnection = lastConnection;
     }
+//
+//    @Builder
+//    public UserInfo(UserInfoDto userInfoDto, LocalDateTime lastConnection) {
+//        this.userId = userInfoDto.getUserId();
+//        this.userPw = userInfoDto.getUserPw();
+//        this.userName = userInfoDto.getUserName();
+//        this.userGender = userInfoDto.getUserGender();
+//        this.userBirth = userInfoDto.getUserBirth();
+//        this.userStatus = UserStatus.GENERAL;
+//        this.lastConnection = lastConnection;
+//    }
 
     public void changeUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
