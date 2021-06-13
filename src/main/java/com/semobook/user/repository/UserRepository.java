@@ -1,12 +1,9 @@
 package com.semobook.user.repository;
 
 
-import com.semobook.bookReview.domain.BookReview;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.UserInfoDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

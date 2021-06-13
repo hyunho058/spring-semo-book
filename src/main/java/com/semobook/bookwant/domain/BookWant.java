@@ -1,6 +1,8 @@
 package com.semobook.bookwant.domain;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookWithReviewDto;
+import com.semobook.bookwant.dto.Preference;
 import com.semobook.user.domain.UserInfo;
 import lombok.Builder;
 import lombok.Generated;
@@ -24,23 +26,36 @@ public class BookWant {
 
     @Id
     @GeneratedValue
-    private int wantNo;
-    private String preference;
+    private long wantNo;
+    //LIKE,DISLIKE
+    @Enumerated(EnumType.STRING)
+    private Preference preference;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_no")
-    private UserInfo userInfo;
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "isbn" )
     private Book book;
 
-    @Builder
-    public BookWant(String preference, UserInfo userInfo, Book book){
-        this.preference = preference;
-        this.userInfo = userInfo;
-        this.book = book;
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_no")
+    private UserInfo userInfo;
 
+
+
+    @Builder
+    public BookWant(Preference preference, BookWithReviewDto bookDto, UserInfo userInfo){
+        this.preference = preference;
+        this.book = Book.builder()
+                .bookName(bookDto.getBookName())
+                .isbn(bookDto.getIsbn())
+                .author(bookDto.getAuthor())
+                .publisher(bookDto.getPublisher())
+                .kdc(bookDto.getKdc())
+                .category(bookDto.getCategory())
+                .keyword(bookDto.getKeyword())
+                .img(bookDto.getImg())
+                .build();
+                // TODO: 2021-06-10 book 으로변환
+        this.userInfo = userInfo;
     }
 
 }
