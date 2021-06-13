@@ -38,10 +38,10 @@ public class BookReviewController {
         return ResponseEntity.ok(boardService.updateReview(request));
     }
 
-    //도서 별점만 주기
+    //도서 별점만 주기(도서 선소도)
     @PostMapping("/update/rating")
-    public ResponseEntity<BookReviewResponse> readRatingBookReview(@Parameter @RequestBody BookSearchRequest request){
-        return ResponseEntity.ok(boardService.readRatingReview(request));
+    public ResponseEntity<BookReviewResponse> readRatingBookReview(@Parameter @RequestBody BookReviewRatingRequest request){
+        return ResponseEntity.ok(boardService.bookReviewRating(request));
     }
 
     //리뷰 조회

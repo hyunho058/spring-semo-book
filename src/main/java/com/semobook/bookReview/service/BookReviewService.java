@@ -46,7 +46,7 @@ public class BookReviewService {
      *
      * @author hyejinzz
      * @since 2021/05/29
-    **/
+     **/
     @Transactional
     public BookReviewResponse createReview(BookReviewRequest request) {
         log.info("createReview ::");
@@ -60,7 +60,7 @@ public class BookReviewService {
             log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
             //Todo isbn이 없으면 저장을 못하는 상황임, 책이 db에 없으면 외부api 요청해서 정보 가져오고 책에 isbn만 넣어서 insert를 함
             // TODO: 같은 책은 글을 더 쓰지 못하도록 처리해야한다.
-            if (book != null && resultUserInfo != null){
+            if (book != null && resultUserInfo != null) {
                 bookReviewRepository.save(BookReview.builder()
                         .rating(request.getRating())
                         .reviewContents(request.getReviewContents())
@@ -76,7 +76,7 @@ public class BookReviewService {
                 hCode = StatusEnum.hd1004;
                 hMessage = "저장완료";
                 data = request;
-            }else {
+            } else {
                 hCode = StatusEnum.hd4444;
                 hMessage = "저장실패";
                 data = null;
@@ -97,6 +97,61 @@ public class BookReviewService {
                 .build();
     }
 
+
+    /**
+     * 도서 별점 주기
+     *
+     * @author hyunho
+     * @since 2021/06/13
+    **/
+    @Transactional
+    public BookReviewResponse bookReviewRating(BookReviewRatingRequest request){
+        log.info("bookReviewRating ::");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
+
+        try {
+            Book book = bookRepository.findByIsbn(request.getIsbn());
+            UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+            log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
+            //Todo isbn이 없으면 저장을 못하는 상황임, 책이 db에 없으면 외부api 요청해서 정보 가져오고 책에 isbn만 넣어서 insert를 함
+            // TODO: 같은 책은 글을 더 쓰지 못하도록 처리해야한다.
+            if (book != null && resultUserInfo != null) {
+                bookReviewRepository.save(BookReview.builder()
+                        .rating(request.getRating())
+                        .createDate(LocalDateTime.now())
+                        .declaration(0)
+                        .book(book)
+                        .userInfo(resultUserInfo)
+                        .build());
+                //평점  3점 이상이면 recom으로 추천 업뎃치기
+                if (request.getRating() >= 3) {
+//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
+                }
+                hCode = StatusEnum.hd1004;
+                hMessage = "저장완료";
+                data = request;
+            } else {
+                hCode = StatusEnum.hd4444;
+                hMessage = "저장실패";
+                data = null;
+            }
+
+        } catch (Exception e) {
+            log.error("createReview err :: error msg : {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "createReview 에러";
+            data = null;
+
+        }
+
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
 
     /**
      * 내 글 보여주기
@@ -183,7 +238,7 @@ public class BookReviewService {
      *
      * @author hyejinzz, hyunho
      * @since 2021/05/19
-    **/
+     **/
     public BookReviewResponse readRatingReview(BookSearchRequest request) {
         log.info("readRatingReview");
         String hMessage = null;
@@ -214,13 +269,12 @@ public class BookReviewService {
                 .build();
     }
 
-
     /**
      * 글 수정
      *
      * @author hyejinzz
      * @since 2021/05/19
-    **/
+     **/
     @Transactional
     public BookReviewResponse updateReview(BookUpdateRequest request) {
         String hMessage = null;
@@ -262,7 +316,7 @@ public class BookReviewService {
      *
      * @author hyejinzz, hyunho
      * @since 2021/05/30
-    **/
+     **/
     @Transactional
     public BookReviewResponse deleteReview(DeleteBookReviewRequest deleteBookReviewRequest) {
         String hMessage = null;
