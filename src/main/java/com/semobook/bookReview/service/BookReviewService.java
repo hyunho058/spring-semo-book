@@ -41,7 +41,12 @@ public class BookReviewService {
     private final UserRepository userRepository;
 
 
-    //글 등록
+    /**
+     * 글 등록
+     *
+     * @author hyejinzz
+     * @since 2021/05/29
+    **/
     @Transactional
     public BookReviewResponse createReview(BookReviewRequest request) {
         log.info("createReview ::");
@@ -50,11 +55,8 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
-//            BookDto bookDto = new BookDto(bookRepository.findByIsbn(request.getIsbn()));
             Book book = bookRepository.findByIsbn(request.getIsbn());
-//            log.info("createReview :: resultBook is {}", bookDto.getBookName());
             UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserNo(request.getUserNo()))
             log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
             //Todo isbn이 없으면 저장을 못하는 상황임, 책이 db에 없으면 외부api 요청해서 정보 가져오고 책에 isbn만 넣어서 insert를 함
             // TODO: 같은 책은 글을 더 쓰지 못하도록 처리해야한다.
@@ -102,8 +104,6 @@ public class BookReviewService {
      * @author hyejinzz
      * @since 2021-05-29
      **/
-
-    //내 글 보여주기
     public BookReviewResponse readMyReview(BookSearchRequest request) {
         log.info(":: readMyReview() :: request is {}", request.getUserNo());
         String hMessage = "";
@@ -139,7 +139,6 @@ public class BookReviewService {
     }
 
 
-    //모든 글
     /**
      * 모든 글
      * reference - https://www.inflearn.com/questions/14559
@@ -154,14 +153,10 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
-
             Page<BookReview> page = bookReviewRepository.findAll(PageRequest.of(pageNum, 5));
             List<BookReviewWithBookDto> result = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithBookDto(bookReview))
                     .collect(Collectors.toList());
-//            List<BookReviewWithBookDto> result = bookReviewList.stream()
-//                    .map(r -> new BookReviewWithBookDto(r))
-//                    .collect(Collectors.toList());
             log.info("bookReviewList : {}", result.toString());
 
             hCode = StatusEnum.hd1004;
@@ -183,27 +178,12 @@ public class BookReviewService {
                 .build();
     }
 
-//    @Data
-//    static class BookReviewDto {
-//        private int rating;
-//        private String reviewContents;
-//        private LocalDateTime createDate;
-//        private int declaration;
-//        private Book book;
-//        private UserInfo userInfo;
-//
-//        public BookReviewDto(BookReview bookReview) {
-//            rating = bookReview.getRating();
-//            reviewContents = bookReview.getReviewContents();
-//            createDate = bookReview.getCreateDate();
-//            declaration = bookReview.getDeclaration();
-//            book = bookReview.getBook();
-//            userInfo = bookReview.getUserInfo();
-//        }
-//    }
-
-
-    //모든 사람 글 보여주기
+    /**
+     * 모든 사람 글 보여주기
+     *
+     * @author hyejinzz, hyunho
+     * @since 2021/05/19
+    **/
     public BookReviewResponse readRatingReview(BookSearchRequest request) {
         log.info("readRatingReview");
         String hMessage = null;
@@ -235,7 +215,12 @@ public class BookReviewService {
     }
 
 
-    //글 수정
+    /**
+     * 글 수정
+     *
+     * @author hyejinzz
+     * @since 2021/05/19
+    **/
     @Transactional
     public BookReviewResponse updateReview(BookUpdateRequest request) {
         String hMessage = null;
@@ -272,7 +257,12 @@ public class BookReviewService {
                 .build();
     }
 
-    //글 삭제
+    /**
+     * 글 삭제
+     *
+     * @author hyejinzz, hyunho
+     * @since 2021/05/30
+    **/
     @Transactional
     public BookReviewResponse deleteReview(DeleteBookReviewRequest deleteBookReviewRequest) {
         String hMessage = null;

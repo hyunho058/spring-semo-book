@@ -73,7 +73,6 @@ public class BookService {
     }
 
 
-
     /**
      * 도서 조회
      *
@@ -89,7 +88,7 @@ public class BookService {
 
         try {
             Book book = bookRepository.findByIsbn(isbn);
-            BookDto bookDto =  new BookDto(book);
+            BookDto bookDto = new BookDto(book);
 
             if (book == null) {
                 hCode = StatusEnum.hd4444;
@@ -113,11 +112,9 @@ public class BookService {
 
 
     /**
-     *
-     *
      * @author hyunho
      * @since 2021/06/05
-    **/
+     **/
     public BookResponse findBookWithReview(String isbn) {
         log.info(":: findBookWithReview  :: book is {}", isbn);
         hMessage = null;
@@ -125,7 +122,7 @@ public class BookService {
         data = null;
         try {
 //            Book book = bookRepository.findByIsbnWithReview(isbn);
-            BookWithReviewDto bookWithReviewDto =  new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
+            BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
 
             if (bookWithReviewDto == null) {
                 hCode = StatusEnum.hd4444;
@@ -169,7 +166,6 @@ public class BookService {
                 .collect(Collectors.toList());
 
 
-
         return BookResponse.builder()
                 .data(result)
                 .hCode(hCode)
@@ -182,7 +178,7 @@ public class BookService {
      *
      * @author hyunho
      * @since 2021/06/03
-    **/
+     **/
 //    public BookResponse pageBookList(){
 //        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "bookName"));
 //        Page<Book> books = bookRepository.findALl(pageRequest);
@@ -237,7 +233,7 @@ public class BookService {
      *
      * @author hyunho
      * @since 2021/06/02
-    **/
+     **/
 //    public BookResponse findAllWithReview(@RequestParam(value = "offset", defaultValue = "0") int offset,
 //                                          @RequestParam(value = "limit", defaultValue = "100") int limit)
 //    {

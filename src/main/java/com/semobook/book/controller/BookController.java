@@ -31,10 +31,10 @@ public class BookController {
      *
      * @author khh
      * @since 2021/04/25
-    **/
+     **/
     @Operation(description = "책 등록")
     @PostMapping("/addBook")
-    public ResponseEntity<BookResponse> addBook(@Parameter @RequestBody BookRequest bookRequest){
+    public ResponseEntity<BookResponse> addBook(@Parameter @RequestBody BookRequest bookRequest) {
         log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", bookRequest.getIsbn(), bookRequest.getBookName(), bookRequest.getAuthor());
         return ResponseEntity.ok(bookService.addBook(bookRequest));
     }
@@ -45,10 +45,10 @@ public class BookController {
      *
      * @author hyunho
      * @since 2021/05/27
-    **/
+     **/
     @Operation(description = "도서 삭제")
     @PostMapping("/delete")
-    public ResponseEntity<BookResponse> deleteBookCon(@Parameter @RequestParam String isbn){
+    public ResponseEntity<BookResponse> deleteBookCon(@Parameter @RequestParam String isbn) {
         log.info(":: deleteBookCon  :: isbn is {}", isbn);
         return ResponseEntity.ok(bookService.deleteBook(isbn));
     }
@@ -58,18 +58,24 @@ public class BookController {
      *
      * @author khh
      * @since 2021/04/25
-    **/
+     **/
     @Operation(description = "책 조회")
     @GetMapping(value = "/{isbn}")
-    public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable String isbn){
+    public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable String isbn) {
         log.info("==/findBook {}", isbn);
         return ResponseEntity.ok(bookService.findBook(isbn));
     }
 
 
+    /**
+     * 책 조회
+     *
+     * @author hyunho
+     * @since 2021/06/05
+     **/
     @Operation(description = "책 조회(리뷰 포함)")
     @GetMapping(value = "/bookWithReview/{isbn}")
-    public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn){
+    public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn) {
         log.info("==/findBookWithReview {}", isbn);
         return ResponseEntity.ok(bookService.findBookWithReview(isbn));
     }
@@ -79,10 +85,10 @@ public class BookController {
      *
      * @author khh
      * @since 2021/04/25
-    **/
+     **/
     @Operation(description = "모든 책 조회")
     @GetMapping("/all/{page}")
-    public ResponseEntity<BookResponse> findAll(@Parameter @PathVariable int page){
+    public ResponseEntity<BookResponse> findAll(@Parameter @PathVariable int page) {
         log.info("==/findAll");
         //TODO[hyunho]:패이지 처리
         return ResponseEntity.ok(bookService.findAll(page));
@@ -96,14 +102,12 @@ public class BookController {
 //    }
 
 
-
-
     /**
      * 리뷰가 포함된 책 검색(All)
      *
      * @author hyunho
      * @since 2021/06/02
-    **/
+     **/
 //    @Operation(description = "리뷰가 포함된 책 조회")
 //    @GetMapping("/bookWithReviews")
 //    public ResponseEntity<BookResponse> findAllWithReview(){
