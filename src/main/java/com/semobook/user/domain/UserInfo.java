@@ -51,7 +51,8 @@ public class UserInfo {
 
 
     @Builder
-    public UserInfo(String userId, String userPw, String userName, String userGender, String userBirth, LocalDateTime lastConnection) {
+    public UserInfo(long userNo,String userId, String userPw, String userName, String userGender, String userBirth, LocalDateTime lastConnection) {
+        this.userNo = userNo;
         this.userId = userId;
         this.userPw = userPw;
         this.userName = userName;
