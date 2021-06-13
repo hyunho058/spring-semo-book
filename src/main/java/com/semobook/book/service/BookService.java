@@ -40,6 +40,7 @@ public class BookService {
      * @author khh
      * @since 2021/04/25
      **/
+    @Transactional
     public BookResponse addBook(BookRequest bookRequest) {
         hMessage = null;
         hCode = null;
