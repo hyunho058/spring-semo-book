@@ -29,11 +29,11 @@ public class BookReview {
     @Enumerated(EnumType.STRING)
     private ReviewStatus reviewStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no")
     private UserInfo userInfo;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "isbn" )
     private Book book;
 
@@ -52,5 +52,4 @@ public class BookReview {
         this.rating = rating;
         this.reviewContents = reviewContents;
     }
-
 }

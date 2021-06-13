@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Timer;
 import java.util.stream.Collectors;
 
 /**
@@ -273,12 +274,13 @@ public class BookReviewService {
 
     //글 삭제
     @Transactional
-    public BookReviewResponse deleteReview(long reviewNo) {
+    public BookReviewResponse deleteReview(DeleteBookReviewRequest deleteBookReviewRequest) {
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
         try {
-            bookReviewRepository.deleteBookReviewByReviewNo(reviewNo);
+            bookReviewRepository.deleteBookReviewByReviewNo(deleteBookReviewRequest.getReviewNo());
+//            data = resultCode;
             hCode = StatusEnum.hd1004;
             hMessage = "삭제 완료";
         } catch (Exception e) {

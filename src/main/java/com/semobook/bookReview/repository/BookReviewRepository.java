@@ -39,11 +39,14 @@ public interface BookReviewRepository extends CrudRepository<BookReview,String> 
     List<BookReview> findAllByBook(Book book, Pageable pageable);
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//    //모든 리뷰 보기
+    //모든 리뷰 보기
     List<BookReview> findAllByCreateDateBefore(LocalDateTime createDate, Pageable pageable);
 
     //삭제
-    BookReview deleteBookReviewByReviewNo(long reviewNo);
+//    @Query(value = "select new com.semobook.bookReview.dto.BookReviewDto(br) FROM BookReview br where br.reviewNo = :reviewNo")
+    @Query(value = "select br FROM BookReview br where br.reviewNo = :reviewNo")
+    int deleteBookReviewByReviewNo(@Param(value = "reviewNo") long reviewNo);
+
 
     BookReview findByReviewNo(long reviewNo);
 

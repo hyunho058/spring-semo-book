@@ -38,7 +38,7 @@ public class Book {
     private String img;
 
 //    @JsonIgnore //bookReviewList 를 호회하지 않는다..... 쓰면 좋지 않다..... 쓰지마라
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookReview> bookReviewList = new ArrayList<>();
 
     @Builder
