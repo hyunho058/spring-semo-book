@@ -7,11 +7,13 @@ import com.semobook.bookReview.dto.BookReviewResponse;
 import com.semobook.bookwant.domain.BookWant;
 import com.semobook.bookwant.dto.BookWantCreateRequest;
 import com.semobook.bookwant.dto.BookWantDto;
+import com.semobook.bookwant.dto.BookWantReadRequest;
 import com.semobook.bookwant.dto.BookWantResponse;
 import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
+import com.semobook.user.dto.BookWantListByUserDto;
 import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,7 +29,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookWantService {
-
     private final BookWantRepository bookWantRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
@@ -116,15 +118,16 @@ public class BookWantService {
     }
 
 
-    public BookWantResponse getPreference(Long userNo) {
+    public BookWantResponse getPreference(BookWantReadRequest request) {
         log.info(":: getPreference :: start ");
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
+        long userNo = request.getUserNo();
 
         try {
-            List<BookWant> bookWants = bookWantRepository.findAll(userNo);
-            if (bookWants.size() == 0) {
+             BookWantListByUserDto bookWants =new BookWantListByUserDto(userRepository.findByBookWantWithReview(userNo));
+            if (bookWants ==null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "데이터가 없음";
             } else {

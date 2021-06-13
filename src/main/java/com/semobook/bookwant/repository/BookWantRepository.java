@@ -13,11 +13,11 @@ import java.util.List;
 public interface BookWantRepository extends JpaRepository<BookWant,Long> {
 //
     //내 선호도 찾기
-    @Query("select r from BookWant r " +
-            "join fetch r.userInfo u " +
-            "join fetch r.book b " +
-            "where u.userNo = :userNo")
-    List<BookWant> findAll(@Param("userNo") long userNo);
+//    @Query("select r from BookWant r " +
+//            "join fetch r.userInfo u " +
+//            "join fetch r.book b " +
+//            "where u.userNo = :userNo")
+//    List<BookWant> findAll(@Param("userNo") long userNo);
 
     //UserNo별, Isbn별, 선호/비선호
     @Query("select r from BookWant r " +
