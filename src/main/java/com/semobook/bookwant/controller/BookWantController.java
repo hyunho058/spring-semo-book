@@ -1,6 +1,7 @@
 package com.semobook.bookwant.controller;
 
 import com.semobook.bookwant.dto.BookWantCreateRequest;
+import com.semobook.bookwant.dto.BookWantReadRequest;
 import com.semobook.bookwant.dto.BookWantResponse;
 import com.semobook.bookwant.service.BookWantService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,9 +37,9 @@ public class BookWantController {
     }
 
     //id별 성향 가져오기
-    @GetMapping("/{userId}")
-    public ResponseEntity<BookWantResponse> getBookWant(@Parameter @PathVariable Long userId){
-        return ResponseEntity.ok(bookWantService.getPreference(userId));
+    @PostMapping("/{userId}")
+    public ResponseEntity<BookWantResponse> getBookWant(@Parameter @RequestBody BookWantReadRequest request){
+        return ResponseEntity.ok(bookWantService.getPreference(request));
     }
 
 }

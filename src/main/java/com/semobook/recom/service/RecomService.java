@@ -1,9 +1,9 @@
 package com.semobook.recom.service;
 
-import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.common.StatusEnum;
+import com.semobook.recom.domain.RecomBestSeller;
 import com.semobook.recom.domain.RecomUserReview;
 import com.semobook.recom.dto.RecomResponse;
 import com.semobook.recom.repository.RecomBestSellerRepository;
@@ -12,11 +12,12 @@ import com.semobook.recom.repository.RecomUserReviewRepository;
 import com.semobook.recom.repository.RecomUserTotalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -35,7 +36,7 @@ public class RecomService {
     private final RecomUserInfoRepository userInfoRepository;
     private final RecomUserReviewRepository userReviewRepository;
     private final RecomUserTotalRepository recomUserTotalRepository;
-
+    private final RedisService redisService;
 
     /**
      * 유저가 읽은 책 기반 추천
@@ -121,7 +122,7 @@ public class RecomService {
 
 
     /**
-     * Redis애 있던 종합 베스트셀러 값 가져오기
+     * Redis에 있던 종합 베스트셀러 값 가져오기
      * RECOM_BEST_SELLER:A_1
      *
      * @author hyejinzz
@@ -132,13 +133,21 @@ public class RecomService {
         StatusEnum hCode = null;
         String hMessage = null;
         try {
-            List<Book> bookList = new ArrayList<>();
+            List<RecomBestSeller> bookList = new ArrayList<>();
+            String key = "RECOM_BEST_SELLER:A_";
 
-            //TODO[jhj]:Redis에서 데이터 가져오기
-//            bookList = bestSellerRepository.findAllById("RECOM_BEST_SELLER");
+            for (int i = 1; i <= 20; i++) {
+                bookList.add(getFromRedis(key+i));
+            }
 
+            // TODO: 2021-06-13 필터
 
+            data = bookList;
+            hCode = StatusEnum.hd1004;
+            hMessage = "bestSellerRecom";
         } catch (Exception e) {
+            log.error(":: bestSellerRecom err :: error is {} ", e);
+            hCode = StatusEnum.hd4444;
 
         }
         return RecomResponse.builder()
@@ -147,7 +156,40 @@ public class RecomService {
                 .hMessage(hMessage)
                 .build();
 
+    }
 
+    // TODO: 2021-06-13 orm으로 가져오는 방법을 찾지 못해서 직접 가지고 온다.
+    private RecomBestSeller getFromRedis(String key) {
+
+        String isbnKey = "isbn";
+        String bookNameKey = "bookName";
+        String authorKey = "author";
+        String publisherKey = "publisher";
+        String kdcKey = "kdc";
+        String categoryKey = "category";
+        String keywordKey = "keyword";
+        String imgKey = "img";
+
+        String isbn = redisService.getHashOps(key, isbnKey);
+        String bookName = redisService.getHashOps(key, bookNameKey);
+        String author = redisService.getHashOps(key, authorKey);
+        String publisher = redisService.getHashOps(key, publisherKey);
+        String kdc = redisService.getHashOps(key, kdcKey);
+        String category = redisService.getHashOps(key, categoryKey);
+        String keyword = redisService.getHashOps(key, keywordKey);
+        String img = redisService.getHashOps(key, imgKey);
+
+        return RecomBestSeller.builder()
+                .rank(key)
+                .isbn(isbn)
+                .bookName(bookName)
+                .author(author)
+                .publisher(publisher)
+                .kdc(kdc)
+                .category(category)
+                .keyword(keyword)
+                .img(img)
+                .build();
     }
 
 

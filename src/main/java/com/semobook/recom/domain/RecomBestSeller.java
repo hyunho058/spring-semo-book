@@ -3,19 +3,22 @@ package com.semobook.recom.domain;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
 
 
 /**
 * 베스트셀러 추천 (배치)
- * RECOM_BEST_SELLER_1 : bestSellsr 1위
+ * RECOM_BEST_SELLER:A_1 : bestSellsr 종합 1위
 * @author hyejinzz
 * @since 2021-05-29
 **/
 @Getter
 @RedisHash("RECOM_BEST_SELLER")
-public class RecomBestSeller {
+public class RecomBestSeller  implements Serializable {
     @Id
     private String rank;
     private String isbn;

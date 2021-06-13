@@ -4,6 +4,7 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookWithReviewDto;
 import com.semobook.bookwant.dto.Preference;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
 import lombok.Generated;
 import lombok.Getter;
@@ -35,14 +36,14 @@ public class BookWant {
     @JoinColumn(name = "isbn" )
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no")
     private UserInfo userInfo;
 
 
 
     @Builder
-    public BookWant(Preference preference, BookWithReviewDto bookDto, UserInfo userInfo){
+    public BookWant(Preference preference, BookWithReviewDto bookDto, UserInfoDto userInfo){
         this.preference = preference;
         this.book = Book.builder()
                 .bookName(bookDto.getBookName())
@@ -55,7 +56,9 @@ public class BookWant {
                 .img(bookDto.getImg())
                 .build();
                 // TODO: 2021-06-10 book 으로변환
-        this.userInfo = userInfo;
+        this.userInfo = UserInfo.builder()
+                .userNo(userInfo.getUserNo())
+        .build();
     }
 
 }
