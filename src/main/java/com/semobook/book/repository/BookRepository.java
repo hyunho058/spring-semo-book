@@ -24,7 +24,7 @@ public interface BookRepository extends CrudRepository<Book, String> {
     Book findByIsbnWithReview(@Param("isbn")String isbn);
 
     //책 전채 조회(패이징처리)
-    @Query(value = "select b from Book b left join b.bookReviewList br",
+    @Query(value = "select b from Book b left join fetch b.bookReviewList br",
             countQuery = "select count(b.bookName) from Book b")
     Page<Book> findAll(Pageable pageable);
 
