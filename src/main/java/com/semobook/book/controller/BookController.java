@@ -26,7 +26,6 @@ public class BookController {
     private final BookService bookService;
 
 
-    //jenkinsTest
     /**
      * 책 등록
      *
@@ -36,6 +35,13 @@ public class BookController {
     @Operation(description = "책 등록")
     @PostMapping("/addBook")
     public ResponseEntity<BookResponse> addBook(@Parameter @RequestBody BookRequest bookRequest) {
+        log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", bookRequest.getIsbn(), bookRequest.getBookName(), bookRequest.getAuthor());
+        return ResponseEntity.ok(bookService.addBook(bookRequest));
+    }
+
+    @Operation(description = "젠킨스테스트")
+    @PostMapping("/TEST")
+    public ResponseEntity<BookResponse> jenkinsTest(@Parameter @RequestBody BookRequest bookRequest) {
         log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", bookRequest.getIsbn(), bookRequest.getBookName(), bookRequest.getAuthor());
         return ResponseEntity.ok(bookService.addBook(bookRequest));
     }
