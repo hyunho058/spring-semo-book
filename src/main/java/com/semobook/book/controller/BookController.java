@@ -39,14 +39,6 @@ public class BookController {
         return ResponseEntity.ok(bookService.addBook(bookRequest));
     }
 
-    //젠킨스 테스트
-    @Operation(description = "젠킨스테스트")
-    @PostMapping("/TEST")
-    public ResponseEntity<BookResponse> jenkinsTest(@Parameter @RequestBody BookRequest bookRequest) {
-        log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", bookRequest.getIsbn(), bookRequest.getBookName(), bookRequest.getAuthor());
-        return ResponseEntity.ok(bookService.addBook(bookRequest));
-    }
-
 
     /**
      * delete book
