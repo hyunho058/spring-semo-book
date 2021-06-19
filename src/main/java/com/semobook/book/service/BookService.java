@@ -160,7 +160,24 @@ public class BookService {
 
         //page처리 적용
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
-        Page<Book> page = bookRepository.findAll(pageRequest);
+        PageRequest pageAndSortRequest = PageRequest.of(pageNum, 3, Sort.by(Sort.Direction.DESC, "bookName"));
+//        Page<Book> page = bookRepository.findAll(pageRequest);
+        Slice<Book> page = bookRepository.findAll(pageAndSortRequest);   //limit + 1결과를 반환한다,
+
+        List<Book> content = page.getContent(); //패이지로 가져온
+//        long totalElements = page.getTotalElements(); //total count
+        int pageNumber = page.getNumber();  //page number
+//        int totalPage = page.getTotalPages();   //total page
+        boolean firstPage = page.isFirst(); //first page
+        boolean nextPageState = page.hasNext(); //다음 페이지 존재 여부
+
+        log.info("page count = "+content.size());
+//        log.info("total count = "+totalElements);
+        log.info("page number = "+pageNumber);
+//        log.info("total page = "+totalPage);
+        log.info("first page state = "+firstPage);
+        log.info("next page state = "+nextPageState);
+
 //        Slice<Book> slicePage = bookRepository.findAll(pageRequest);  client 단에ㅓ 더보기 기능을 사용할때 slice 를 사용하면 좋다.
         List<BookListDto> result = page.getContent().stream()
                 .map(b -> new BookListDto(b))
