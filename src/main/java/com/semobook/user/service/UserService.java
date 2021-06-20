@@ -52,8 +52,8 @@ public class UserService {
         }
         return UserResponse.builder()
                 .data(data)
-                .hcode(hCode)
-                .hMessage(hMessage)
+                .code(hCode)
+                .message(hMessage)
                 .build();
     }
 
@@ -87,8 +87,8 @@ public class UserService {
 
         return UserResponse.builder()
                 .data(data)
-                .hcode(hCode)
-                .hMessage(hMessage)
+                .code(hCode)
+                .message(hMessage)
                 .build();
     }
 
@@ -128,8 +128,8 @@ public class UserService {
         }
 
         return UserResponse.builder()
-                .hcode(hCode)
-                .hMessage(hMessage)
+                .code(hCode)
+                .message(hMessage)
                 .data(data)
                 .build();
     }
@@ -165,8 +165,8 @@ public class UserService {
         }
 
         return UserResponse.builder()
-                .hcode(hCode)
-                .hMessage(hMessage)
+                .code(hCode)
+                .message(hMessage)
                 .data(data)
                 .build();
 
@@ -204,8 +204,8 @@ public class UserService {
             hMessage = "탈퇴 실패";
         }
         return UserResponse.builder()
-                .hcode(hCode)
-                .hMessage(hMessage)
+                .code(hCode)
+                .message(hMessage)
                 .data(data)
                 .build();
     }
@@ -242,8 +242,8 @@ public class UserService {
             hMessage = "정보 수정 실패";
         }
         return UserResponse.builder()
-                .hcode(hCode)
-                .hMessage(hMessage)
+                .code(hCode)
+                .message(hMessage)
                 .data(data)
                 .build();
     }

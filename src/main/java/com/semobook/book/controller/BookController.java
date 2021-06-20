@@ -4,6 +4,7 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookDeleteRequest;
 import com.semobook.book.dto.BookRequest;
 import com.semobook.book.dto.BookResponse;
+import com.semobook.book.dto.BookSearchRequest;
 import com.semobook.book.service.BookService;
 import com.semobook.user.dto.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,8 +54,16 @@ public class BookController {
         return ResponseEntity.ok(bookService.deleteBook(isbn));
     }
 
+
+    @Operation(description = "도서 검색(검색어)")
+    @PostMapping("/searchBook")
+    public ResponseEntity<BookResponse> searchBook(@Parameter @RequestBody BookSearchRequest bookSearchRequest){
+        log.info("/search :: keyword : {} :: pageNum : {} ===", bookSearchRequest.getKeyword(), bookSearchRequest.getPageNum());
+        return ResponseEntity.ok(bookService.searchBook(bookSearchRequest));
+    }
+
     /**
-     * 책 검색
+     * 책 검색 (ISBN)
      *
      * @author khh
      * @since 2021/04/25
