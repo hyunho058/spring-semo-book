@@ -16,6 +16,7 @@ public class UserInfoDto {
     private String userGender;
     private String userBirth;
     private LocalDateTime lastConnection;
+    private String userPriority;
 
     public UserInfoDto(UserInfo userInfo) {
         this.userNo = userInfo.getUserNo();
@@ -26,5 +27,6 @@ public class UserInfoDto {
         this.userGender = userInfo.getUserGender();
         this.userBirth = userInfo.getUserBirth();
         this.lastConnection = userInfo.getLastConnection();
+        this.userPriority = userInfo.getUserPriority();
     }
 }

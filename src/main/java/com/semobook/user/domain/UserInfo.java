@@ -49,9 +49,11 @@ public class UserInfo {
 
     private LocalDateTime delDate;
 
+    private String userPriority;
+
 
     @Builder
-    public UserInfo(long userNo,String userId, String userPw, String userName, String userGender, String userBirth, LocalDateTime lastConnection) {
+    public UserInfo(long userNo,String userId, String userPw, String userName, String userGender, String userBirth, LocalDateTime lastConnection, String userPriority) {
         this.userNo = userNo;
         this.userId = userId;
         this.userPw = userPw;
@@ -60,6 +62,7 @@ public class UserInfo {
         this.userBirth = userBirth;
         this.userStatus = UserStatus.GENERAL;
         this.lastConnection = lastConnection;
+        this.userPriority = userPriority;
     }
 //
 //    @Builder
