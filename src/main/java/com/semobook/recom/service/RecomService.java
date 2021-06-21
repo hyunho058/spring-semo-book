@@ -258,11 +258,10 @@ public class RecomService {
      * @since 2021-06-20
      **/
     private List<RecomBestSeller> getBestSellerList(String cate, int num) {
-//        int index = categoryIndex.get(cate);
+        int index = categoryIndex.get(cate);
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            String key = REDIS_KEY_BEST_SELLER + cate;
-            bookList.add(getBestSeller(key, categoryIndex.get(cate)));
+            bookList.add(getBestSeller(cate, categoryIndex.get(cate)));
         }
         return bookList;
     }
@@ -275,11 +274,11 @@ public class RecomService {
      * @since 2021-06-20
      **/
     private RecomBestSeller getBestSeller(String key, int idx) {
-        String findKeyvalue = key + idx++;
-        log.info(":: getFromRedis :: test is {} ", findKeyvalue);
-
-        RecomBestSeller bs = bestSellerRepository.findById(findKeyvalue).get();
-        log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
+       log.info(key);
+        RecomBestSeller bs = bestSellerRepository.findById(key + idx++).orElse(null);
+        if(bs != null) {
+            log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
+        }
         return bs == null ? new RecomBestSeller() : bs;
 
     }
