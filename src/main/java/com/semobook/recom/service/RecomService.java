@@ -186,21 +186,21 @@ public class RecomService {
         Map<String, Integer> goalMap = new HashMap<>();
         List<RecomBestSeller> list = new ArrayList<>();
         for (int i = 0; i < userPriority.size(); i++) {
-            switch (i) {
+            switch (i+1) {
                 case 1:
-                    goalMap.put(userPriority.get(i), SemoConstant.FIRST_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i)+"_", SemoConstant.FIRST_PRIORITY_RATIO);
                     break;
                 case 2:
-                    goalMap.put(userPriority.get(i), SemoConstant.SECOND_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i)+"_", SemoConstant.SECOND_PRIORITY_RATIO);
                     break;
                 case 3:
-                    goalMap.put(userPriority.get(i), SemoConstant.THRID_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i)+"_", SemoConstant.THRID_PRIORITY_RATIO);
                     break;
                 case 4:
-                    goalMap.put(userPriority.get(i), SemoConstant.FIRTH_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i)+"_", SemoConstant.FIRTH_PRIORITY_RATIO);
                     break;
                 case 5:
-                    goalMap.put(userPriority.get(i), SemoConstant.FIFTH_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i)+"_", SemoConstant.FIFTH_PRIORITY_RATIO);
                     break;
             }
         }
@@ -258,10 +258,10 @@ public class RecomService {
      * @since 2021-06-20
      **/
     private List<RecomBestSeller> getBestSellerList(String cate, int num) {
-        int index = categoryIndex.get(cate);
+//        int index = categoryIndex.get(cate);
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            String key = REDIS_KEY_BEST_SELLER + cate + index;
+            String key = REDIS_KEY_BEST_SELLER + cate;
             bookList.add(getBestSeller(key, categoryIndex.get(cate)));
         }
         return bookList;
@@ -275,8 +275,10 @@ public class RecomService {
      * @since 2021-06-20
      **/
     private RecomBestSeller getBestSeller(String key, int idx) {
+        String findKeyvalue = key + idx++;
+        log.info(":: getFromRedis :: test is {} ", findKeyvalue);
 
-        RecomBestSeller bs = bestSellerRepository.findById(key + idx++).get();
+        RecomBestSeller bs = bestSellerRepository.findById(findKeyvalue).get();
         log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
         return bs == null ? new RecomBestSeller() : bs;
 
