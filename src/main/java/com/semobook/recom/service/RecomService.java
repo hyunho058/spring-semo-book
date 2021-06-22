@@ -159,10 +159,15 @@ public class RecomService {
                 // 성향별로 가져오기
                 bestSellersList = userEvaluation(userPriority);
             }
-            data = bestSellersList;
-            log.info(":: userRandomEvaluation :: data is {} ", data);
-
-            hMessage = "userRandomEvaluation 성공";
+            if (bestSellersList.size() > 0 && bestSellersList.get(0) == null) {
+                hCode = StatusEnum.hd4444;
+                hMessage = "userRandomEvaluation fail";
+            }
+            if (bestSellersList.size() > 0 && bestSellersList.get(0) != null) {
+                data = bestSellersList;
+                log.info(":: userRandomEvaluation :: data is {} ", data);
+                hMessage = "userRandomEvaluation 성공";
+            }
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;
             hMessage = "userRandomEvaluation 에러";
@@ -186,26 +191,31 @@ public class RecomService {
         Map<String, Integer> goalMap = new HashMap<>();
         List<RecomBestSeller> list = new ArrayList<>();
         for (int i = 0; i < userPriority.size(); i++) {
-            switch (i+1) {
+            switch (i + 1) {
                 case 1:
-                    goalMap.put(userPriority.get(i)+"_", SemoConstant.FIRST_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) + "_", SemoConstant.FIRST_PRIORITY_RATIO);
                     break;
                 case 2:
-                    goalMap.put(userPriority.get(i)+"_", SemoConstant.SECOND_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) + "_", SemoConstant.SECOND_PRIORITY_RATIO);
                     break;
                 case 3:
-                    goalMap.put(userPriority.get(i)+"_", SemoConstant.THRID_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) + "_", SemoConstant.THRID_PRIORITY_RATIO);
                     break;
                 case 4:
-                    goalMap.put(userPriority.get(i)+"_", SemoConstant.FIRTH_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) + "_", SemoConstant.FIRTH_PRIORITY_RATIO);
                     break;
                 case 5:
-                    goalMap.put(userPriority.get(i)+"_", SemoConstant.FIFTH_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) + "_", SemoConstant.FIFTH_PRIORITY_RATIO);
                     break;
             }
         }
-        for(String s : goalMap.keySet()){
+        for (String s : goalMap.keySet()) {
             list.addAll(getBestSellerList(s, goalMap.get(s)));
+        }
+
+        //부족한 개수 채우기
+        if(list.size()<20){
+            list.addAll(getBestSellerList("A_",10));
         }
 
         return list;
@@ -221,17 +231,19 @@ public class RecomService {
     private List<String> getUserPriority(long userId) {
         List<String> userPriority = new ArrayList<>();
         //1. redis
-        String value = userPriorityRedisRepository.findById(userId).get().getValue();
+        String value;
+        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(null);
         //2.Database
-        if (value == null) {
+        if (userPriorityRedis == null) {
             UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(userId));
+            if (userInfo == null) return userPriority;
             value = userInfo.getUserPriority();
             saveUserPriorityRedis(userId, value);
         }
-        if (value != null) {
+        if (userPriorityRedis != null) {
+            value = userPriorityRedis.getValue();
             userPriority = Arrays.asList(value.split(":"));
         }
-
         return userPriority;
     }
 
@@ -245,7 +257,7 @@ public class RecomService {
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (String s : CATEGORY_TYPE) {
             int index = categoryIndex.get(s);
-            bookList.add(getBestSeller(s, index));
+            bookList.add(getBestSeller(s));
         }
         bookList = bookListCutter(bookList);
         return bookList;
@@ -261,7 +273,7 @@ public class RecomService {
         int index = categoryIndex.get(cate);
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            bookList.add(getBestSeller(cate, categoryIndex.get(cate)));
+            bookList.add(getBestSeller(cate));
         }
         return bookList;
     }
@@ -273,10 +285,12 @@ public class RecomService {
      * @author hyejinzz
      * @since 2021-06-20
      **/
-    private RecomBestSeller getBestSeller(String key, int idx) {
-       log.info(key);
+    private RecomBestSeller getBestSeller(String key) {
+        log.info(key);
+        int idx = categoryIndex.get(key);
         RecomBestSeller bs = bestSellerRepository.findById(key + idx++).orElse(null);
-        if(bs != null) {
+        categoryIndex.put(key,idx);
+        if (bs != null) {
             log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
         }
         return bs == null ? new RecomBestSeller() : bs;
@@ -324,98 +338,6 @@ public class RecomService {
         return bookList;
     }
 
-
-    // TODO: 2021-06-13 Hash를 orm으로 가져오는 방법을 찾지 못해서 직접 가지고 온다.
-//    private RecomBestSeller getFromRedis(String key) {
-//
-//        String isbnKey = "isbn";
-//        String bookNameKey = "bookName";
-//        String authorKey = "author";
-//        String publisherKey = "publisher";
-//        String kdcKey = "kdc";
-//        String categoryKey = "category";
-//        String keywordKey = "keyword";
-//        String imgKey = "img";
-//
-//        String isbn = redisService.getHashOps(key, isbnKey);
-//        String bookName = redisService.getHashOps(key, bookNameKey);
-//        String author = redisService.getHashOps(key, authorKey);
-//        String publisher = redisService.getHashOps(key, publisherKey);
-//        String kdc = redisService.getHashOps(key, kdcKey);
-//        String category = redisService.getHashOps(key, categoryKey);
-//        String keyword = redisService.getHashOps(key, keywordKey);
-//        String img = redisService.getHashOps(key, imgKey);
-//
-//        return RecomBestSeller.builder()
-//                .rank(key)
-//                .isbn(isbn)
-//                .bookName(bookName)
-//                .author(author)
-//                .publisher(publisher)
-//                .kdc(kdc)
-//                .category(category)
-//                .keyword(keyword)
-//                .img(img)
-//                .build();
-//    }
-
-    //
-//    /**
-//     * Redis에 있던 종합 베스트셀러 값 가져오기
-//     * RECOM_BEST_SELLER:A_1
-//     *
-//     * @author hyejinzz
-//     * @since 2021/06/12
-//     **/
-//    public RecomResponse bestSellerRecom() {
-//        Object data = null;
-//        StatusEnum hCode = null;
-//        String hMessage = null;
-//        try {
-//            List<RecomBestSeller> bookList = new ArrayList<>();
-//            String key = "RECOM_BEST_SELLER:A_";
-//
-//            for (int i = 1; i <= 20; i++) {
-//                bookList.add(getFromRedis(key + i));
-//            }
-//
-//
-//            // TODO: 2021-06-13 필터
-//
-//            data = bookList;
-//            hCode = StatusEnum.hd1004;
-//            hMessage = "bestSellerRecom";
-//        } catch (Exception e) {
-//            log.error(":: bestSellerRecom err :: error is {} ", e);
-//            hCode = StatusEnum.hd4444;
-//
-//        }
-//        return RecomResponse.builder()
-//                .data(data)
-//                .hCode(hCode)
-//                .hMessage(hMessage)
-//                .build();
-//    }
-
-//    public RecomResponse userBaseEvaluation() {
-//        Object data = null;
-//        StatusEnum hCode = null;
-//        String hMessage = null;
-//        try {
-//            hCode = StatusEnum.hd1004;
-//            data = basicEvaluation();
-//            hMessage = "userBaseEvaluation 성공";
-//        } catch (Exception e) {
-//            hCode = StatusEnum.hd4444;
-//            hMessage = "userBaseEvaluation 에러";
-//            log.error(":: userBaseEvaluation err :: error is {} ", e);
-//        }
-//        return RecomResponse.builder()
-//                .data(data)
-//                .hCode(hCode)
-//                .hMessage(hMessage)
-//                .build();
-//    }
 
 
 }
