@@ -1,9 +1,7 @@
 package com.semobook.recom.domain;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import com.sun.org.apache.xpath.internal.operations.Equals;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -16,6 +14,7 @@ import java.io.Serializable;
 * @author hyejinzz
 * @since 2021-05-29
 **/
+@NoArgsConstructor
 @Getter
 @RedisHash("RECOM_BEST_SELLER")
 public class RecomBestSeller  implements Serializable {
@@ -43,6 +42,19 @@ public class RecomBestSeller  implements Serializable {
         this.category = category;
         this.keyword = keyword;
         this.img = img;
+    }
+
+    @Override
+    public int hashCode() {
+        return isbn.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof RecomBestSeller) {
+            return isbn.equals(((RecomBestSeller) o).isbn);
+        }
+        return false;
     }
 
 

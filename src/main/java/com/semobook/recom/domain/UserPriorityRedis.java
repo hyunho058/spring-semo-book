@@ -1,0 +1,39 @@
+package com.semobook.recom.domain;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
+import java.io.Serializable;
+
+
+/**
+ * DB에 있는 user_priority 값을 캐싱한다.
+ * USER_PRIORITY:12
+ * value 1_A:2_B:3_C:4_D...
+ *
+ * @author hyejinzz
+ * @since 2021-06-19
+ **/
+@Data
+@RedisHash("USER_PRIORITY")
+public class UserPriorityRedis implements Serializable {
+    @Id
+    @Indexed
+    long userNo;
+    @Indexed
+    String value;
+
+    @Builder
+    public UserPriorityRedis(long userNo, String value) {
+
+        this.userNo = userNo;
+        this.value = value;
+    }
+
+
+}
