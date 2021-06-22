@@ -232,7 +232,7 @@ public class RecomService {
         List<String> userPriority = new ArrayList<>();
         //1. redis
         String value;
-        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(null);
+        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(new UserPriorityRedis());
         //2.Database
         if (userPriorityRedis == null) {
             UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(userId));
@@ -288,7 +288,8 @@ public class RecomService {
     private RecomBestSeller getBestSeller(String key) {
         log.info(key);
         int idx = categoryIndex.get(key);
-        RecomBestSeller bs = bestSellerRepository.findById(key + idx++).orElse(null);
+        if(idx >20) return new RecomBestSeller();
+        RecomBestSeller bs = bestSellerRepository.findById(key + idx++).orElse(new RecomBestSeller());
         categoryIndex.put(key,idx);
         if (bs != null) {
             log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
