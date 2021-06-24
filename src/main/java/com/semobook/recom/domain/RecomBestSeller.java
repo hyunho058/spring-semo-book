@@ -57,5 +57,4 @@ public class RecomBestSeller  implements Serializable {
         return false;
     }
 
-
 }
