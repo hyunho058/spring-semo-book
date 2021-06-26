@@ -169,7 +169,7 @@ public class BookReviewService {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
 
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 10));
             List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
