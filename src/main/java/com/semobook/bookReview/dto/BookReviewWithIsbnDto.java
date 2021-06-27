@@ -19,6 +19,7 @@ public class BookReviewWithIsbnDto {
     private BookDto bookDto;
 
     public BookReviewWithIsbnDto(BookReview bookReview) {
+        reviewNo = bookReview.getReviewNo();
         rating = bookReview.getRating();
         reviewContents = bookReview.getReviewContents();
         createDate = bookReview.getCreateDate();
