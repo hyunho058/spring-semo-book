@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
@@ -20,6 +21,7 @@ import java.io.Serializable;
  * @since 2021-06-19
  **/
 @Data
+@NoArgsConstructor
 @RedisHash("USER_PRIORITY")
 public class UserPriorityRedis implements Serializable {
     @Id

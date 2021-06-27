@@ -4,9 +4,7 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
-import com.semobook.recom.domain.RecomBestSeller;
-import com.semobook.recom.domain.RecomUserReview;
-import com.semobook.recom.domain.UserPriorityRedis;
+import com.semobook.recom.domain.*;
 import com.semobook.recom.dto.RecomResponse;
 import com.semobook.recom.repository.*;
 import com.semobook.user.dto.UserInfoDto;
@@ -20,7 +18,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.semobook.common.SemoConstant.CATEGORY_TYPE;
-import static com.semobook.common.SemoConstant.REDIS_KEY_BEST_SELLER;
 
 @Slf4j
 @Service
@@ -34,6 +31,7 @@ public class RecomService {
     private final RecomUserTotalRepository recomUserTotalRepository;
     private final UserPriorityRedisRepository userPriorityRedisRepository;
     private final UserRepository userRepository;
+    private final AllReviewRepository allReviewRepository;
     Map<String, Integer> categoryIndex;
 
     /**
@@ -193,19 +191,19 @@ public class RecomService {
         for (int i = 0; i < userPriority.size(); i++) {
             switch (i + 1) {
                 case 1:
-                    goalMap.put(userPriority.get(i) + "_", SemoConstant.FIRST_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i), SemoConstant.FIRST_PRIORITY_RATIO);
                     break;
                 case 2:
-                    goalMap.put(userPriority.get(i) + "_", SemoConstant.SECOND_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i), SemoConstant.SECOND_PRIORITY_RATIO);
                     break;
                 case 3:
-                    goalMap.put(userPriority.get(i) + "_", SemoConstant.THRID_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) , SemoConstant.THRID_PRIORITY_RATIO);
                     break;
                 case 4:
-                    goalMap.put(userPriority.get(i) + "_", SemoConstant.FIRTH_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i) , SemoConstant.FIRTH_PRIORITY_RATIO);
                     break;
                 case 5:
-                    goalMap.put(userPriority.get(i) + "_", SemoConstant.FIFTH_PRIORITY_RATIO);
+                    goalMap.put(userPriority.get(i), SemoConstant.FIFTH_PRIORITY_RATIO);
                     break;
             }
         }
@@ -214,8 +212,9 @@ public class RecomService {
         }
 
         //부족한 개수 채우기
-        if(list.size()<20){
-            list.addAll(getBestSellerList("A_",10));
+        if (list.size() < 20) {
+            int searchSize = 20 - list.size();
+            list.addAll(getBestSellerList("A_", searchSize));
         }
 
         return list;
@@ -223,17 +222,19 @@ public class RecomService {
 
 
     /**
-     * 유저 성향 가져오기 redis -> db
+     * 유저 성향 가져오기 리뷰데이터->redis -> db
      *
      * @author hyejinzz
      * @since 2021-06-20
      **/
     private List<String> getUserPriority(long userId) {
         List<String> userPriority = new ArrayList<>();
-        //1. redis
+        //리뷰데이터로 새로운 성향 만들기
+        makeUserPriority(userId);
+        //redis
         String value;
-        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(null);
-        //2.Database
+        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(new UserPriorityRedis());
+        //Database
         if (userPriorityRedis == null) {
             UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(userId));
             if (userInfo == null) return userPriority;
@@ -245,6 +246,20 @@ public class RecomService {
             userPriority = Arrays.asList(value.split(":"));
         }
         return userPriority;
+    }
+
+    /**
+     * redis에 임시로저장된 데이터를 바탕으로 새로운 priority 가져온다
+     *
+     * @param userId
+     */
+    private void makeUserPriority(long userId) {
+        //redis에 없으면 그냥 return
+        AllReview allReview = allReviewRepository.findById(userId).orElse(null);
+        if(allReview !=null){
+            createUserPriority(userId, allReview.getValue());
+        }
+
     }
 
 
@@ -288,8 +303,9 @@ public class RecomService {
     private RecomBestSeller getBestSeller(String key) {
         log.info(key);
         int idx = categoryIndex.get(key);
-        RecomBestSeller bs = bestSellerRepository.findById(key + idx++).orElse(null);
-        categoryIndex.put(key,idx);
+        RecomBestSeller bs = bestSellerRepository.findById(key + idx++).orElse(new RecomBestSeller());
+        idx = idx > 20 ? 1 : idx;
+        categoryIndex.put(key, idx);
         if (bs != null) {
             log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
         }
@@ -338,6 +354,60 @@ public class RecomService {
         return bookList;
     }
 
+    /**
+     * redis Date Update
+     */
+    private void updateDataFromRedis(long userId, ReviewInfo value) {
+        AllReview find = allReviewRepository.findById(userId).orElse(null);
+        List<ReviewInfo> findValue = null;
+        if (find != null) {
+            findValue = find.getValue();
+        }
+        if (findValue != null) {
+            findValue.add(value);
+            allReviewRepository.save(AllReview.builder()
+                    .userId(userId)
+                    .value(findValue)
+                    .build());
+        }
+
+    }
+
+
+    /**
+     * 유저평점을 바탕으로 userpriority 만들기 (최신 5개만)
+     *
+     * @author hyejinzz
+     * @since 2021-06-27
+     **/
+
+    private void createUserPriority(long userNo, List<ReviewInfo> value) {
+
+        //4개보다 크면 최신 5개만 가져온다
+        if (value.size() > SemoConstant.CHECK_USER_REVIEW_CNT) {
+            int cutSize = SemoConstant.CHECK_USER_REVIEW_CNT + 1;
+            value = value.subList(value.size() - cutSize, value.size());
+        }
+        Map<String, Integer> map = new HashMap<>();
+        for (ReviewInfo reviewInfo : value) {
+            String key = reviewInfo.getCategory();
+            map.put(key, map.getOrDefault(key, 0) + 1);
+        }
+
+        List<String> sortKey = new ArrayList<>(map.keySet());
+        Collections.sort(sortKey, (o1, o2) -> map.get(o2).compareTo(map.get(o1)));
+        //redis 저장
+        StringBuilder saveValue = new StringBuilder();
+        for (String l : sortKey) {
+            saveValue.append(l).append(SemoConstant.COLON);
+        }
+        saveValue.deleteCharAt(saveValue.lastIndexOf(SemoConstant.COLON));
+        userPriorityRedisRepository.save(UserPriorityRedis.builder()
+                .userNo(userNo)
+                .value(saveValue.toString())
+                .build());
+
+    }
 
 
 }

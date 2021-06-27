@@ -9,11 +9,17 @@ public class SemoConstant {
 
     public static final String REDIS_KEY_BEST_SELLER = "RECOM_BEST_SELLER:";
 
-    public static final int FIRST_PRIORITY_RATIO = 7;
-    public static final int SECOND_PRIORITY_RATIO = 5;
-    public static final int THRID_PRIORITY_RATIO = 4;
-    public static final int FIRTH_PRIORITY_RATIO = 3;
+    public static final int FIRST_PRIORITY_RATIO = 5;
+    public static final int SECOND_PRIORITY_RATIO = 3;
+    public static final int THRID_PRIORITY_RATIO = 2;
+    public static final int FIRTH_PRIORITY_RATIO = 1;
     public static final int FIFTH_PRIORITY_RATIO = 1;
 
+    public static final String VARTICAL_BAR = "|";
+    public static final String BACKSLASH_VARTICAL_BAR = "\\|";
+    public static final String COLON = ":";
+
+    //
+    public static final int CHECK_USER_REVIEW_CNT = 5;
 
 }
