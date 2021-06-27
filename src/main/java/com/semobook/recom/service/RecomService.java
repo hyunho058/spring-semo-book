@@ -235,13 +235,13 @@ public class RecomService {
         String value;
         UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(new UserPriorityRedis());
         //Database
-        if (userPriorityRedis == null) {
+        if (userPriorityRedis.getValue() == null) {
             UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(userId));
             if (userInfo == null) return userPriority;
             value = userInfo.getUserPriority();
             saveUserPriorityRedis(userId, value);
         }
-        if (userPriorityRedis != null) {
+        if (userPriorityRedis.getValue() != null) {
             value = userPriorityRedis.getValue();
             userPriority = Arrays.asList(value.split(":"));
         }
