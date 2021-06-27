@@ -1,6 +1,5 @@
 package com.semobook.recom.domain;
 
-import com.sun.org.apache.xpath.internal.operations.Equals;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -56,6 +55,5 @@ public class RecomBestSeller  implements Serializable {
         }
         return false;
     }
-
 
 }

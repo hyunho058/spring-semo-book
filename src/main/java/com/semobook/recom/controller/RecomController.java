@@ -74,9 +74,9 @@ public class RecomController {
 
     //유저 성향 가져오기
     @Operation(description = "유저 성향 가져오기")
-    @GetMapping(value = "/priority/{userId}")
-    public ResponseEntity<RecomResponse> userPriority(@Parameter @PathVariable long userId) {
-        return ResponseEntity.ok(recomService.userRandomEvaluation(userId));
+    @GetMapping(value = "/priority")
+    public ResponseEntity<RecomResponse> userPriority(@Parameter @RequestParam(name = "userNo") long userNo) {
+        return ResponseEntity.ok(recomService.userRandomEvaluation(userNo));
     }
 
 

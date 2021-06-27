@@ -11,16 +11,16 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
 
     @Schema(description = "성공 코드" , example = "성공 : hd1004")
-    StatusEnum hCode;
+    StatusEnum code;
     @Schema(description = "메시지")
-    String hMessage;
+    String message;
     @Schema(description = "데이터")
     Object data;
 
     @Builder
-    public UserResponse(StatusEnum hcode, String hMessage, Object data) {
-        this.hCode = hcode;
-        this.hMessage = hMessage;
+    public UserResponse(StatusEnum code, String message, Object data) {
+        this.code = code;
+        this.message = message;
         this.data = data;
     }
 }
