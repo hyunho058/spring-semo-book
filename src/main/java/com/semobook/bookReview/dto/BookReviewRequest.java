@@ -20,5 +20,5 @@ public class BookReviewRequest {
     @Schema(description = "리뷰내용" , example = "정말재밌는책이었다.")
     String reviewContents;
     @Column(columnDefinition = "책 정보")
-    BookDto bookDto;
+    BookDto book;
 }

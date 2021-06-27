@@ -52,31 +52,54 @@ public class BookReviewService {
         StatusEnum hCode = null;
 
         try {
-            Book book = bookRepository.findByIsbn(request.getIsbn());
-            UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-            log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
-            //Todo isbn이 없으면 저장을 못하는 상황임, 책이 db에 없으면 외부api 요청해서 정보 가져오고 책에 isbn만 넣어서 insert를 함
-            // TODO: 같은 책은 글을 더 쓰지 못하도록 처리해야한다.
-            if (book != null && resultUserInfo != null) {
-                bookReviewRepository.save(BookReview.builder()
-                        .rating(request.getRating())
-                        .reviewContents(request.getReviewContents())
-                        .createDate(LocalDateTime.now())
-                        .declaration(0)
-                        .book(book)
-                        .userInfo(resultUserInfo)
-                        .build());
-                //평점  3점 이상이면 recom으로 추천 업뎃치기
-                if (request.getRating() >= 3) {
-//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
-                }
-                hCode = StatusEnum.hd1004;
-                hMessage = "저장완료";
-                data = request;
-            } else {
+            if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())){
+                log.info("createReview:: review is existence");
                 hCode = StatusEnum.hd4444;
-                hMessage = "저장실패";
+                hMessage = "이미 리뷰를 등록하였습니다.";
                 data = null;
+            }else {
+                log.info("createReview:: review is not existence");
+                Book book;
+                if (bookRepository.existsByIsbn(request.getBook().getIsbn())){
+                    log.info("createReview:: book is existence");
+                    book = bookRepository.findByIsbn(request.getBook().getIsbn());
+                }else {
+                    log.info("createReview:: book is not existence");
+                    book = bookRepository.save(Book.builder()
+                            .isbn(request.getBook().getIsbn())
+                            .bookName(request.getBook().getBookName())
+                            .author(request.getBook().getAuthor())
+                            .publisher(request.getBook().getPublisher())
+                            .kdc(request.getBook().getKdc())
+                            .category(request.getBook().getCategory())
+                            .keyword(request.getBook().getKeyword())
+                            .img(request.getBook().getImg())
+                            .build());
+                }
+                UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
+                if (book != null && resultUserInfo != null) {
+                    bookReviewRepository.save(BookReview.builder()
+                            .rating(request.getRating())
+                            .reviewContents(request.getReviewContents())
+                            .createDate(LocalDateTime.now())
+                            .declaration(0)
+                            .book(book)
+                            .userInfo(resultUserInfo)
+                            .build());
+                    //평점  3점 이상이면 recom으로 추천 업뎃치기
+                    if (request.getRating() >= 3) {
+//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
+                    }
+                    hCode = StatusEnum.hd1004;
+                    hMessage = "저장완료";
+                    data = request;
+                } else {
+                    hCode = StatusEnum.hd4444;
+                    hMessage = "저장실패";
+                    data = null;
+                }
+
             }
 
         } catch (Exception e) {
