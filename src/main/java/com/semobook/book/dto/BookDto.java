@@ -3,11 +3,13 @@ package com.semobook.book.dto;
 import com.semobook.book.domain.Book;
 import com.semobook.bookReview.dto.BookReviewWithBookDto;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class BookDto {
 
     private String isbn;

@@ -1,8 +1,12 @@
 package com.semobook.bookReview.dto;
 
+import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.Column;
 
 @Getter
 @NoArgsConstructor
@@ -15,6 +19,6 @@ public class BookReviewRequest {
     int rating;
     @Schema(description = "리뷰내용" , example = "정말재밌는책이었다.")
     String reviewContents;
-    @Schema(description = "시작페이지, 시작페이지 기준으로 5개 나옴" , example = "0")
-    int startPage;
+    @Column(columnDefinition = "책 정보")
+    BookDto bookDto;
 }
