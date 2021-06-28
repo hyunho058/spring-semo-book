@@ -4,6 +4,7 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
+import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
@@ -371,6 +372,38 @@ public class BookReviewService {
             hCode = StatusEnum.hd4444;
             hMessage = "삭제 중 오류";
         }
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
+
+    public BookReviewResponse monthReview(MonthBookReviewRequest monthBookReviewRequest){
+        log.info("monthReview()");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
+
+        try {
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo(monthBookReviewRequest.getUserNo(), PageRequest.of(0, 100));
+            List<BookReviewWithBookDto> result = page.getContent().stream()
+                    .map(bookReview -> new BookReviewWithBookDto(bookReview))
+                    .collect(Collectors.toList());
+            log.info("BookReview list : {}", page.getTotalPages());
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "가져오기";
+            data = result;
+
+        } catch (Exception e) {
+            log.error("monthReview err :: error msg : {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "monthReview 에러";
+            data = null;
+
+        }
+
         return BookReviewResponse.builder()
                 .data(data)
                 .hCode(hCode)
