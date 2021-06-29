@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface BookReviewRepository extends CrudRepository<BookReview, String> {
+public interface BookReviewRepository extends CrudRepository<BookReview, String>, BookReviewRepositoryCustom {
     //저장
     BookReview save(BookReview board);
     /**
@@ -58,22 +58,25 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
      */
     Page<BookReview> findAll(Pageable pageable);
 
-    //리뷰 존재 여부 확인
-    @Query("select count (br.reviewNo) > 0 " +
-            "from BookReview br " +
-            "where br.userInfo.userNo = :userNo and br.book.isbn = :isbn")
-    boolean exists(@Param(value = "userNo") long userNo,@Param(value = "isbn") String isbn);
-
+    //---------------리뷰 존재 여부 확인---------------//
+//    @Query("select count (br.reviewNo) > 0 " +
+//            "from BookReview br " +
+//            "where br.userInfo.userNo = :userNo and br.book.isbn = :isbn")
+//    boolean exists(@Param(value = "userNo") long userNo,@Param(value = "isbn") String isbn);
+    boolean exists(long userNo, String isbn);   //querydsl
     //reviewNo로 존재 여부 확인
-    boolean existsByReviewNo(long reviewNo);
-
+    boolean existsByReviewNo(long reviewNo);    //querydsl
+    //------------------------------------------------------------//
 
     //리뷰 리슽 조회(리뷰 내용을 쓴것만)
+//    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book " +
+//            "where ui.userNo = :userNo " +
+//            "and br.reviewContents is not null " +
+//            "and EXTRACT(YEAR FROM c.createdAt)=:ey " +
+//            "and EXTRACT(MONTH FROM c.createdAt)=:eq\n",
+//            countQuery = "select count(br.reviewNo) from BookReview  br")
     @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book " +
-            "where ui.userNo = :userNo " +
-            "and br.reviewContents is not null " +
-            "and EXTRACT(YEAR FROM c.createdAt)=:ey " +
-            "and EXTRACT(MONTH FROM c.createdAt)=:eq\n",
+            "where ui.userNo = :userNo ",
         countQuery = "select count(br.reviewNo) from BookReview  br")
     Page<BookReview> findAllByUserInfo(@Param(value = "userNo") long userNo, Pageable pageable);
 
