@@ -6,6 +6,7 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.domain.QBook;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.domain.QBookReview;
+import com.semobook.user.domain.QUserInfo;
 import jdk.internal.net.http.common.Log;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +17,7 @@ import java.util.Timer;
 
 import static com.semobook.book.domain.QBook.*;
 import static com.semobook.bookReview.domain.QBookReview.bookReview;
+import static com.semobook.user.domain.QUserInfo.*;
 
 @Slf4j
 public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
@@ -25,6 +27,12 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         this.queryFactory = queryFactory;
     }
 
+    /**
+     * 리뷰 작성 여부 확인(한 책당 하나의 리뷰만 쓸수 있다.)
+     *
+     * @author hyunho
+     * @since 2021/07/03
+    **/
     @Override
     public boolean exists(long userNo, String isbn) {
         Integer fetchOne = queryFactory
@@ -35,6 +43,12 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         return fetchOne != null;
     }
 
+    /**
+     * PK(reviewNo) 를 잉용해 존재 여부 확인
+     *
+     * @author hyunho
+     * @since 2021/07/03
+    **/
     @Override
     public boolean existsByReviewNo(long reviewNo) {
         Integer fetchOne = queryFactory
@@ -46,37 +60,20 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     }
 
 
-    //    2021-06-15 13:49:31.482941
-
-//    select *
-//    from book_review
-//    where create_date
-//    BETWEEN DATE_ADD(now(), INTERVAL -1 MONTH)
-//    AND cast(now() as date)
-
-//    select *
-//    from book_review
-//    where create_date
-//    BETWEEN DATE_ADD(now(), INTERVAL -1 MONTH)
-//    AND now();
-
-    //java.time.LocalDate
-//    LocalDate first = LocalDate.of(1990, 01, 01);
-//    LocalDate last = LocalDate.of(1990, 02, 01);
-//
-//    return query.from(human)
-//            .innerJoin(human.pet, pet)
-//            .where(SQLExpressions.date(human.age).between(first, last))
-//            .list(order);
-
+    /**
+     * 유저 월별 리뷰 조회
+     *
+     * @author hyunho
+     * @since 2021/07/03
+    **/
 //    https://www.inflearn.com/questions/193289
     @Override
     public List<BookReview> findByBookBetweenDate(LocalDateTime startDate, LocalDateTime endDate) {
         log.info("startDate is = {}",startDate);
-//        LocalDateTime startDate1 = LocalDateTime.of(2021, 06, 01, 00, 00, 00);
-//        LocalDateTime endDate1 = LocalDateTime.of(2021, 06, 30, 23, 59, 59);
         List<BookReview> resultList = queryFactory
                 .selectFrom(bookReview)
+                .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
+                .join(bookReview.book, book).fetchJoin()
                 .where(bookReview.createDate.between(startDate, endDate).and(bookReview.reviewContents .isNotNull()))
                 .fetch();
         return resultList;

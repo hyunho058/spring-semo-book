@@ -391,8 +391,8 @@ public class BookReviewService {
             List<BookReview> page = bookReviewRepository.findByBookBetweenDate(
                     monthBookReviewRequest.getStartDate(),
                     monthBookReviewRequest.getEndDate());
-            List<BookReviewWithBookDto> result = page.stream()
-                    .map(bookReview -> new BookReviewWithBookDto(bookReview))
+            List<BookReviewWithIsbnDto> result = page.stream()
+                    .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
             log.info("BookReview list : {}", page);
 
