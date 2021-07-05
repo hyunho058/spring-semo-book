@@ -22,4 +22,7 @@ public class SemoConstant {
     //
     public static final int CHECK_USER_REVIEW_CNT = 5;
 
+    public static final String OPEN_API_KAKAO_BOOK = "https://dapi.kakao.com";
+    public static final String KAKAO_AK_BOOK_SEARCH = "KakaoAK a85301089026f3d76b61ac72f59b1d91";
+
 }

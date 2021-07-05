@@ -3,6 +3,7 @@ package com.semobook.book.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.*;
 import com.semobook.book.repository.BookRepository;
+import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,6 @@ public class BookService {
     Object data;
 
     private final BookRepository bookRepository;
-    private String OPEN_API_KAKAO_BOOK = "https://dapi.kakao.com";
-    private String KAKAO_AK_BOOK_SEARCH = "KakaoAK a85301089026f3d76b61ac72f59b1d91";
 
 
     /**
@@ -259,7 +258,7 @@ public class BookService {
         try {
             log.info(":: searchBook  :: keyword is {}", bookSearchRequest.getKeyword());
 
-            WebClient webClient = WebClient.builder().baseUrl(OPEN_API_KAKAO_BOOK).build();
+            WebClient webClient = WebClient.builder().baseUrl(SemoConstant.OPEN_API_KAKAO_BOOK).build();
             responseJson = webClient
                     .get()
                     .uri(uriBuilder -> uriBuilder.path("v3/search/book")
@@ -267,7 +266,7 @@ public class BookService {
                             .queryParam("page", bookSearchRequest.getPageNum())
                             .queryParam("size", 12)
                             .build()
-                    ).header("Authorization", KAKAO_AK_BOOK_SEARCH)
+                    ).header("Authorization", SemoConstant.KAKAO_AK_BOOK_SEARCH)
                     .httpRequest(httpRequest -> {
                         HttpClientRequest reactorRequest = httpRequest.getNativeRequest();
                         reactorRequest.responseTimeout(Duration.ofSeconds(2));
@@ -302,9 +301,59 @@ public class BookService {
                     .data(null)
                     .build();
         }
+    }
 
+    /**
+     * isbn, keyword를 입력하면 카카오 api를 이용해서 책정보를 return하는 메서드
+     * TODO 메서드화 하기
+     *
+     * @author hyejinzz
+     * @since 2021-07-02
+     **/
+    public DocumentListDto searchBookMethod(BookSearchRequest bookSearchRequest) {
+
+        Mono<DocumentListDto> responseJson;
+
+        try {
+            log.info(":: searchBook  :: keyword is {}", bookSearchRequest.getKeyword());
+
+            WebClient webClient = WebClient.builder().baseUrl(SemoConstant.OPEN_API_KAKAO_BOOK).build();
+            responseJson = webClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder.path("v3/search/book")
+                            .queryParam("query", bookSearchRequest.getKeyword())
+                            .queryParam("page", bookSearchRequest.getPageNum())
+                            .queryParam("size", 12)
+                            .build()
+                    ).header("Authorization", SemoConstant.KAKAO_AK_BOOK_SEARCH)
+                    .httpRequest(httpRequest -> {
+                        HttpClientRequest reactorRequest = httpRequest.getNativeRequest();
+                        reactorRequest.responseTimeout(Duration.ofSeconds(2));
+                    })
+                    .retrieve()
+                    .bodyToMono(DocumentListDto.class);
+
+            responseJson.subscribe(response -> {
+                List<Document> documents = new ArrayList<>();
+                documents.addAll(response.getDocuments());
+                log.info(":: korea book library findBook :: response size is {}", documents.size());
+            }, e -> {
+                log.info(":: korea book library findBook :: error message is {}", e.getMessage());
+            });
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "검색 성공";
+
+            return responseJson.block();
+
+        } catch (Exception e) {
+            log.info(":: searchBook err :: error is {}", e);
+
+            return new DocumentListDto();
+        }
 
     }
+
 
 
     /**

@@ -1,6 +1,5 @@
 package com.semobook.book.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.semobook.bookReview.domain.BookReview;
 import lombok.*;
 
