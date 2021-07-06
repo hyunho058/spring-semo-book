@@ -1,6 +1,7 @@
 package com.semobook.bookReview.controller;
 
 import com.semobook.bookReview.dto.*;
+import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
 import com.semobook.bookReview.service.BookReviewService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -61,6 +62,12 @@ public class BookReviewController {
     @PostMapping("/delete")
     public ResponseEntity<BookReviewResponse> deleteBookReview(@Parameter @RequestBody DeleteBookReviewRequest deleteBookReviewRequest){
         return ResponseEntity.ok(boardService.deleteReview(deleteBookReviewRequest));
+    }
+
+    //월별 리뷰 조회
+    @PostMapping("/month/review")
+    public ResponseEntity<BookReviewResponse> monthReviewCon(@Parameter @RequestBody MonthBookReviewRequest monthBookReviewRequest){
+        return ResponseEntity.ok(boardService.monthReview(monthBookReviewRequest));
     }
 
     // TODO: 2021-05-29 신고하기 기능 추가 필요

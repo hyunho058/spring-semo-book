@@ -32,45 +32,28 @@ public class RecomController {
      */
 
 
-//    //관리자 추천
-//    @Operation(description = "관리자 기반의 추천")
-//    @PostMapping("/admin")
-//    public String adminBasedRecom(){
-//        return "";
-//    }
 //
 //    //유저가 읽은 책 기반 추천
-    @Operation(description = "유저가 읽은 책 기반의 추천")
-    @GetMapping("/readbook")
-    public ResponseEntity<RecomResponse> userReview(long userId) {
-        return ResponseEntity.ok(recomService.getUserReviewRecom(userId));
-    }
-
-    //
-//    //유저 정보 기반 추천
-//    @Operation(description = "유저 정보(성별,나이) 기반의 추천")
+//    @Operation(description = "유저가 읽은 책 기반의 추천")
+//    @GetMapping("/readbook")
+//    public ResponseEntity<RecomResponse> userReview(long userId) {
+//        return ResponseEntity.ok(recomService.getUserReviewRecom(userId));
+//    }
+//
+//    //유저가 보고싶다고 찜해놓은 책들
+//    @Operation(description = "유저가 보고싶다고 찜한")
 //    @PostMapping("/userinfo")
-//    public String userInfoBasedRecom(){
+//    public String userWantBookRecom() {
 //        return "";
 //    }
-//
-//
-    //유저가 보고싶다고 찜해놓은 책들
-    @Operation(description = "유저가 보고싶다고 찜한")
-    @PostMapping("/userinfo")
-    public String userWantBookRecom() {
-        return "";
-    }
 
-    //
-//
-////    //베스트 셀러
-//    @Operation(description = "베스트 셀러 추천")
-//    @GetMapping("/bestseller")
-//    public ResponseEntity<RecomResponse> bestsellerRecom() {
-//        return ResponseEntity.ok(recomService.userBaseEvaluation());
-//
-//    }
+
+    //유저 책 추천 리스트 가져오기기
+    @Operation(description = "유저 책 가져오기")
+    @GetMapping(value = "/book-list/{userNo}")
+    public ResponseEntity<RecomResponse> userrecom(@Parameter @PathVariable long userNo) {
+        return ResponseEntity.ok(recomService.recomByUser(userNo));
+    }
 
     //유저 성향 가져오기
     @Operation(description = "유저 성향 가져오기")

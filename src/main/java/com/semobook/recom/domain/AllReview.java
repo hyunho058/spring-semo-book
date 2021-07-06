@@ -3,14 +3,11 @@ package com.semobook.recom.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 @NoArgsConstructor
 @Getter

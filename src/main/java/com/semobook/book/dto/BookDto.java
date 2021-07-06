@@ -2,6 +2,7 @@ package com.semobook.book.dto;
 
 import com.semobook.book.domain.Book;
 import com.semobook.bookReview.dto.BookReviewWithBookDto;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +32,21 @@ public class BookDto {
         keyword = book.getKeyword();
         img = book.getImg();
     }
+
+       @Builder
+        public BookDto(String isbn, String bookName, String author, String publisher,
+                       String kdc, String category, String keyword, String img){
+        this.isbn = isbn;
+        this.bookName = bookName;
+        this.author = author;
+        this.publisher = publisher;
+        this.kdc = kdc;
+        this. category = category;
+        this.keyword = keyword;
+        this.img = img;
+    }
+
+
 
 
 

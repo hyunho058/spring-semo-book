@@ -4,20 +4,26 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.dto.*;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClientRequest;
+
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,7 +42,7 @@ public class BookService {
 
     /**
      * 책 등록
-     * test
+     *
      * @author khh
      * @since 2021/04/25
      **/
@@ -89,12 +95,11 @@ public class BookService {
 
         try {
             Book book = bookRepository.findByIsbn(isbn);
-            BookDto bookDto = new BookDto(book);
-
             if (book == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "검색된 도서가 없습니다.";
             } else {
+                BookDto bookDto = new BookDto(book);
                 data = bookDto;
                 hCode = StatusEnum.hd1004;
                 hMessage = "도서 조회 성공";
@@ -160,7 +165,24 @@ public class BookService {
 
         //page처리 적용
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
+        PageRequest pageAndSortRequest = PageRequest.of(pageNum, 3, Sort.by(Sort.Direction.DESC, "bookName"));
         Page<Book> page = bookRepository.findAll(pageRequest);
+//        Slice<Book> page = bookRepository.findAll(pageAndSortRequest);   //limit + 1결과를 반환한다,
+
+        List<Book> content = page.getContent(); //패이지로 가져온
+        long totalElements = page.getTotalElements(); //total count
+        int pageNumber = page.getNumber();  //page number
+        int totalPage = page.getTotalPages();   //total page
+        boolean firstPage = page.isFirst(); //first page
+        boolean nextPageState = page.hasNext(); //다음 페이지 존재 여부
+
+        log.info("page count = " + content.size());
+        log.info("total count = " + totalElements);
+        log.info("page number = " + pageNumber);
+        log.info("total page = " + totalPage);
+        log.info("first page state = " + firstPage);
+        log.info("next page state = " + nextPageState);
+
 //        Slice<Book> slicePage = bookRepository.findAll(pageRequest);  client 단에ㅓ 더보기 기능을 사용할때 slice 를 사용하면 좋다.
         List<BookListDto> result = page.getContent().stream()
                 .map(b -> new BookListDto(b))
@@ -228,6 +250,113 @@ public class BookService {
                 .build();
     }
 
+    public BookResponse searchBook(BookSearchRequest bookSearchRequest) {
+
+        hMessage = null;
+        hCode = null;
+        data = null;
+        Mono<DocumentListDto> responseJson;
+
+        try {
+            log.info(":: searchBook  :: keyword is {}", bookSearchRequest.getKeyword());
+
+            WebClient webClient = WebClient.builder().baseUrl(SemoConstant.OPEN_API_KAKAO_BOOK).build();
+            responseJson = webClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder.path("v3/search/book")
+                            .queryParam("query", bookSearchRequest.getKeyword())
+                            .queryParam("page", bookSearchRequest.getPageNum())
+                            .queryParam("size", 12)
+                            .build()
+                    ).header("Authorization", SemoConstant.KAKAO_AK_BOOK_SEARCH)
+                    .httpRequest(httpRequest -> {
+                        HttpClientRequest reactorRequest = httpRequest.getNativeRequest();
+                        reactorRequest.responseTimeout(Duration.ofSeconds(2));
+                    })
+                    .retrieve()
+                    .bodyToMono(DocumentListDto.class);
+
+            responseJson.subscribe(response -> {
+                List<Document> documents = new ArrayList<>();
+                documents.addAll(response.getDocuments());
+                log.info(":: korea book library findBook :: response size is {}", documents.size());
+            }, e -> {
+                log.info(":: korea book library findBook :: error message is {}", e.getMessage());
+            });
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "검색 성공";
+
+            return BookResponse.builder()
+                    .hCode(hCode)
+                    .hMessage(hMessage)
+                    .data(responseJson.block())
+                    .build();
+        } catch (Exception e) {
+            log.info(":: searchBook err :: error is {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "검색 실패";
+
+            return BookResponse.builder()
+                    .hCode(hCode)
+                    .hMessage(hMessage)
+                    .data(null)
+                    .build();
+        }
+    }
+
+    /**
+     * isbn, keyword를 입력하면 카카오 api를 이용해서 책정보를 return하는 메서드
+     * TODO 메서드화 하기
+     *
+     * @author hyejinzz
+     * @since 2021-07-02
+     **/
+    public DocumentListDto searchBookMethod(BookSearchRequest bookSearchRequest) {
+
+        Mono<DocumentListDto> responseJson;
+
+        try {
+            log.info(":: searchBook  :: keyword is {}", bookSearchRequest.getKeyword());
+
+            WebClient webClient = WebClient.builder().baseUrl(SemoConstant.OPEN_API_KAKAO_BOOK).build();
+            responseJson = webClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder.path("v3/search/book")
+                            .queryParam("query", bookSearchRequest.getKeyword())
+                            .queryParam("page", bookSearchRequest.getPageNum())
+                            .queryParam("size", 12)
+                            .build()
+                    ).header("Authorization", SemoConstant.KAKAO_AK_BOOK_SEARCH)
+                    .httpRequest(httpRequest -> {
+                        HttpClientRequest reactorRequest = httpRequest.getNativeRequest();
+                        reactorRequest.responseTimeout(Duration.ofSeconds(2));
+                    })
+                    .retrieve()
+                    .bodyToMono(DocumentListDto.class);
+
+            responseJson.subscribe(response -> {
+                List<Document> documents = new ArrayList<>();
+                documents.addAll(response.getDocuments());
+                log.info(":: korea book library findBook :: response size is {}", documents.size());
+            }, e -> {
+                log.info(":: korea book library findBook :: error message is {}", e.getMessage());
+            });
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "검색 성공";
+
+            return responseJson.block();
+
+        } catch (Exception e) {
+            log.info(":: searchBook err :: error is {}", e);
+
+            return new DocumentListDto();
+        }
+
+    }
+
+
 
     /**
      * book 패이징 처리 with bookReview
@@ -252,13 +381,3 @@ public class BookService {
 
 
 }
-
-
-
-
-
-
-
-
-
-

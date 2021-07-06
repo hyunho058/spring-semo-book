@@ -4,6 +4,7 @@ import com.semobook.book.domain.Book;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
+import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.service.RecomService;
@@ -50,55 +51,56 @@ public class BookReviewService {
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
-
+        log.info("createReview():: request.getUserNo() is {}", request.getUserNo());
+        log.info("createReview():: request.getBook().getIsbn() is {}", request.getBook().getIsbn());
         try {
-            if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())){
+            if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
                 log.info("createReview:: review is existence");
-                hCode = StatusEnum.hd4444;
-                hMessage = "이미 리뷰를 등록하였습니다.";
-                data = null;
-            }else {
+//                hCode = StatusEnum.hd4444;
+//                hMessage = "이미 리뷰를 등록하였습니다.";
+//                data = null;
+            } else {
                 log.info("createReview:: review is not existence");
-                Book book;
-                if (bookRepository.existsByIsbn(request.getBook().getIsbn())){
-                    log.info("createReview:: book is existence");
-                    book = bookRepository.findByIsbn(request.getBook().getIsbn());
-                }else {
-                    log.info("createReview:: book is not existence");
-                    book = bookRepository.save(Book.builder()
-                            .isbn(request.getBook().getIsbn())
-                            .bookName(request.getBook().getBookName())
-                            .author(request.getBook().getAuthor())
-                            .publisher(request.getBook().getPublisher())
-                            .kdc(request.getBook().getKdc())
-                            .category(request.getBook().getCategory())
-                            .keyword(request.getBook().getKeyword())
-                            .img(request.getBook().getImg())
-                            .build());
-                }
-                UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
-                if (book != null && resultUserInfo != null) {
-                    bookReviewRepository.save(BookReview.builder()
-                            .rating(request.getRating())
-                            .reviewContents(request.getReviewContents())
-                            .createDate(LocalDateTime.now())
-                            .declaration(0)
-                            .book(book)
-                            .userInfo(resultUserInfo)
-                            .build());
-                    //평점  3점 이상이면 recom으로 추천 업뎃치기
-                    if (request.getRating() >= 3) {
-//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
-                    }
-                    hCode = StatusEnum.hd1004;
-                    hMessage = "저장완료";
-                    data = request;
-                } else {
-                    hCode = StatusEnum.hd4444;
-                    hMessage = "저장실패";
-                    data = null;
-                }
+//                Book book;
+//                if (bookRepository.existsByIsbn(request.getBook().getIsbn())){
+//                    log.info("createReview:: book is existence");
+//                    book = bookRepository.findByIsbn(request.getBook().getIsbn());
+//                }else {
+//                    log.info("createReview:: book is not existence");
+//                    book = bookRepository.save(Book.builder()
+//                            .isbn(request.getBook().getIsbn())
+//                            .bookName(request.getBook().getBookName())
+//                            .author(request.getBook().getAuthor())
+//                            .publisher(request.getBook().getPublisher())
+//                            .kdc(request.getBook().getKdc())
+//                            .category(request.getBook().getCategory())
+//                            .keyword(request.getBook().getKeyword())
+//                            .img(request.getBook().getImg())
+//                            .build());
+//                }
+//                UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+//                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
+//                if (book != null && resultUserInfo != null) {
+//                    bookReviewRepository.save(BookReview.builder()
+//                            .rating(request.getRating())
+//                            .reviewContents(request.getReviewContents())
+//                            .createDate(LocalDateTime.now())
+//                            .declaration(0)
+//                            .book(book)
+//                            .userInfo(resultUserInfo)
+//                            .build());
+//                    //평점  3점 이상이면 recom으로 추천 업뎃치기
+//                    if (request.getRating() >= 3) {
+////                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
+//                    }
+//                    hCode = StatusEnum.hd1004;
+//                    hMessage = "저장완료";
+//                    data = request;
+//                } else {
+//                    hCode = StatusEnum.hd4444;
+//                    hMessage = "저장실패";
+//                    data = null;
+//                }
 
             }
 
@@ -123,23 +125,23 @@ public class BookReviewService {
      *
      * @author hyunho
      * @since 2021/06/13
-    **/
+     **/
     @Transactional
-    public BookReviewResponse bookReviewRating(BookReviewRatingRequest request){
+    public BookReviewResponse bookReviewRating(BookReviewRatingRequest request) {
         log.info("bookReviewRating ::");
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
         try {
-            if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())){
+            if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
                 log.info("bookReviewRating:: review is existence");
-            }else {
+            } else {
                 log.info("bookReviewRating:: review is not existence");
                 Book book;
-                if (bookRepository.existsByIsbn(request.getBook().getIsbn())){
+                if (bookRepository.existsByIsbn(request.getBook().getIsbn())) {
                     log.info("bookReviewRating:: book is existence");
                     book = bookRepository.findByIsbn(request.getBook().getIsbn());
-                }else {
+                } else {
                     log.info("bookReviewRating:: book is not existence");
                     book = bookRepository.save(Book.builder()
                             .isbn(request.getBook().getIsbn())
@@ -371,6 +373,41 @@ public class BookReviewService {
             hCode = StatusEnum.hd4444;
             hMessage = "삭제 중 오류";
         }
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
+
+    public BookReviewResponse monthReview(MonthBookReviewRequest monthBookReviewRequest) {
+        log.info("monthReview()");
+        String hMessage = null;
+        Object data = null;
+        StatusEnum hCode = null;
+
+        try {
+//            Page<BookReview> page = bookReviewRepository.findAllByUserInfo(monthBookReviewRequest.getUserNo(), PageRequest.of(0, 100));
+            List<BookReview> page = bookReviewRepository.findByBookBetweenDate(
+                    monthBookReviewRequest.getStartDate(),
+                    monthBookReviewRequest.getEndDate());
+            List<BookReviewWithIsbnDto> result = page.stream()
+                    .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
+                    .collect(Collectors.toList());
+            log.info("BookReview list : {}", page);
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "가져오기";
+            data = result;
+
+        } catch (Exception e) {
+            log.error("monthReview err :: error msg : {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "monthReview 에러";
+            data = null;
+
+        }
+
         return BookReviewResponse.builder()
                 .data(data)
                 .hCode(hCode)
