@@ -225,16 +225,17 @@ public class UserService {
         Object data = null;
         try {
             //기존 유저
-            UserInfo beforeUser = userRepository.findByUserNoAndUserStatus(updateUser.getUserNo(), UserStatus.GENERAL);
-
-            if (beforeUser == null) {
+            UserInfo userInfo = userRepository.findByUserNoAndUserStatus(updateUser.getUserNo(), UserStatus.GENERAL);
+            if (userInfo == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "조회되는 회원이 없음";
             } else {
-                beforeUser.changeUserInfo(updateUser);
-                userRepository.save(beforeUser);
+                userInfo.changeUserInfo(updateUser);
+                userRepository.save(userInfo);
+                UserInfoDto userInfoDto = new UserInfoDto(userInfo);
+
                 hCode = StatusEnum.hd1004;
-                data = beforeUser;
+                data = userInfoDto;
                 hMessage = "정보 수정 성공";
             }
 
