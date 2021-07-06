@@ -444,12 +444,12 @@ public class RecomService {
      */
     private List<RecomInfo> getTotalRecom() {
         List<RecomInfo> recomInfoList = new ArrayList<>();
-        recomInfoList.addAll(adminRecom());
+//        recomInfoList.addAll(adminRecom());
 //        recomInfoList.add(reviewRecom());
 //        recomInfoList.add(userWantRecom());
 //        recomInfoList.add(userInfoRecom());
 //        recomInfoList.add(userCategoryRecom());
-//        recomInfoList.add(bestSellerRecom());
+        recomInfoList.add(bestSellerRecom());
 //        recomInfoList.add(steadySeller());
 
         return recomInfoList;
@@ -581,21 +581,59 @@ public class RecomService {
      * 베스트 셀러 가져오기
      */
     private RecomInfo bestSellerRecom() {
+        List<BookDto> bookInfoList = new ArrayList<>();
+        try {
+
+            for (int i = 1; i <= 10; i++) {
+                RecomBestSeller recomBestSeller = bestSellerRepository.findById("A_" + i).orElse(null);
+                if (recomBestSeller != null) {
+                    bookInfoList.add(BookDto.builder()
+                            .isbn(recomBestSeller.getIsbn())
+                            .bookName(recomBestSeller.getBookName())
+                            .author(recomBestSeller.getAuthor())
+                            .publisher(recomBestSeller.getPublisher())
+                            .img(recomBestSeller.getImg())
+                            .build());
+                }
+            }
+        } catch (Exception e) {
+            log.error(":: bestSellerRecom err :: error is {} ", e);
+
+        }
         return RecomInfo.builder()
                 .title("베스트 셀러")
+                .bookInfoList(bookInfoList)
                 .build();
     }
 
     /**
      * 스테디 셀러 가져오기
      */
+    // TODO: 2021-07-06  steadySeller 데이터 가져오기
     private RecomInfo steadySeller() {
+        List<BookDto> bookInfoList = new ArrayList<>();
+        try {
 
+            for (int i = 1; i <= 10; i++) {
+                RecomBestSeller recomBestSeller = bestSellerRepository.findById("A_" + i).orElse(null);
+                if (recomBestSeller != null) {
+                    bookInfoList.add(BookDto.builder()
+                            .isbn(recomBestSeller.getIsbn())
+                            .bookName(recomBestSeller.getBookName())
+                            .author(recomBestSeller.getAuthor())
+                            .publisher(recomBestSeller.getPublisher())
+                            .img(recomBestSeller.getImg())
+                            .build());
+                }
+            }
+        } catch (Exception e) {
+            log.error(":: bestSellerRecom err :: error is {} ", e);
 
+        }
         return RecomInfo.builder()
-                .title("스테디셀러")
+                .title("스테디 셀러")
+                .bookInfoList(bookInfoList)
                 .build();
-
     }
 
     private String chkIsbn(String isbn) {
