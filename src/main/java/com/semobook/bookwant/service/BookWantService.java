@@ -44,11 +44,14 @@ public class BookWantService {
             String requestIsbn = bookWantCreateRequest.getIsbn();
             Long requestUserNo = bookWantCreateRequest.getUserNo();
 //            BookWant findbookWant =
-            BookWantDto findBookWant;
+            BookWantDto findBookWant = null;
             try {
-                findBookWant = new BookWantDto(bookWantRepository.findAllByUserInfo_UserIdAndBook_Isbn(requestUserNo, requestIsbn));
-            }catch (Exception e){
-                findBookWant = null;
+                BookWant bookWant = bookWantRepository.findAllByUserInfo_UserIdAndBook_Isbn(requestUserNo, requestIsbn);
+                if (bookWant != null) {
+                    findBookWant = new BookWantDto(bookWant);
+                }
+            } catch (Exception e) {
+
             }
 
             // TODO: 2021-06-10 책이 없을때 체크
@@ -61,14 +64,22 @@ public class BookWantService {
             }
 
             Book book = bookRepository.findByIsbn(requestIsbn);
-            BookWithReviewDto dto = new BookWithReviewDto(book);
-            UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(requestUserNo));
+            BookWithReviewDto dto = null;
+            if (book != null) {
+                 dto = new BookWithReviewDto(book);
+            }
+            if (book == null){
+                //todo 이때 api에서 책정보 가져와야함 ㅎㅎ
+            }
+
+            UserInfoDto userDto = new UserInfoDto(userRepository.findByUserNo(requestUserNo));
+
             if (findBookWant == null) {
 
                 BookWant bookWant = BookWant.builder()
                         .bookDto(dto)
                         .preference(bookWantCreateRequest.getPreference())
-                        .userInfo(userInfo)
+                        .userInfo(userDto)
                         .build();
                 bookWantRepository.save(bookWant);
                 hCode = StatusEnum.hd1004;
@@ -126,8 +137,8 @@ public class BookWantService {
         long userNo = request.getUserNo();
 
         try {
-             BookWantListByUserDto bookWants =new BookWantListByUserDto(userRepository.findByBookWantWithReview(userNo));
-            if (bookWants ==null) {
+            BookWantListByUserDto bookWants = new BookWantListByUserDto(userRepository.findByBookWantWithReview(userNo));
+            if (bookWants == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "데이터가 없음";
             } else {
