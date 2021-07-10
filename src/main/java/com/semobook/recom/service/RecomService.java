@@ -598,19 +598,16 @@ public class RecomService {
     private RecomInfo bestSellerRecom() {
         List<BookDto> bookInfoList = new ArrayList<>();
         try {
+            bookInfoList = getBestSellerList("A_", 10).stream().map(a -> BookDto.builder()
+                    .isbn(a.getIsbn())
+                    .bookName(a.getBookName())
+                    .author(a.getAuthor())
+                    .publisher(a.getPublisher())
+                    .category(a.getCategory())
+                    .img(a.getImg())
+                    .build()).collect(Collectors.toList());
 
-            for (int i = 1; i <= 10; i++) {
-                RecomBestSeller recomBestSeller = bestSellerRepository.findById("A_" + i).orElse(null);
-                if (recomBestSeller != null) {
-                    bookInfoList.add(BookDto.builder()
-                            .isbn(recomBestSeller.getIsbn())
-                            .bookName(recomBestSeller.getBookName())
-                            .author(recomBestSeller.getAuthor())
-                            .publisher(recomBestSeller.getPublisher())
-                            .img(recomBestSeller.getImg())
-                            .build());
-                }
-            }
+
         } catch (Exception e) {
             log.error(":: bestSellerRecom err :: error is {} ", e);
 
