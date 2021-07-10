@@ -64,6 +64,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(updateUser));
     }
 
+    @Operation(description = "회원 정보")
+    @PostMapping("/userInfo")
+    public ResponseEntity<UserResponse> userInfoWithReviewCountCon(@Parameter @RequestBody UserInfoRequest userInfoRequest){
+        return ResponseEntity.ok(userService.userInfoWithReviewCount(userInfoRequest));
+    }
+
 
 
 

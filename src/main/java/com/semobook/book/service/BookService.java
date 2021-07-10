@@ -3,9 +3,11 @@ package com.semobook.book.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.*;
 import com.semobook.book.repository.BookRepository;
+import com.semobook.bookReview.domain.BookReview;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

@@ -44,5 +44,8 @@ public interface BookRepository extends CrudRepository<Book, String> {
     //책 제거
     int deleteBookByIsbn (String isbn);
 
+    //도서 존재 여부
+    boolean existsByIsbn(String isbn);
+
 
 }
