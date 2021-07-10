@@ -3,6 +3,7 @@ package com.semobook.user.service;
 
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.BookReviewWithIsbnDto;
+import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
@@ -26,6 +27,7 @@ public class UserService {
 
 
     private final UserRepository userRepository;
+    private final BookReviewRepository bookReviewRepository;
 
     /**
      * 모든회원 조회(테스트용)
@@ -249,4 +251,38 @@ public class UserService {
     }
 
 
+    /**
+     * user info with review count api
+     *
+     * @author hyunho
+     * @since 2021/06/24
+    **/
+    public UserResponse userInfoWithReviewCount(UserInfoRequest userInfoRequest) {
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data = null;
+
+        try {
+            //TODO[hyunho] : 유저가 작성한 리뷰 수 조회 쿼리 수정 필요(oneToNmay 관계 collection 조회 필요)
+            UserInfo userInfo = userRepository.findByUserNo(userInfoRequest.getUserNo());
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 1));
+            UserInfoWithReviewCountDto userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),
+                    userInfo.getUserId(),
+                    userInfo.getUserName(),
+                    page.getTotalElements());
+
+            hCode = StatusEnum.hd1004;
+            data = userInfoWithReviewCountDto;
+            hMessage = "정보 조회 성공";
+        }catch (Exception e){
+            log.info(":: userInfo err :: error is {} ", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "정보 조회 실패";
+        }
+        return UserResponse.builder()
+                .code(hCode)
+                .message(hMessage)
+                .data(data)
+                .build();
+    }
 }
