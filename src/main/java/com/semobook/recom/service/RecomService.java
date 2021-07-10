@@ -153,7 +153,7 @@ public class RecomService {
         String hMessage = null;
         try {
             hCode = StatusEnum.hd1004;
-            userPriority = getUserPriority(userId);
+            userPriority = getUserPriorityList(userId);
 
             if (userPriority.size() == 0) {
                 bestSellersList = basicEvaluation();
@@ -232,7 +232,7 @@ public class RecomService {
      * @author hyejinzz
      * @since 2021-06-20
      **/
-    private List<String> getUserPriority(long userId) {
+    private List<String> getUserPriorityList(long userId) {
         List<String> userPriority = new ArrayList<>();
         //리뷰데이터로 새로운 성향 만들기
         makeUserPriority(userId);
@@ -252,6 +252,7 @@ public class RecomService {
         }
         return userPriority;
     }
+
 
     /**
      * redis에 임시로저장된 데이터를 바탕으로 새로운 priority 가져온다
@@ -331,6 +332,7 @@ public class RecomService {
     }
 
     /**
+     * todo 해야함
      * 이용자가 추천받고 싶지 않은 책들을 필터함
      * 유저가 이미 평가한 책들을 필터함
      *
@@ -422,7 +424,7 @@ public class RecomService {
         String hMessage = null;
         try {
 
-            List<RecomInfo> list = getTotalRecom();
+            List<RecomInfo> list = getTotalRecom(userId);
             data = list;
             hCode = StatusEnum.hd1004;
             hMessage = "recomByUser 성공";
@@ -442,13 +444,13 @@ public class RecomService {
     /**
      * 7개의 추천데이터중 최소 3~5개의 추천 데이터 List를 가져온디
      */
-    private List<RecomInfo> getTotalRecom() {
+    private List<RecomInfo> getTotalRecom(long userId) {
         List<RecomInfo> recomInfoList = new ArrayList<>();
 //        recomInfoList.addAll(adminRecom());
 //        recomInfoList.add(reviewRecom());
 //        recomInfoList.add(userWantRecom());
 //        recomInfoList.add(userInfoRecom());
-//        recomInfoList.add(userCategoryRecom());
+        recomInfoList.add(userCategoryRecom(userId));
         recomInfoList.add(bestSellerRecom());
 //        recomInfoList.add(steadySeller());
 
@@ -571,9 +573,22 @@ public class RecomService {
     /**
      * 유저 선호 카테고리
      */
-    private RecomInfo userCategoryRecom() {
+    private RecomInfo userCategoryRecom(long userId) {
+
+        String userPriority = getUserPriorityList(userId).get(0);
+
+        List<BookDto> bestSeller = getBestSellerList(userPriority, 10).stream().map(a -> BookDto.builder()
+                .isbn(a.getIsbn())
+                .bookName(a.getBookName())
+                .author(a.getAuthor())
+                .publisher(a.getPublisher())
+                .category(a.getCategory())
+                .img(a.getImg())
+                .build()).collect(Collectors.toList());
+
         return RecomInfo.builder()
                 .title("회원님이 선호하는 ()분야의 책을 모아봤어요")
+                .bookInfoList(bestSeller)
                 .build();
     }
 
