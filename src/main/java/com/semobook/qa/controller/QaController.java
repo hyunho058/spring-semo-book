@@ -1,5 +1,6 @@
 package com.semobook.qa.controller;
 
+import com.semobook.qa.dto.QaListRequest;
 import com.semobook.qa.dto.QaRequest;
 import com.semobook.qa.dto.QaResponse;
 import com.semobook.qa.service.QaService;
@@ -23,8 +24,13 @@ public class QaController {
     private final QaService qaService;
 
     @PostMapping("/create")
-    public ResponseEntity<QaResponse> createQa(@Parameter @RequestBody QaRequest request){
+    public ResponseEntity<QaResponse> createQaCon(@Parameter @RequestBody QaRequest request){
         return ResponseEntity.ok(qaService.createQa(request));
+    }
+
+    @PostMapping("/findAllQa")
+    public ResponseEntity<QaResponse> findAllQaCon(@Parameter @RequestBody QaListRequest request){
+        return ResponseEntity.ok(qaService.findAllQa(request));
     }
 
 }
