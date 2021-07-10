@@ -2,6 +2,7 @@ package com.semobook.user.domain;
 
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookwant.domain.BookWant;
+import com.semobook.qa.domain.Qa;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
 import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
@@ -17,7 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 public class UserInfo {
-
 
     @Id
     @GeneratedValue
@@ -44,6 +44,9 @@ public class UserInfo {
 
     @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL)
     private List<BookWant> bookWants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL)
+    private List<Qa> qaList = new ArrayList<>();
 
     private String deleteReason;
 

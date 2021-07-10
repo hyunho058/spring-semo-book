@@ -1,0 +1,30 @@
+package com.semobook.qa.controller;
+
+import com.semobook.qa.dto.QaRequest;
+import com.semobook.qa.dto.QaResponse;
+import com.semobook.qa.service.QaService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@Tag(name = "Qa Controller")
+@RequestMapping("/qa")
+@RequiredArgsConstructor
+public class QaController {
+
+    private final QaService qaService;
+
+    @PostMapping("/create")
+    public ResponseEntity<QaResponse> createQa(@Parameter @RequestBody QaRequest request){
+        return ResponseEntity.ok(qaService.createQa(request));
+    }
+
+}

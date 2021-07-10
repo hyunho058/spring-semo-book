@@ -1,0 +1,69 @@
+package com.semobook.qa.service;
+
+import com.semobook.bookReview.repository.BookReviewRepository;
+import com.semobook.common.StatusEnum;
+import com.semobook.qa.domain.Qa;
+import com.semobook.qa.dto.QaRequest;
+import com.semobook.qa.dto.QaResponse;
+import com.semobook.qa.repository.QaRepository;
+import com.semobook.user.domain.UserInfo;
+import com.semobook.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class QaService {
+    private final QaRepository qaRepository;
+    private final UserRepository userRepository;
+    private String hMessage = null;
+    private Object data = null;
+    private StatusEnum hCode = null;
+
+
+    /**
+     * create qa
+     *
+     * @author hyunho
+     * @since 2021-07-10
+     **/
+    @Transactional
+    public QaResponse createQa(QaRequest request) {
+        log.info(":: createQa ::");
+        hMessage = null;
+        data = null;
+        hCode = null;
+
+        log.info(":: createQa :: request is {} ", request);
+        try {
+            UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+
+            Qa qa = qaRepository.save(Qa.builder()
+                    .title(request.getTitle())
+                    .requestContents(request.getRequestContents())
+                    .userInfo(resultUserInfo)
+                    .createDate(LocalDateTime.now())
+                    .build());
+
+            hCode = StatusEnum.hd1004;
+            hMessage = "저장완료";
+            data = qa.getQaNo();
+        }catch (Exception e){
+            hCode = StatusEnum.hd4444;
+            hMessage = "저장실패";
+            data = null;
+        }
+
+        return QaResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
+}
