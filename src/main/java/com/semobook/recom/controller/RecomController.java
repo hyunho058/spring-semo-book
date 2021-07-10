@@ -50,8 +50,8 @@ public class RecomController {
 
     //유저 책 추천 리스트 가져오기기
     @Operation(description = "유저 책 가져오기")
-    @GetMapping(value = "/book-list/{userNo}")
-    public ResponseEntity<RecomResponse> userrecom(@Parameter @PathVariable long userNo) {
+    @GetMapping(value = "/book-list")
+    public ResponseEntity<RecomResponse> userRecom(@Parameter @RequestParam(name = "userNo") long userNo) {
         return ResponseEntity.ok(recomService.recomByUser(userNo));
     }
 
