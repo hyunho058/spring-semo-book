@@ -2,10 +2,11 @@ package com.semobook.recom.service;
 
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookDto;
-import com.semobook.book.dto.BookSearchRequest;
-import com.semobook.book.dto.Document;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.book.service.BookService;
+import com.semobook.bookwant.dto.BookWantDto;
+import com.semobook.bookwant.dto.Preference;
+import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.*;
@@ -15,6 +16,7 @@ import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import tools.StringTools;
 
@@ -38,6 +40,7 @@ public class RecomService {
     private final AllReviewRepository allReviewRepository;
     Map<String, Integer> categoryIndex;
     private final BookService bookService;
+    private final BookWantRepository bookWantRepository;
 
     /**
      * 초기세팅 : 인덱스별 값
@@ -446,9 +449,9 @@ public class RecomService {
      */
     private List<RecomInfo> getTotalRecom(long userId) {
         List<RecomInfo> recomInfoList = new ArrayList<>();
-//        recomInfoList.addAll(adminRecom());
+        recomInfoList.addAll(adminRecom());
 //        recomInfoList.add(reviewRecom());
-//        recomInfoList.add(userWantRecom());
+        recomInfoList.add(userWantRecom(userId));
 //        recomInfoList.add(userInfoRecom());
         recomInfoList.add(userCategoryRecom(userId));
         recomInfoList.add(bestSellerRecom());
@@ -496,48 +499,12 @@ public class RecomService {
 
         List<BookDto> bookInfoList = new ArrayList<>();
         for (String i : isbnList) {
-            bookInfoList.add(getBookInfo(i));
+            bookInfoList.add(bookService.findBook3Step(i));
         }
 
         return bookInfoList;
     }
 
-    //isbn 정보로 책 가져오기
-    private BookDto getBookInfo(String isbn) {
-        //1. bookDB에 책정보있는지 조회
-        Book book = bookRepository.findByIsbn(isbn);
-        BookDto bookDto = new BookDto();
-        if (book != null) {
-            bookDto = new BookDto(bookRepository.findByIsbn(isbn));
-        }
-        //2. 없으면 api에서조회
-        if (book == null) {
-            BookSearchRequest request = BookSearchRequest.builder()
-                    .keyword(isbn)
-                    .pageNum(1)
-                    .build();
-            ArrayList<Document> bookInfoList = bookService.searchBookMethod(request).getDocuments();
-            if (bookInfoList.size() >= 1) {
-                Document bookInfo = bookInfoList.get(0);
-
-                //isbn 가공처리
-                String convertIsbn = chkIsbn(bookInfo.getIsbn());
-                //db에 저장
-                book = Book.builder()
-                        .isbn(convertIsbn)
-                        .bookName(bookInfo.getTitle())
-                        .author(StringTools.listConvToString(bookInfo.getAuthors(), SemoConstant.VARTICAL_BAR))
-                        .publisher(bookInfo.getPublisher())
-                        .img(bookInfo.getThumbnail())
-                        .build();
-                bookRepository.save(book);
-                bookDto = new BookDto(book);
-            } else {
-                log.error(":: getBookInfo err :: not found bookInfo ");
-            }
-        }
-        return bookDto;
-    }
 
 
     /**
@@ -547,6 +514,7 @@ public class RecomService {
      * @since 2021-06-30
      **/
     private RecomInfo reviewRecom() {
+
         return RecomInfo.builder()
                 .title("회원님이 읽고싶어한 책이에요")
                 .build();
@@ -555,8 +523,29 @@ public class RecomService {
     /**
      * 유저가 읽고싶다고 저장한 데이터를 가져온다
      */
-    private RecomInfo userWantRecom() {
+    private RecomInfo userWantRecom(long userId) {
+        List<BookDto> bookInfoList = new ArrayList<>();
+        try {
+
+            List<BookWantDto> bookWantPage = bookWantRepository.findLikeAllByUserInfo(userId, Preference.LIKE, PageRequest.of(0, 100))
+                    .stream()
+                    .map(a -> BookWantDto.builder()
+                            .bookWant(a)
+                            .build()).collect(Collectors.toList());
+
+
+            //????? 생각해보기 ㅡㅡ
+            for (BookWantDto bwd : bookWantPage) {
+                bookInfoList.add(bookService.findBook3Step(bwd.getIsbn()));
+            }
+        }
+        catch (Exception e){
+            log.error(":: userWantRecom err :: error is {} ", e);
+
+        }
+
         return RecomInfo.builder()
+                .bookInfoList(bookInfoList)
                 .title("회원님이 읽고싶어한 책이에요")
                 .build();
     }
@@ -648,13 +637,6 @@ public class RecomService {
                 .build();
     }
 
-    private String chkIsbn(String isbn) {
-        if (isbn.length() > 13) {
-            List<String> isbnList = StringTools.stringConvToList(isbn, " ");
-            return isbnList.get(1);
-        }
-        return isbn;
-    }
 
 
 }

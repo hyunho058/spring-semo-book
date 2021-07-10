@@ -44,7 +44,8 @@ public class Book {
     private List<BookReview> bookReviewList = new ArrayList<>();
 
     @Builder
-    public Book(String isbn, String bookName, String author, String publisher, String kdc, String category, String keyword, String img) {
+    public Book(String isbn, String bookName, String author, String publisher,
+                String kdc, String category, String keyword, String img, String contents) {
         this.isbn = isbn;
         this.bookName = bookName;
         this.author = author;
@@ -53,5 +54,6 @@ public class Book {
         this.category = category;
         this.keyword = keyword;
         this.img = img;
+        this.contents = contents;
     }
 }
