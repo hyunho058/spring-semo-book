@@ -1,4 +1,4 @@
-package com.semobook.recom.domain;
+package com.semobook.book.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Getter
 @RedisHash("RECOM_BEST_SELLER")
-public class RecomBestSeller  implements Serializable {
+public class RecomBestSeller implements Serializable {
     @Id
     private String rank;
     private String isbn;
@@ -30,7 +30,7 @@ public class RecomBestSeller  implements Serializable {
 
 
     @Builder
-    public RecomBestSeller(String rank, String isbn, String bookName, String author,String publisher,
+    public RecomBestSeller(String rank, String isbn, String bookName, String author, String publisher,
                            String kdc, String category, String keyword, String img){
         this.rank = rank;
         this.isbn = isbn;

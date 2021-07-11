@@ -1,6 +1,6 @@
-package com.semobook.recom.repository;
+package com.semobook.user.repository;
 
-import com.semobook.recom.domain.UserPriorityRedis;
+import com.semobook.user.dto.UserPriorityRedis;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

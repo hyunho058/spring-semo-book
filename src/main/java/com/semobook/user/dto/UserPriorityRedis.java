@@ -1,4 +1,4 @@
-package com.semobook.recom.domain;
+package com.semobook.user.dto;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,6 +1,8 @@
-package com.semobook.recom.domain;
+package com.semobook.bookReview.domain;
 
+import com.semobook.recom.domain.ReviewInfo;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -10,7 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
-@Getter
+@Data
 @RedisHash("ALL_REVIEW")
 public class AllReview implements Serializable {
     @Id
