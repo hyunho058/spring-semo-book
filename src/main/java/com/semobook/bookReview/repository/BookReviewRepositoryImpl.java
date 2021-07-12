@@ -1,23 +1,15 @@
 package com.semobook.bookReview.repository;
 
-import com.querydsl.core.types.dsl.DateExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.semobook.book.domain.Book;
-import com.semobook.book.domain.QBook;
 import com.semobook.bookReview.domain.BookReview;
-import com.semobook.bookReview.domain.QBookReview;
-import com.semobook.user.domain.QUserInfo;
-import jdk.internal.net.http.common.Log;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Timer;
 
-import static com.semobook.book.domain.QBook.*;
+import static com.semobook.book.domain.QBook.book;
 import static com.semobook.bookReview.domain.QBookReview.bookReview;
-import static com.semobook.user.domain.QUserInfo.*;
+import static com.semobook.user.domain.QUserInfo.userInfo;
 
 @Slf4j
 public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
@@ -68,13 +60,13 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     **/
 //    https://www.inflearn.com/questions/193289
     @Override
-    public List<BookReview> findByBookBetweenDate(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("startDate is = {}",startDate);
         List<BookReview> resultList = queryFactory
                 .selectFrom(bookReview)
                 .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
                 .join(bookReview.book, book).fetchJoin()
-                .where(bookReview.createDate.between(startDate, endDate).and(bookReview.reviewContents .isNotNull()))
+                .where(userInfo.userNo.eq(userNo).and(bookReview.createDate.between(startDate, endDate).and(bookReview.reviewContents .isNotNull())))
                 .fetch();
         return resultList;
     }

@@ -449,6 +449,7 @@ public class BookReviewService {
         try {
 //            Page<BookReview> page = bookReviewRepository.findAllByUserInfo(monthBookReviewRequest.getUserNo(), PageRequest.of(0, 100));
             List<BookReview> page = bookReviewRepository.findByBookBetweenDate(
+                    monthBookReviewRequest.getUserNo(),
                     monthBookReviewRequest.getStartDate(),
                     monthBookReviewRequest.getEndDate());
             List<BookReviewWithIsbnDto> result = page.stream()

@@ -2,10 +2,8 @@ package com.semobook.bookReview.repository;
 
 import com.semobook.book.domain.Book;
 import com.semobook.bookReview.domain.BookReview;
-import com.semobook.user.domain.UserInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -80,7 +78,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
         countQuery = "select count(br.reviewNo) from BookReview  br")
     Page<BookReview> findAllByUserInfo(@Param(value = "userNo") long userNo, Pageable pageable);
 
-    List<BookReview> findByBookBetweenDate(LocalDateTime startDate, LocalDateTime endDate);
+    List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 
 //    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book where ui.userNo = :userNo",
 //            countQuery = "select count(br.reviewNo) from BookReview  br")
