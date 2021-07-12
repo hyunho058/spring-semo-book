@@ -57,7 +57,7 @@ public class BestSellerService {
      **/
     public RecomBestSeller getBestSeller(String key) {
         int idx = categoryIndex.get(key);
-        RecomBestSeller bs = recomBestSellerRepository.findById(key+idx).orElse(null);
+        RecomBestSeller bs = recomBestSellerRepository.findById(key+idx++).orElse(null);
         idx = idx > 20 ? 1 : idx;
         categoryIndex.put(key, idx);
         if (bs != null) {

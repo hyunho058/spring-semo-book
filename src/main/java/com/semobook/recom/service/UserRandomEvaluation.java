@@ -130,7 +130,7 @@ public class UserRandomEvaluation {
     private List<RecomBestSeller> basicEvaluation() {
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (String s : SemoConstant.CATEGORY_TYPE) {
-            int index = categoryIndex.get(s);
+
             bookList.add(bestSellerService.getBestSeller(s));
         }
         bookList = resultFilterService.BestSellerListCutter(bookList);
