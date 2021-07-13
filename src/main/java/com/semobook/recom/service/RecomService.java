@@ -1,8 +1,13 @@
 package com.semobook.recom.service;
 
+import com.semobook.book.domain.Book;
+import com.semobook.book.domain.RecomBestSeller;
 import com.semobook.book.dto.BookDto;
+import com.semobook.book.repository.BookRepository;
 import com.semobook.book.service.BestSellerService;
 import com.semobook.book.service.BookService;
+import com.semobook.bookReview.domain.AllReview;
+import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookwant.dto.BookWantDto;
 import com.semobook.bookwant.dto.Preference;
 import com.semobook.bookwant.repository.BookWantRepository;
@@ -10,6 +15,8 @@ import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.AdminRecom;
 import com.semobook.recom.domain.RecomInfo;
+import com.semobook.recom.domain.RecomUserReview;
+import com.semobook.recom.domain.ReviewInfo;
 import com.semobook.recom.dto.RecomResponse;
 import com.semobook.recom.repository.AdminRecomRepository;
 import com.semobook.user.service.UserService;
@@ -34,13 +41,15 @@ public class RecomService {
     private final BookWantRepository bookWantRepository;
     private final BestSellerService bestSellerService;
     private final UserService userService;
+    private final BookRepository bookRepository;
+    private final AllReviewRepository allReviewRepository;
 
     /**
      * 유저별 추천
      *
      * @author hyunho
      * @since 2021/07/11
-    **/
+     **/
     public RecomResponse recomByUser(long userId) {
 
         Object data = null;
@@ -73,25 +82,29 @@ public class RecomService {
         List<RecomInfo> recomInfoList = new ArrayList<>();
         //관리자 추천
         List<RecomInfo> adminRecomResult = adminRecom();
-        if(!(adminRecomResult == null || adminRecomResult.size()==0) ) {
+        if (!(adminRecomResult == null || adminRecomResult.size() == 0)) {
             recomInfoList.addAll(adminRecomResult);
+        }
+        RecomInfo getUserReviewRecomResult = getUserReviewRecom(userId);
+        if (!(getUserReviewRecomResult == null || getUserReviewRecomResult.getBookInfoList().size() == 0)) {
+            recomInfoList.add(getUserReviewRecomResult);
         }
 
 //        recomInfoList.add(reviewRecom());
         //유저가 좋아요 누른 글 추천
         RecomInfo userWantRecomResult = userWantRecom(userId);
-        if(!(userWantRecomResult == null || userWantRecomResult.getBookInfoList().size() == 0)) {
+        if (!(userWantRecomResult == null || userWantRecomResult.getBookInfoList().size() == 0)) {
             recomInfoList.add(userWantRecomResult);
         }
 //        recomInfoList.add(userInfoRecom());
 
         RecomInfo userCategoryRecomResult = userCategoryRecom(userId);
-        if(!(userCategoryRecomResult == null || userCategoryRecomResult.getBookInfoList().size() == 0)) {
+        if (!(userCategoryRecomResult == null || userCategoryRecomResult.getBookInfoList().size() == 0)) {
             recomInfoList.add(userCategoryRecomResult);
         }
 
 
-        if(recomInfoList.size()<3) {
+        if (recomInfoList.size() < 3) {
             recomInfoList.add(bestSellerRecom());
 //        recomInfoList.add(steadySeller());
         }
@@ -119,7 +132,7 @@ public class RecomService {
             recomInfoList.add(
                     RecomInfo.builder()
                             .title(adminRecom.getTitle())
-                            .bookInfoList(getBookInfoByIsbnList(StringTools.stringConvToList(adminRecom.getIsbn(),SemoConstant.BACKSLASH_VARTICAL_BAR)))
+                            .bookInfoList(getBookInfoByIsbnList(StringTools.stringConvToList(adminRecom.getIsbn(), SemoConstant.BACKSLASH_VARTICAL_BAR)))
                             .build()
             );
 
@@ -133,10 +146,56 @@ public class RecomService {
      *
      * @author hyunho
      * @since 2021/07/11
-    **/
+     **/
+
+    public RecomInfo getUserReviewRecom(long userNo) {
+        List<BookDto> bookInfoList = new ArrayList<>();
+        List<ReviewInfo> value;
+        String recentCategory = null;
+        String userPriorityValue = null;
+        try {
+            AllReview allReview = allReviewRepository.findById(userNo).orElse(null);
+
+
+            if (allReview == null) {
+                return null;
+            }
+            if (allReview != null) {
+                value = allReview.getValue();
+                for (ReviewInfo info : value) {
+                    if (info.getPoint() >= 3) {
+                        recentCategory = info.getCategory();
+                    }
+                }
+            }
+            if (recentCategory != null) {
+                bookInfoList = bestSellerService.getBestSellerList(recentCategory, 10)
+                        .stream()
+                        .map(a -> BookDto.builder()
+                                .isbn(a.getIsbn())
+                                .bookName(a.getBookName())
+                                .author(a.getAuthor())
+                                .publisher(a.getPublisher())
+                                .category(a.getCategory())
+                                .img(a.getImg())
+                                .build())
+                        .collect(Collectors.toList());
+                userPriorityValue = SemoConstant.CATEGORY_TYPE_MAP.get(recentCategory);
+            }
+        } catch (Exception e) {
+            log.error(":: getUserReviewRecom err :: error is {} ", e);
+
+        }
+        if (bookInfoList.size() == 0) return null;
+        else return RecomInfo.builder()
+                .bookInfoList(bookInfoList)
+                .title("회원님이 최근에 좋아한 " + userPriorityValue +" 분야의 책이에요")
+                .build();
+    }
 
     /**
      * 유저가 리뷰를 등록하면 관련도서 추천을 함
+     *
      * 1. 책에 keyword 있으면 keyword 같은 키워드 탐색
      * 2. 값이 부족하면 category로 같은 도서 탐색
      * 3. 값이 부족하면 kdc로 앞자리 같은 도서 탐색
@@ -147,7 +206,8 @@ public class RecomService {
      * @since 2021-06-01
      **/
     // TODO: 2021-06-01 LIST<BOOK> 으로 만들어야한다
-//    public void updateUserReviewRecom(String isbn, long userNo) {
+//    public  void updateUserReviewRecom(String isbn, long userNo) {
+//        //List<RecomInfo>
 //        Book book = bookRepository.findByIsbn(isbn);
 //
 //        List<Book> bookList = new ArrayList<>();
@@ -196,7 +256,7 @@ public class RecomService {
      *
      * @author hyunho
      * @since 2021/07/11
-    **/
+     **/
     /**
      * 유저가 읽고싶다고 저장한 데이터를 가져온다
      */
@@ -214,12 +274,11 @@ public class RecomService {
             for (BookWantDto bwd : bookWantPage) {
                 bookInfoList.add(bookService.findBook3Step(bwd.getIsbn()));
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error(":: userWantRecom err :: error is {} ", e);
 
         }
-        if(bookInfoList.size() == 0) return null;
+        if (bookInfoList.size() == 0) return null;
         else return RecomInfo.builder()
                 .bookInfoList(bookInfoList)
                 .title("회원님이 읽고싶어한 책이에요")
@@ -238,15 +297,15 @@ public class RecomService {
      *
      * @author hyunho
      * @since 2021/07/11
-    **/
+     **/
 
     private RecomInfo userCategoryRecom(long userId) {
 
-        List<String>userPriorityList = userService.getUserPriorityList(userId);
+        List<String> userPriorityList = userService.getUserPriorityList(userId);
         String userPriority;
         String userPriorityValue = "";
         List<BookDto> bestSeller = null;
-        if(userPriorityList.size()>=1) {
+        if (userPriorityList.size() >= 1) {
             userPriority = userPriorityList.get(0);
             userPriorityValue = SemoConstant.CATEGORY_TYPE_MAP.get(userPriority);
 
@@ -260,9 +319,9 @@ public class RecomService {
                     .build()).collect(Collectors.toList());
 
         }
-        if(bestSeller == null || bestSeller.size() == 0 ) return null;
+        if (bestSeller == null || bestSeller.size() == 0) return null;
         return RecomInfo.builder()
-                .title("회원님이 선호하는 "+userPriorityValue+"분야의 책을 모아봤어요")
+                .title("회원님이 선호하는 " + userPriorityValue + "분야의 책을 모아봤어요")
                 .bookInfoList(bestSeller)
                 .build();
     }
@@ -272,7 +331,7 @@ public class RecomService {
      *
      * @author hyunho
      * @since 2021/07/11
-    **/
+     **/
     private RecomInfo bestSellerRecom() {
         List<BookDto> bookInfoList = new ArrayList<>();
         try {
@@ -300,7 +359,7 @@ public class RecomService {
      *
      * @author hyunho
      * @since 2021/07/11
-    **/
+     **/
 
 
     /**
@@ -308,18 +367,15 @@ public class RecomService {
      *
      * @author hyunho
      * @since 2021/07/11
-     *
-    **/
+     **/
 
-    List<BookDto> getBookInfoByIsbnList(List<String> isbnList){
+    List<BookDto> getBookInfoByIsbnList(List<String> isbnList) {
         List<BookDto> bookDtoList = new ArrayList<>();
-        for(String isbn : isbnList) {
+        for (String isbn : isbnList) {
             bookDtoList.add(bookService.findBook3Step(isbn));
         }
         return bookDtoList;
     }
-
-
 
 
 }

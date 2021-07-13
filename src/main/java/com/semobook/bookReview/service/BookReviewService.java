@@ -109,9 +109,9 @@ public class BookReviewService {
                     }
 
                     //평점  3점 이상이면 recom으로 추천 업뎃치기
-                    if (request.getRating() >= 3) {
+//                    if (request.getRating() >= 3) {
 //                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
-                    }
+//                    }
                     //레디스에
                     hCode = StatusEnum.hd1004;
                     hMessage = "저장완료";
@@ -188,8 +188,8 @@ public class BookReviewService {
      **/
     @Transactional
     public BookReviewResponse bookReviewRating(BookReviewRatingRequest request) {
-        log.info("bookReviewRating ::");
         String hMessage = null;
+        log.info("bookReviewRating ::");
         Object data = null;
         StatusEnum hCode = null;
         try {
