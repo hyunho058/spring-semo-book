@@ -274,7 +274,7 @@ public class UserService {
         try {
             //TODO[hyunho] : 유저가 작성한 리뷰 수 조회 쿼리 수정 필요(oneToNmay 관계 collection 조회 필요)
             UserInfo userInfo = userRepository.findByUserNo(userInfoRequest.getUserNo());
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 1));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 100));
             UserInfoWithReviewCountDto userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),
                     userInfo.getUserId(),
                     userInfo.getUserName(),
