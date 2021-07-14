@@ -3,6 +3,9 @@ package com.semobook.bookReview.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.bookReview.domain.BookReview;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,5 +72,46 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .where(userInfo.userNo.eq(userNo).and(bookReview.createDate.between(startDate, endDate).and(bookReview.reviewContents .isNotNull())))
                 .fetch();
         return resultList;
+    }
+
+    @Override
+    public Page<BookReview> findAllByUserInfo_userNo(long userNo, Pageable pageable) {
+        // 조회 쿼리와 카운트 커리 한번에(querydsl 이 아라서 토탈카운트 쿼리를 새성) - 데이터 수가 적을때
+//        QueryResults<BookReview> results = queryFactory
+//                .select(bookReview)
+//                .from(bookReview)
+//                .leftJoin(bookReview.userInfo).fetchJoin()
+//                .leftJoin(bookReview.book).fetchJoin()
+//                .where(bookReview.userInfo.userNo.eq(userNo))
+//                .offset(pageable.getOffset())   //N 번부터 시작
+//                .limit(pageable.getPageSize()) //조회 갯수
+//                .fetchResults();
+//
+//        List<BookReview> content = result.getResults();
+//        long total = result.getTotal();
+//
+//        return new PageImpl<>(content, pageable, total);
+
+
+        // 직접 카운트 쿼리 작성(카운트쿼리 최적화할 수 있음 -
+        List<BookReview> results = queryFactory
+                .select(bookReview)
+                .from(bookReview)
+                .leftJoin(bookReview.userInfo).fetchJoin()
+                .leftJoin(bookReview.book).fetchJoin()
+                .where(bookReview.userInfo.userNo.eq(userNo))
+                .offset(pageable.getOffset())   //N 번부터 시작
+                .limit(pageable.getPageSize()) //조회 갯수
+                .fetch();
+
+        long total = queryFactory
+                .select(bookReview)
+                .from(bookReview)
+                .leftJoin(bookReview.userInfo).fetchJoin()
+                .leftJoin(bookReview.book).fetchJoin()
+                .where(bookReview.userInfo.userNo.eq(userNo))
+                .fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
     }
 }

@@ -270,10 +270,11 @@ public class BookReviewService {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
 
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 10));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
             List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
+            log.info("readMyReview :: count is {}",page.getTotalElements());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";

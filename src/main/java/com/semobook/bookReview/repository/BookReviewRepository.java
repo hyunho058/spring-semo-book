@@ -25,19 +25,20 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
      **/
     //find
     //내가 쓴 글 보기
-    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book where ui.userNo = :userNo",
-            countQuery = "select count(br.reviewNo) from BookReview  br")
-    Page<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo") long userNo, Pageable pageable);
+    //jpql
+//    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book where ui.userNo = :userNo",
+//            countQuery = "select count(br.reviewNo) from BookReview  br")
+//    Page<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo") long userNo, Pageable pageable);
+    //querydsl
+    Page<BookReview> findAllByUserInfo_userNo(long userNo, Pageable pageable);
 
     //이 책 리뷰 모두 보기
-//    List<BookReview> findAllByIsbn(String isbn, Pageable pageable);
     List<BookReview> findAllByBook(Book book, Pageable pageable);
 
     //모든 리뷰 보기
     List<BookReview> findAllByCreateDateBefore(LocalDateTime createDate, Pageable pageable);
 
     //삭제
-//    @Query(value = "select new com.semobook.bookReview.dto.BookReviewDto(br) FROM BookReview br where br.reviewNo = :reviewNo")
     @Query(value = "select br FROM BookReview br where br.reviewNo = :reviewNo")
     int deleteBookReviewByReviewNo(@Param(value = "reviewNo") long reviewNo);
 
@@ -80,8 +81,6 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
 
     List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 
-//    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book where ui.userNo = :userNo",
-//            countQuery = "select count(br.reviewNo) from BookReview  br")
-//    Page<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo") long userNo, Pageable pageable);
+
 
 }
