@@ -27,8 +27,8 @@ public class RecomController {
         return ResponseEntity.ok(recomService2.recomByUser(userNo));
     }
 
-    //유저 성향 가져오기
-    @Operation(description = "유저 성향 가져오기")
+    //유저 성향별 랜덤평가 가져오기
+    @Operation(description = "유저 성향별 랜덤평가 가져오기")
     @GetMapping(value = "/priority")
     public ResponseEntity<RecomResponse> userPriority(@Parameter @RequestParam(name = "userNo") long userNo) {
         return ResponseEntity.ok(userRandomEvaluation.userRandomEvaluation(userNo));

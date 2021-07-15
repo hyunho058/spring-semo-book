@@ -58,10 +58,10 @@ public class BestSellerService {
      * @since 2021-06-20
      **/
     public List<RecomBestSeller> getBestSellerList(String cate, int num) {
-        int index = bestSellerCategoryIndex.get(cate);
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             bookList.add(getBestSeller(cate));
+            bookList.add(getSteadySeller(cate));
         }
         return bookList;
     }
@@ -100,16 +100,27 @@ public class BestSellerService {
         return bs == null ? new RecomBestSeller() : bs;
     }
 
-    public RecomSteadySeller getSteadySeller(String key) {
+    public RecomBestSeller getSteadySeller(String key) {
         int idx = steadySellerCategoryIndex.get(key);
         int maxIdx = steadySellerMaxCategoryIndex.get(key);
         RecomSteadySeller ss = recomSteadySellerRepository.findById(key + idx++).orElse(null);
+
         idx = idx > maxIdx ? 1 : idx;
         bestSellerCategoryIndex.put(key, idx);
         if (ss != null) {
             log.info(":: getSteadySeller :: test is {} ", ss.getIsbn());
         }
-        return ss == null ? new RecomSteadySeller() : ss;
+        return ss == null ?
+                new RecomBestSeller() :
+                RecomBestSeller.builder()
+                        .author(ss.getAuthor())
+                        .bookName(ss.getBookName())
+                        .img(ss.getImg())
+                        .category(ss.getCategory())
+                        .isbn(ss.getIsbn())
+                        .publisher(ss.getPublisher())
+                        .rank(ss.getRank())
+                        .build();
     }
 
 }

@@ -30,7 +30,6 @@ public class UserRandomEvaluation {
     Map<String, Integer> categoryIndex;
 
 
-
     /**
      * 1. redis 조회
      * 2. db 조회, redis 저장
@@ -130,14 +129,12 @@ public class UserRandomEvaluation {
     private List<RecomBestSeller> basicEvaluation() {
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (String s : SemoConstant.CATEGORY_TYPE) {
-
+            bookList.add(bestSellerService.getSteadySeller(s));
             bookList.add(bestSellerService.getBestSeller(s));
         }
         bookList = resultFilterService.BestSellerListCutter(bookList);
         return bookList;
     }
-
-
 
 
     /**
@@ -159,10 +156,6 @@ public class UserRandomEvaluation {
         }
 
     }
-
-
-
-
 
 
 }
