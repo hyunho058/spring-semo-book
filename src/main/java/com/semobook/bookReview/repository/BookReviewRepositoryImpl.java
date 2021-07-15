@@ -114,4 +114,20 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
 
         return new PageImpl<>(results, pageable, total);
     }
+
+
+    @Override
+    public Page<BookReview> findByBookReview(String isbn, Pageable pageable) {
+        List<BookReview> results = queryFactory
+                .selectFrom(bookReview)
+                .where(bookReview.book.isbn.eq(isbn))
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(bookReview)
+                .where(bookReview.book.isbn.eq(isbn))
+                .fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
+    }
 }

@@ -68,12 +68,6 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
     //------------------------------------------------------------//
 
     //리뷰 리슽 조회(리뷰 내용을 쓴것만)
-//    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book " +
-//            "where ui.userNo = :userNo " +
-//            "and br.reviewContents is not null " +
-//            "and EXTRACT(YEAR FROM c.createdAt)=:ey " +
-//            "and EXTRACT(MONTH FROM c.createdAt)=:eq\n",
-//            countQuery = "select count(br.reviewNo) from BookReview  br")
     @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book " +
             "where ui.userNo = :userNo ",
         countQuery = "select count(br.reviewNo) from BookReview  br")
@@ -81,6 +75,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
 
     List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 
-
+    //도서에 속한 리뷰 조회
+    Page<BookReview> findByBookReview(String isbn, Pageable pageable);
 
 }
