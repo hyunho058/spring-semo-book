@@ -80,7 +80,8 @@ public class UserService {
         Object data = null;
 
         try {
-            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL));
+//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL));
+            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserId(userId));
             if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "유효하지 않은 회원정보";
@@ -114,7 +115,8 @@ public class UserService {
         StatusEnum hCode = null;
         Object data = null;
         try {
-            UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
+//            UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
+            UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
             UserInfoDto userInfoDto = new UserInfoDto(signUserInfo);
             if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
