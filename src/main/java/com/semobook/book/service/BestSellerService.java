@@ -1,7 +1,9 @@
 package com.semobook.book.service;
 
 import com.semobook.book.domain.RecomBestSeller;
+import com.semobook.book.domain.RecomSteadySeller;
 import com.semobook.book.repository.RecomBestSellerRepository;
+import com.semobook.book.repository.RecomSteadySellerRepository;
 import com.semobook.common.SemoConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,29 +20,60 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class BestSellerService {
-    Map<String, Integer> categoryIndex;
+    Map<String, Integer> bestSellerCategoryIndex;
+    Map<String, Integer> steadySellerCategoryIndex;
+    Map<String, Integer> bestSellerMaxCategoryIndex;
+    Map<String, Integer> steadySellerMaxCategoryIndex;
     private final RecomBestSellerRepository recomBestSellerRepository;
+    private final RecomSteadySellerRepository recomSteadySellerRepository;
 
     /**
-     * 초기세팅 : 인덱스별 값
+     * 초기세팅 : 인덱스별 값, 최대인덱스 가져오기
      */
     @PostConstruct
     private void init() {
-        categoryIndex = new HashMap<>();
+        bestSellerCategoryIndex = new HashMap<>();
+        steadySellerCategoryIndex = new HashMap<>();
         for (int i = 0; i < SemoConstant.CATEGORY_TYPE.length; i++) {
-            categoryIndex.put(SemoConstant.CATEGORY_TYPE[i], 1);
+            bestSellerCategoryIndex.put(SemoConstant.CATEGORY_TYPE[i], 1);
+            steadySellerCategoryIndex.put(SemoConstant.CATEGORY_TYPE[i], 1);
+
+            RecomBestSeller bsIdx = recomBestSellerRepository.findById("TOTAL" + SemoConstant.CATEGORY_TYPE[i]).orElse(null);
+            if (bsIdx != null) {
+                bestSellerMaxCategoryIndex.put(SemoConstant.CATEGORY_TYPE[i], Integer.parseInt(bsIdx.getIsbn()));
+            }
+            RecomSteadySeller ssIdx = recomSteadySellerRepository.findById("TOTAL" + SemoConstant.CATEGORY_TYPE[i]).orElse(null);
+            if (ssIdx != null) {
+                steadySellerMaxCategoryIndex.put(SemoConstant.CATEGORY_TYPE[i], Integer.parseInt(ssIdx.getIsbn()));
+            }
         }
+
 
     }
 
     /**
-     * 카테고리별 개수별로 가져오기
+     * 베스트셀러 카테고리별 개수별로 가져오기
      *
      * @author hyejinzz
      * @since 2021-06-20
      **/
     public List<RecomBestSeller> getBestSellerList(String cate, int num) {
-        int index = categoryIndex.get(cate);
+        int index = bestSellerCategoryIndex.get(cate);
+        List<RecomBestSeller> bookList = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            bookList.add(getBestSeller(cate));
+        }
+        return bookList;
+    }
+
+    /**
+     * 스테디셀러 카테고리별 개수벼롤 가져오기
+     *
+     * @author hyejinzz
+     * @since 2021-07-15
+     **/
+    public List<RecomBestSeller> getSteadySellerList(String cate, int num) {
+        int index = steadySellerCategoryIndex.get(cate);
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             bookList.add(getBestSeller(cate));
@@ -56,15 +89,27 @@ public class BestSellerService {
      * @since 2021-06-20
      **/
     public RecomBestSeller getBestSeller(String key) {
-        int idx = categoryIndex.get(key);
-        RecomBestSeller bs = recomBestSellerRepository.findById(key+idx++).orElse(null);
-        idx = idx > 20 ? 1 : idx;
-        categoryIndex.put(key, idx);
+        int idx = bestSellerCategoryIndex.get(key);
+        int maxIdx = bestSellerMaxCategoryIndex.get(key);
+        RecomBestSeller bs = recomBestSellerRepository.findById(key + idx++).orElse(null);
+        idx = idx > maxIdx ? 1 : idx;
+        bestSellerCategoryIndex.put(key, idx);
         if (bs != null) {
-            log.info(":: getFromRedis :: test is {} ", bs.getIsbn());
+            log.info(":: getBestSeller :: test is {} ", bs.getIsbn());
         }
         return bs == null ? new RecomBestSeller() : bs;
+    }
 
+    public RecomSteadySeller getSteadySeller(String key) {
+        int idx = steadySellerCategoryIndex.get(key);
+        int maxIdx = steadySellerMaxCategoryIndex.get(key);
+        RecomSteadySeller ss = recomSteadySellerRepository.findById(key + idx++).orElse(null);
+        idx = idx > maxIdx ? 1 : idx;
+        bestSellerCategoryIndex.put(key, idx);
+        if (ss != null) {
+            log.info(":: getSteadySeller :: test is {} ", ss.getIsbn());
+        }
+        return ss == null ? new RecomSteadySeller() : ss;
     }
 
 }

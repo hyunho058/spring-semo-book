@@ -4,44 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SemoConstant {
-    public static final String[] CATEGORY_TYPE = {"A_", "B_", "C_", "D_", "E_", "F_", "G_", "H_", "I_",
-            "J_", "K_", "L_", "M_", "N_", "Q_", "R_", "S_", "T_", "U_",
-            "V_", "a_", "b_", "c_", "d_", "e_", "f_", "g_"};
+    public static final String[] CATEGORY_TYPE = {"A","100","200","300","400","500","600","700","800","900"};
 
     public static final Map<String, String> CATEGORY_TYPE_MAP = new HashMap<String, String>() {
         {
-            put("A_", "종합");
-            put("B_", "소설");
-            put("C_", "에세이");
-            put("D_", "국내소설");
-            put("E_", "국외소설");
-            put("F_", "시");
-            put("G_", "어린이");
-            put("H_", "가정생활");
-            put("I_", "인문");
-            put("J_", "정치사회");
-            put("K_", "경제경영");
-            put("L_", "건강");
-            put("M_", "교양과학");
-            put("N_", "외국어");
-            put("Q_", "예술");
-            put("R_", "취미/스포츠");
-            put("S_", "TOEIC/TOEFL");
-            put("T_", "유아");
-            put("U_", "종교");
-            put("V_", "아동만화");
-            put("a_", "요리/와인");
-            put("b_", "역사/문화");
-            put("c_", "자기계발");
-            put("d_", "여행");
-            put("e_", "기술/컴퓨터");
-            put("f_", "만화");
-            put("g_", "청소년");
+            put("100", "인문/철학");
+            put("200", "종교");
+            put("300", "사회과학");
+            put("400", "자연과학");
+            put("500", "기술/생활");
+            put("600", "예술/스포츠");
+            put("700", "언어");
+            put("800", "문학");
+            put("900", "지리/역사");
+            put("A", "종합");
 
         }
     };
-
     public static final String REDIS_KEY_BEST_SELLER = "RECOM_BEST_SELLER:";
+    public static final String REDIS_KEY_STEADY_SELLER = "RECOM_STEADY_SELLER:";
 
     public static final int FIRST_PRIORITY_RATIO = 5;
     public static final int SECOND_PRIORITY_RATIO = 3;
