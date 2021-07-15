@@ -120,7 +120,9 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     public Page<BookReview> findByBookReview(String isbn, Pageable pageable) {
         List<BookReview> results = queryFactory
                 .selectFrom(bookReview)
+                .leftJoin(bookReview.userInfo).fetchJoin()
                 .where(bookReview.book.isbn.eq(isbn))
+                .orderBy(bookReview.createDate.desc())
                 .fetch();
 
         long total = queryFactory
