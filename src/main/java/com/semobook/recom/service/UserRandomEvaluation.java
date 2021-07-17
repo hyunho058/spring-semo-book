@@ -129,8 +129,15 @@ public class UserRandomEvaluation {
     private List<RecomBestSeller> basicEvaluation() {
         List<RecomBestSeller> bookList = new ArrayList<>();
         for (String s : SemoConstant.CATEGORY_TYPE) {
-            bookList.add(bestSellerService.getSteadySeller(s));
-            bookList.add(bestSellerService.getBestSeller(s));
+            RecomBestSeller ss = bestSellerService.getSteadySeller(s);
+            if(ss.getIsbn() != null){
+                bookList.add(ss);
+            }
+            RecomBestSeller bs = bestSellerService.getSteadySeller(s);
+            if(bs.getIsbn() != null){
+                bookList.add(bs);
+            }
+
         }
         bookList = resultFilterService.BestSellerListCutter(bookList);
         return bookList;

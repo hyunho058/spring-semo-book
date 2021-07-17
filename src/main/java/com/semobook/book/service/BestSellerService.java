@@ -33,7 +33,9 @@ public class BestSellerService {
     @PostConstruct
     private void init() {
         bestSellerCategoryIndex = new HashMap<>();
+        bestSellerMaxCategoryIndex = new HashMap<>();
         steadySellerCategoryIndex = new HashMap<>();
+        steadySellerMaxCategoryIndex = new HashMap<>();
         for (int i = 0; i < SemoConstant.CATEGORY_TYPE.length; i++) {
             bestSellerCategoryIndex.put(SemoConstant.CATEGORY_TYPE[i], 1);
             steadySellerCategoryIndex.put(SemoConstant.CATEGORY_TYPE[i], 1);
@@ -91,7 +93,8 @@ public class BestSellerService {
     public RecomBestSeller getBestSeller(String key) {
         int idx = bestSellerCategoryIndex.get(key);
         int maxIdx = bestSellerMaxCategoryIndex.get(key);
-        RecomBestSeller bs = recomBestSellerRepository.findById(key + idx++).orElse(null);
+        log.info(":: getBestSeller :: test is {} ", key+"_"+idx);
+        RecomBestSeller bs = recomBestSellerRepository.findById(key+ "_"+ idx++).orElse(null);
         idx = idx > maxIdx ? 1 : idx;
         bestSellerCategoryIndex.put(key, idx);
         if (bs != null) {
@@ -101,9 +104,12 @@ public class BestSellerService {
     }
 
     public RecomBestSeller getSteadySeller(String key) {
+
         int idx = steadySellerCategoryIndex.get(key);
         int maxIdx = steadySellerMaxCategoryIndex.get(key);
-        RecomSteadySeller ss = recomSteadySellerRepository.findById(key + idx++).orElse(null);
+        log.info(":: getSteadySeller :: test is {} ", key+"_"+idx);
+
+        RecomSteadySeller ss = recomSteadySellerRepository.findById(key +"_"+ idx++).orElse(null);
 
         idx = idx > maxIdx ? 1 : idx;
         bestSellerCategoryIndex.put(key, idx);

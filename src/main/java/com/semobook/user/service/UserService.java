@@ -7,7 +7,7 @@ import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.bookReview.domain.AllReview;
 import com.semobook.recom.domain.ReviewInfo;
-import com.semobook.user.dto.UserPriorityRedis;
+import com.semobook.user.domain.UserPriorityRedis;
 import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.domain.UserInfo;
@@ -312,7 +312,7 @@ public class UserService {
         //Database
         if (userPriorityRedis.getValue() == null) {
             UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(userId));
-            if (userInfo == null) return userPriority;
+            if (userInfo.getUserPriority() == null) return userPriority;
             value = userInfo.getUserPriority();
             saveUserPriorityRedis(userId, value);
         }
