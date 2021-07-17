@@ -1,0 +1,28 @@
+spring:
+  ###redis
+  redis:
+    port: 4989
+    host: 211.37.147.89
+  ##database
+  datasource:
+    url: jdbc:mariadb://211.37.147.89:3306/semo
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: "semo"
+    password: "h919294"
+    jackson:
+      property-naming-strategy: com.semobook.config.CustomNamingStrategy
+      mapper:
+        use-std-bean-naming: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+#        hibernate.default_batch_fetch_size: 1000
+logging:
+  level:
+    org.hibernate.SQL: trace
+    org.hibernate.type: trace
+server:
+  port: 8080
