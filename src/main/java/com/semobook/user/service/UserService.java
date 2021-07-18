@@ -423,6 +423,7 @@ public class UserService {
 //                    int cutSize = SemoConstant.CHECK_USER_REVIEW_CNT + 1;
 //                    value = value.subList(value.size() - cutSize, value.size());
 //                }
+                value.stream().filter(a->!(a.getCategory().isEmpty()|| a.getCategory() =="A"));
                 Map<String, Integer> map = new HashMap<>();
                 for (ReviewInfo reviewInfo : value) {
                     String key = reviewInfo.getCategory();

@@ -68,9 +68,9 @@ public class BookReviewService {
         try {
             if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
                 log.info("createReview:: review is existence");
-//                hCode = StatusEnum.hd4444;
-//                hMessage = "이미 리뷰를 등록하였습니다.";
-//                data = null;
+                hCode = StatusEnum.hd4444;
+                hMessage = "이미 리뷰를 등록하였습니다.";
+                data = null;
             } else {
                 log.info("createReview:: review is not existence");
                 Book book;
@@ -93,14 +93,14 @@ public class BookReviewService {
                 UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
                 log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
                 if (book != null && resultUserInfo != null) {
-                    bookReviewRepository.save(BookReview.builder()
-                            .rating(request.getRating())
-                            .reviewContents(request.getReviewContents())
-                            .createDate(LocalDateTime.now())
-                            .declaration(0)
-                            .book(book)
-                            .userInfo(resultUserInfo)
-                            .build());
+//                    bookReviewRepository.save(BookReview.builder()
+//                            .rating(request.getRating())
+//                            .reviewContents(request.getReviewContents())
+//                            .createDate(LocalDateTime.now())
+//                            .declaration(0)
+//                            .book(book)
+//                            .userInfo(resultUserInfo)
+//                            .build());
 
                     //redis에 리뷰 업데이트
                     boolean isUpdate = updateRedisReview(request);
@@ -149,35 +149,44 @@ public class BookReviewService {
      **/
     private boolean updateRedisReview(BookReviewRequest request) {
         //책정보 조회
-        BookDto bookDto = bookService.findBook3Step(request.getIsbn());
-        List<ReviewInfo> reviewInfoList = new ArrayList<>();
-        //카테고리 정보가 없으면 업데이트하지 못함
-        if (bookDto.getCategory() == null) return false;
-        //redis에서 기존 리뷰데이터 꺼내서 새로 setting
-        AllReview allReviewList = allReviewRepository.findById(request.getUserNo()).orElse(null);
-        if (allReviewList != null) {
-            reviewInfoList = allReviewList.getValue();
+        try {
+            BookDto bookDto = bookService.findBook3Step(request.getBook().getIsbn());
+            List<ReviewInfo> reviewInfoList = new ArrayList<>();
+            //카테고리 정보가 없으면 업데이트하지 못함
+            if (bookDto.getCategory() == null) return false;
+            //redis에서 기존 리뷰데이터 꺼내서 새로 setting
+            AllReview allReviewList = allReviewRepository.findById(request.getUserNo()).orElse(null);
+            if (allReviewList != null) {
+                reviewInfoList = allReviewList.getValue();
 
+            }
+            //redis값이 없으면 db에서 가져오기
+            if (allReviewList == null) {
+                reviewInfoList = bookReviewRepository.findAllByUserInfo_userNo(request.getUserNo(), PageRequest.of(0, 100))
+                        .stream().filter(a-> !(a.getBook().getCategory().isEmpty() || a.getBook().getCategory() == "A"))
+                        .map(a -> ReviewInfo.builder()
+                                .point(a.getRating())
+                                .isbn(a.getBook().getIsbn())
+                                .category(a.getBook().getCategory())
+                                .build()).collect(Collectors.toList());
+
+            }
+            //redis에 저장
+            reviewInfoList.add(ReviewInfo.builder()
+                    .category(bookDto.getCategory())
+                    .isbn(bookDto.getIsbn())
+                    .point(request.getRating())
+                    .build());
+
+            if(reviewInfoList.size()>0) {
+                AllReview saveData = AllReview.builder().userId(request.getUserNo()).value(reviewInfoList).build();
+                allReviewRepository.save(saveData);
+
+            }
+        }catch (Exception e){
+            log.error(":: updateRedisReview err :: error is {} ", e);
+            return false;
         }
-        //redis값이 없으면 db에서 가져오기
-        if (allReviewList == null) {
-            reviewInfoList = bookReviewRepository.findAllByUserInfo_userNo(request.getUserNo(), PageRequest.of(0, 100))
-                    .stream().map(a -> ReviewInfo.builder()
-                            .point(a.getRating())
-                            .isbn(a.getBook().getIsbn())
-                            .category(a.getBook().getCategory())
-                            .build()).collect(Collectors.toList());
-
-        }
-        //redis에 저장
-        reviewInfoList.add(ReviewInfo.builder()
-                .category(bookDto.getCategory())
-                .isbn(bookDto.getIsbn())
-                .point(request.getRating())
-                .build());
-        allReviewList.setValue(reviewInfoList);
-        allReviewRepository.save(allReviewList);
-
         return true;
     }
 
