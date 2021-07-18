@@ -5,17 +5,17 @@ import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
+import com.semobook.bookReview.repository.BookReviewRepositoryImpl;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.ReviewInfo;
-import com.semobook.user.domain.UserPriorityRedis;
-import com.semobook.bookReview.repository.AllReviewRepository;
-import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.domain.UserPriorityRedis;
 import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.*;
 import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.repository.UserRepository;
+import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import tools.StringTools;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 public class UserService {
 
-
+    private final BookReviewRepositoryImpl bookReviewRepositoryImpl;
     private final UserRepository userRepository;
     private final BookReviewRepository bookReviewRepository;
     private final UserPriorityRedisRepository userPriorityRedisRepository;
@@ -274,7 +275,7 @@ public class UserService {
      *
      * @author hyunho
      * @since 2021/06/24
-    **/
+     **/
     public UserResponse userInfoWithReviewCount(UserInfoRequest userInfoRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
@@ -292,7 +293,7 @@ public class UserService {
             hCode = StatusEnum.hd1004;
             data = userInfoWithReviewCountDto;
             hMessage = "정보 조회 성공";
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
             hMessage = "정보 조회 실패";
@@ -305,95 +306,142 @@ public class UserService {
     }
 
 
+    public UserResponse getUserReviewInfo(long userNo) {
+        Object data = null;
+        StatusEnum hCode = null;
+        String hMessage = null;
+        try {
+
+            List<String> list = getUserPriorityList(userNo);
+            if (list == null || list.size() < 1) {
+                if (makeUserPriority(userNo)) {
+                    list = getUserPriorityList(userNo);
+                }
+            }
+            hCode = StatusEnum.hd1004;
+            hMessage = "getUserPriority 성공";
+            data = getTotalUserReviewInfo(list, userNo);
+        } catch (Exception e) {
+            hCode = StatusEnum.hd4444;
+            hMessage = "getUserPriority 에러";
+            log.error(":: getUserPriority err :: error is {} ", e);
+        }
+        return UserResponse.builder()
+                .data(data)
+                .code(hCode)
+                .message(hMessage)
+                .build();
+    }
+
+    private UserReviewInfo getTotalUserReviewInfo(List<String> list, long userNo) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now.withDayOfMonth(1);
+        //이번달 읽은 책
+        int bookThisMonth = bookReviewRepositoryImpl.countfindByBookBetweenDate(userNo, start, now);
+        log.info(":: getTotalUserReviewInfo :: bookThisMonth is {} ", bookThisMonth);
+        //총 읽은 책
+        int bookTotal = bookReviewRepositoryImpl.countReview(userNo);
+        List<String> prioertiesList = new ArrayList<>();
+        //유저의 성향
+        if (list != null && list.size() > 0) {
+            for (String s : list) {
+                prioertiesList.add(SemoConstant.CATEGORY_TYPE_MAP.get(s));
+            }
+        }
+        return new UserReviewInfo(bookThisMonth, bookTotal, prioertiesList);
+
+    }
+
+
     /**
-     * 유저 성향 가져오기 리뷰데이터->redis -> db
+     * 유저 성향 가져오기 redis
      *
      * @author hyejinzz
      * @since 2021-06-20
      **/
     public List<String> getUserPriorityList(long userId) {
         List<String> userPriority = new ArrayList<>();
-        //리뷰데이터로 새로운 성향 만들기
-        makeUserPriority(userId);
-        //redis
+
+        //redis 에서 성향 가져오기
         String value;
-        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(new UserPriorityRedis());
-        //Database
-        if (userPriorityRedis.getValue() == null) {
-            UserInfoDto userInfo = new UserInfoDto(userRepository.findByUserNo(userId));
-            if (userInfo.getUserPriority() == null) return userPriority;
-            value = userInfo.getUserPriority();
-            saveUserPriorityRedis(userId, value);
+        UserPriorityRedis userPriorityRedis = userPriorityRedisRepository.findById(userId).orElse(null);
+
+        if (userPriorityRedis == null || userPriorityRedis.getValue() == null || userPriorityRedis.getValue() == "null") {
+            return null;
         }
-        if (userPriorityRedis.getValue() != null) {
+        if (userPriorityRedis != null) {
             value = userPriorityRedis.getValue();
-            userPriority = Arrays.asList(value.split(":"));
+            userPriority = StringTools.stringConvToList(value, SemoConstant.COLON);
         }
         return userPriority;
     }
 
+
     /**
-     * redis에 임시로저장된 데이터를 바탕으로 새로운 priority 가져온다
+     * 리뷰데이터를 바탕으로 새로운 priority 가져온다
      *
-     * @param userId
+     * @param userNo
      */
-    public void makeUserPriority(long userId) {
-        //redis에 없으면 그냥 return
-        AllReview allReview = allReviewRepository.findById(userId).orElse(null);
-        if (allReview != null) {
-            createUserPriority(userId, allReview.getValue());
-        }
+    public boolean makeUserPriority(long userNo) {
 
+        try {
+            //redis에서 리뷰 가져오기
+            AllReview allReview = allReviewRepository.findById(userNo).orElse(null);
+            List<ReviewInfo> value = null;
+
+            if (allReview != null && allReview.getValue() != null) {
+                value = allReview.getValue();
+            }
+            //redis에 값 없으면 db에서 가져오기
+            if (allReview == null || allReview.getValue() == null) {
+                Page<BookReview> bookReviewList = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(0, 999));
+                if (bookReviewList.getTotalPages() == 0 || bookReviewList.getSize() == 0) return false;
+
+                if (bookReviewList != null && bookReviewList.getSize() > 0) {
+                    value = bookReviewList.stream().filter(a -> StringUtil.isNullOrEmpty(a.getBook().getCategory()) == false)
+                            .map(
+                                    a -> ReviewInfo.builder()
+                                            .point(a.getRating())
+                                            .category(a.getBook().getCategory())
+                                            .isbn(a.getBook().getIsbn())
+                                            .build()).collect(Collectors.toList());
+
+                    //redis에 리뷰데이터 저장하기
+                    allReviewRepository.save(AllReview.builder()
+                            .userId(userNo)
+                            .value(value)
+                            .build());
+                }
+            }
+
+            //성향 만들기
+            if (value != null) {
+                //보류하기
+//                //4개보다 크면 최신 5개만 가져온다
+//                if (value.size() > SemoConstant.CHECK_USER_REVIEW_CNT) {
+//                    int cutSize = SemoConstant.CHECK_USER_REVIEW_CNT + 1;
+//                    value = value.subList(value.size() - cutSize, value.size());
+//                }
+                Map<String, Integer> map = new HashMap<>();
+                for (ReviewInfo reviewInfo : value) {
+                    String key = reviewInfo.getCategory();
+                    map.put(key, map.getOrDefault(key, 0) + 1);
+                }
+                List<String> sortKey = new ArrayList<>(map.keySet());
+                Collections.sort(sortKey, (o1, o2) -> map.get(o2).compareTo(map.get(o1)));
+                //redis 저장
+                String resultValue = StringTools.listConvToString(sortKey, SemoConstant.COLON);
+                userPriorityRedisRepository.save(UserPriorityRedis.builder()
+                        .userNo(userNo)
+                        .value(resultValue)
+                        .build());
+            }
+        } catch (Exception e) {
+            log.error(":: makeUserPriority err :: error is {} ", e);
+            return false;
+        }
+        return true;
     }
-
-    /**
-     * 레디스 저장
-     *
-     * @author hyejinzz
-     * @since 2021-06-20
-     **/
-
-    private void saveUserPriorityRedis(long userId, String value) {
-        UserPriorityRedis up = UserPriorityRedis.builder().userNo(userId).value(value).build();
-        userPriorityRedisRepository.save(up);
-    }
-
-    /**
-     * 유저평점을 바탕으로 userpriority 만들기 (최신 5개만)
-     *
-     * @author hyejinzz
-     * @since 2021-06-27
-     **/
-
-    private void createUserPriority(long userNo, List<ReviewInfo> value) {
-
-        //4개보다 크면 최신 5개만 가져온다
-        if (value.size() > SemoConstant.CHECK_USER_REVIEW_CNT) {
-            int cutSize = SemoConstant.CHECK_USER_REVIEW_CNT + 1;
-            value = value.subList(value.size() - cutSize, value.size());
-        }
-        Map<String, Integer> map = new HashMap<>();
-        for (ReviewInfo reviewInfo : value) {
-            String key = reviewInfo.getCategory();
-            map.put(key, map.getOrDefault(key, 0) + 1);
-        }
-
-        List<String> sortKey = new ArrayList<>(map.keySet());
-        Collections.sort(sortKey, (o1, o2) -> map.get(o2).compareTo(map.get(o1)));
-        //redis 저장
-        StringBuilder saveValue = new StringBuilder();
-        for (String l : sortKey) {
-            saveValue.append(l).append(SemoConstant.COLON);
-        }
-        saveValue.deleteCharAt(saveValue.lastIndexOf(SemoConstant.COLON));
-        userPriorityRedisRepository.save(UserPriorityRedis.builder()
-                .userNo(userNo)
-                .value(saveValue.toString())
-                .build());
-
-
-    }
-
 
 
     public UserResponse mailSend(MailRequest mailRequest) {
@@ -427,6 +475,5 @@ public class UserService {
                 .data(data)
                 .build();
     }
-
 
 }

@@ -23,9 +23,7 @@ import java.io.Serializable;
 @RedisHash("USER_PRIORITY_REDIS")
 public class UserPriorityRedis implements Serializable {
     @Id
-    @Indexed
     long userNo;
-    @Indexed
     String value;
 
     @Builder

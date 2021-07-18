@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-
-
-    private final
-    UserService userService;
+    private final UserService userService;
 
     //모든 회원 조회
     @Operation(description = "모든 회원조회")
@@ -74,6 +71,12 @@ public class UserController {
     @PostMapping("/send-email")
     public ResponseEntity<UserResponse> sendEmailCon(@Parameter @RequestBody MailRequest mailRequest){
         return ResponseEntity.ok(userService.mailSend(mailRequest));
+    }
+
+    @Operation(description = "회원의 성향 가져오기")
+    @PostMapping("/priority")
+    public ResponseEntity<UserResponse> userProiroty(@Parameter @RequestParam(name = "userNo") long userNo){
+        return ResponseEntity.ok(userService.getUserReviewInfo(userNo));
     }
 
 
