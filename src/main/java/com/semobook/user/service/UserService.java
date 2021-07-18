@@ -15,13 +15,13 @@ import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import tools.SecurityTools;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Service
 public class UserService {
 
 
@@ -401,6 +400,8 @@ public class UserService {
         Object data = null;
 
         try {
+
+            log.info("test dsata ---- {}", SecurityTools.md5("semo1234"));
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo("hyunho058@naver.com");
             message.setFrom("lhyun058@gmail.com");
