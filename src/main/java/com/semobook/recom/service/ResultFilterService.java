@@ -20,14 +20,6 @@ public class ResultFilterService {
      * @since 2021-06-19
      *@param bookList
      * @return */
-    public List<RecomBestSeller> BestSellerListCutter(List<RecomBestSeller> bookList) {
-        bookList = bookList.stream().distinct().collect(Collectors.toList());
-        if (bookList.size() > 20) {
-            bookList = bookList.subList(0, 20);
-        }
-        return bookList;
-    }
-
     public List<BookDto> BookDtoListCutter(List<BookDto> bookList) {
         bookList = bookList.stream().distinct().collect(Collectors.toList());
         if (bookList.size() > 20) {
@@ -42,10 +34,6 @@ public class ResultFilterService {
      * @author hyunho
      * @since 2021/07/11
      **/
-    public List<RecomBestSeller> bookListShupple(List<RecomBestSeller> bookList){
-        Collections.shuffle(bookList);
-        return bookList;
-    }
 
     public List<BookDto> bookDtoListShupple(List<BookDto> bookList){
         Collections.shuffle(bookList);

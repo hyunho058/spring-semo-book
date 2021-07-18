@@ -1,6 +1,6 @@
 package com.semobook.recom.service;
 
-import com.semobook.book.domain.RecomBestSeller;
+import com.semobook.book.dto.BookDto;
 import com.semobook.book.service.BestSellerService;
 import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.repository.AllReviewRepository;
@@ -43,7 +43,7 @@ public class UserRandomEvaluation {
     public RecomResponse userRandomEvaluation(long userId) {
 
         List<String> userPriority = new ArrayList<>();
-        List<RecomBestSeller> recomBestSellersList = new ArrayList<>();
+        List<BookDto> recomBestSellersList = new ArrayList<>();
         Object data = null;
         StatusEnum hCode = null;
         String hMessage = null;
@@ -86,9 +86,9 @@ public class UserRandomEvaluation {
      * @param userPriority
      * @return
      */
-    private List<RecomBestSeller> userEvaluation(List<String> userPriority) {
+    private List<BookDto> userEvaluation(List<String> userPriority) {
         Map<String, Integer> goalMap = new HashMap<>();
-        List<RecomBestSeller> list = new ArrayList<>();
+        List<BookDto> list = new ArrayList<>();
         for (int i = 0; i < userPriority.size(); i++) {
             switch (i + 1) {
                 case 1:
@@ -109,13 +109,14 @@ public class UserRandomEvaluation {
             }
         }
         for (String s : goalMap.keySet()) {
-            list.addAll(bestSellerService.getBestSellerList(s, goalMap.get(s)));
+            list.addAll(bestSellerService.getBestSellerSteadySellerListMix(s, goalMap.get(s)));
+            list.addAll(bestSellerService.getBestSellerSteadySellerListMix(s, goalMap.get(s)));
         }
 
         //부족한 개수 채우기
         if (list.size() < 20) {
             int searchSize = 20 - list.size();
-            list.addAll(bestSellerService.getBestSellerList("A_", searchSize));
+            list.addAll(bestSellerService.getBestSellerSteadySellerListMix("A", searchSize));
         }
 
         return list;
@@ -126,20 +127,20 @@ public class UserRandomEvaluation {
      *
      * @return
      */
-    private List<RecomBestSeller> basicEvaluation() {
-        List<RecomBestSeller> bookList = new ArrayList<>();
+    private List<BookDto> basicEvaluation() {
+        List<BookDto> bookList = new ArrayList<>();
         for (String s : SemoConstant.CATEGORY_TYPE) {
-            RecomBestSeller ss = bestSellerService.getSteadySeller(s);
+            BookDto ss = bestSellerService.getSteadySeller(s);
             if(ss.getIsbn() != null){
                 bookList.add(ss);
             }
-            RecomBestSeller bs = bestSellerService.getSteadySeller(s);
+            BookDto bs = bestSellerService.getSteadySeller(s);
             if(bs.getIsbn() != null){
                 bookList.add(bs);
             }
 
         }
-        bookList = resultFilterService.BestSellerListCutter(bookList);
+        bookList = resultFilterService.BookDtoListCutter(bookList);
         return bookList;
     }
 
