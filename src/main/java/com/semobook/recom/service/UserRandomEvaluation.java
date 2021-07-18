@@ -1,9 +1,12 @@
 package com.semobook.recom.service;
 
-import com.semobook.book.domain.RecomBestSeller;
+import com.semobook.book.dto.BookDto;
 import com.semobook.book.service.BestSellerService;
 import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.repository.AllReviewRepository;
+import com.semobook.bookwant.domain.BookWant;
+import com.semobook.bookwant.dto.Preference;
+import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.ReviewInfo;
@@ -11,6 +14,8 @@ import com.semobook.recom.dto.RecomResponse;
 import com.semobook.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,9 +31,9 @@ public class UserRandomEvaluation {
     private final UserService userService;
     private final AllReviewRepository allReviewRepository;
     private final BestSellerService bestSellerService;
+    private final BookWantRepository bookWantRepository;
     private final ResultFilterService resultFilterService;
     Map<String, Integer> categoryIndex;
-
 
 
     /**
@@ -41,16 +46,16 @@ public class UserRandomEvaluation {
      * @author hyejinzz
      * @since 2021-06-19
      **/
-    public RecomResponse userRandomEvaluation(long userId) {
+    public RecomResponse userRandomEvaluation(long userNo) {
 
         List<String> userPriority = new ArrayList<>();
-        List<RecomBestSeller> recomBestSellersList = new ArrayList<>();
+        List<BookDto> recomBestSellersList = new ArrayList<>();
         Object data = null;
         StatusEnum hCode = null;
         String hMessage = null;
         try {
             hCode = StatusEnum.hd1004;
-            userPriority = userService.getUserPriorityList(userId);
+            userPriority = userService.getUserPriorityList(userNo);
 
             if (userPriority.size() == 0) {
                 recomBestSellersList = basicEvaluation();
@@ -64,6 +69,8 @@ public class UserRandomEvaluation {
                 hMessage = "userRandomEvaluation fail";
             }
             if (recomBestSellersList.size() > 0 && recomBestSellersList.get(0) != null) {
+                //필터작업
+                recomBestSellersList = bookFilter(recomBestSellersList,userNo);
                 data = recomBestSellersList;
                 log.info(":: userRandomEvaluation :: data is {} ", data);
                 hMessage = "userRandomEvaluation 성공";
@@ -80,6 +87,29 @@ public class UserRandomEvaluation {
                 .build();
     }
 
+    private List<BookDto> bookFilter(List<BookDto> recomBestSellersList, long userNo) {
+
+        //중복책 제거
+        recomBestSellersList = resultFilterService.bookDtoListDistinct(recomBestSellersList);
+
+        //유저가 보기싫어하는 책 제거
+        recomBestSellersList = resultFilterService.bookListFilter(recomBestSellersList, userNo);
+
+        //20권 안되면 추가하기
+        if(recomBestSellersList.size() < 20){
+            recomBestSellersList.addAll(basicEvaluation());
+            recomBestSellersList = resultFilterService.bookDtoListDistinct(recomBestSellersList);
+            recomBestSellersList = resultFilterService.bookListFilter(recomBestSellersList, userNo);
+        }
+
+        //20권 넘으면 셔플 후 자르기
+
+        if(recomBestSellersList.size() > 20){
+            recomBestSellersList = resultFilterService.bookDtoListCutter(recomBestSellersList);
+        }
+         return recomBestSellersList;
+    }
+
     /**
      * 우선순위에 따라 호출하기
      * 우선순위가 5개가 안되면 나머지는 종합 베스트셀러 호출
@@ -87,9 +117,9 @@ public class UserRandomEvaluation {
      * @param userPriority
      * @return
      */
-    private List<RecomBestSeller> userEvaluation(List<String> userPriority) {
+    private List<BookDto> userEvaluation(List<String> userPriority) {
         Map<String, Integer> goalMap = new HashMap<>();
-        List<RecomBestSeller> list = new ArrayList<>();
+        List<BookDto> list = new ArrayList<>();
         for (int i = 0; i < userPriority.size(); i++) {
             switch (i + 1) {
                 case 1:
@@ -110,13 +140,7 @@ public class UserRandomEvaluation {
             }
         }
         for (String s : goalMap.keySet()) {
-            list.addAll(bestSellerService.getBestSellerList(s, goalMap.get(s)));
-        }
-
-        //부족한 개수 채우기
-        if (list.size() < 20) {
-            int searchSize = 20 - list.size();
-            list.addAll(bestSellerService.getBestSellerList("A_", searchSize));
+            list.addAll(bestSellerService.getBestSellerSteadySellerListMix(s, goalMap.get(s)));
         }
 
         return list;
@@ -127,17 +151,20 @@ public class UserRandomEvaluation {
      *
      * @return
      */
-    private List<RecomBestSeller> basicEvaluation() {
-        List<RecomBestSeller> bookList = new ArrayList<>();
+    private List<BookDto> basicEvaluation() {
+        List<BookDto> bookList = new ArrayList<>();
         for (String s : SemoConstant.CATEGORY_TYPE) {
-
-            bookList.add(bestSellerService.getBestSeller(s));
+            BookDto ss = bestSellerService.getSteadySeller(s);
+            if (ss.getIsbn() != null) {
+                bookList.add(ss);
+            }
+            BookDto bs = bestSellerService.getSteadySeller(s);
+            if (bs.getIsbn() != null) {
+                bookList.add(bs);
+            }
         }
-        bookList = resultFilterService.BestSellerListCutter(bookList);
         return bookList;
     }
-
-
 
 
     /**
@@ -159,10 +186,6 @@ public class UserRandomEvaluation {
         }
 
     }
-
-
-
-
 
 
 }

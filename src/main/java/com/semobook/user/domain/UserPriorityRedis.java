@@ -1,9 +1,7 @@
-package com.semobook.user.dto;
+package com.semobook.user.domain;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -22,12 +20,10 @@ import java.io.Serializable;
  **/
 @Data
 @NoArgsConstructor
-@RedisHash("USER_PRIORITY")
+@RedisHash("USER_PRIORITY_REDIS")
 public class UserPriorityRedis implements Serializable {
     @Id
-    @Indexed
     long userNo;
-    @Indexed
     String value;
 
     @Builder
