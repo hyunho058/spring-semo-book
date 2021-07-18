@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import tools.SecurityTools;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -272,7 +273,7 @@ public class UserService {
      *
      * @author hyunho
      * @since 2021/06/24
-    **/
+     **/
     public UserResponse userInfoWithReviewCount(UserInfoRequest userInfoRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
@@ -290,7 +291,7 @@ public class UserService {
             hCode = StatusEnum.hd1004;
             data = userInfoWithReviewCountDto;
             hMessage = "정보 조회 성공";
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
             hMessage = "정보 조회 실패";
@@ -393,7 +394,6 @@ public class UserService {
     }
 
 
-
     public UserResponse mailSend(MailRequest mailRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
@@ -412,7 +412,7 @@ public class UserService {
             hCode = StatusEnum.hd1004;
             data = mailRequest;
             hMessage = "정보 조회 성공";
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
             hMessage = "정보 조회 실패";
@@ -425,36 +425,41 @@ public class UserService {
                 .data(data)
                 .build();
     }
+
     /**
      * 비밀번호 찾기 (회원Id[Emial] 검색)
      *
      * @author juhan
      * @since 2021-07-18
-    **/
-    public UserResponse findPw(String userId){
+     **/
+    public UserResponse findPw(String userId) {
         log.info(":: UserService_findId :: userId is {} ", userId);
         String hMessage = "";
         StatusEnum hCode = null;
         Object data = null;
 
-        try{
+        try {
             UserInfo userInfo = userRepository.findByUserId(userId);
             log.info("UserID : {} UserPw : {}", userInfo.getUserId(), userInfo.getUserPw());
 
-            userInfo.changePw(tmepCreatePw());
+            String inputPw = tmepCreatePw();
+
+            userInfo.changePw(SecurityTools.md5(inputPw));
+            log.info("InputPW : {}", inputPw);
+            log.info("lockingPW : {}", userInfo.getUserPw());
             userRepository.save(userInfo);
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo("hyunho058@naver.com");
             message.setFrom("lhyun058@gmail.com");
-            message.setSubject("[SEMO BOOK]" + userInfo.getUserName() +"  님 비밀번호 변경 건." );
-            message.setText("비밀번호는" + userInfo.getUserPw()+ " 로 변경완료.");
+            message.setSubject("[SEMO BOOK]" + userInfo.getUserName() + "  님 비밀번호 변경 건.");
+            message.setText("비밀번호는" + inputPw + " 로 변경완료.");
 
             mailSender.send(message);
 
             hCode = StatusEnum.hd1004;
             hMessage = "정보 조회 성공";
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
             hMessage = "정보 조회 실패";
@@ -466,17 +471,15 @@ public class UserService {
                 .data(data)
                 .build();
     }
+
     /**
      * 임시 비밀번호 난수생성
      *
      * @author juhan
      * @since 2021-07-18
-    **/
-    public String tmepCreatePw(){
+     **/
+    public String tmepCreatePw() {
         log.info(":: UserService_tempCreatePw ::");
-        String hMessage = "";
-        StatusEnum hCode = null;
-        Object data = null;
 
         StringBuffer sb = null;
         try {
@@ -489,5 +492,17 @@ public class UserService {
             SecureRandom sr = new SecureRandom();
             sr.setSeed(new Date().getTime());
 
+            int idx = 0;
+            int len = charSet.length;
+            for(int i = 0; i < SemoConstant.TEMP_PW; i++){
+                idx = sr.nextInt(len);
+                sb.append(charSet[idx]);
+            }
 
+        }catch (Exception e){
+            log.info(":: userInfo err :: error is {} ", e);
+        }
+
+        return sb.toString();
+    }
 }
