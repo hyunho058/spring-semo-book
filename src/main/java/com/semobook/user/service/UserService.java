@@ -71,8 +71,8 @@ public class UserService {
         }
         return UserResponse.builder()
                 .data(data)
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .build();
     }
 
@@ -107,8 +107,8 @@ public class UserService {
 
         return UserResponse.builder()
                 .data(data)
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .build();
     }
 
@@ -149,8 +149,8 @@ public class UserService {
         }
 
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
     }
@@ -186,8 +186,8 @@ public class UserService {
         }
 
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
 
@@ -225,8 +225,8 @@ public class UserService {
             hMessage = "탈퇴 실패";
         }
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
     }
@@ -264,8 +264,8 @@ public class UserService {
             hMessage = "정보 수정 실패";
         }
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
     }
@@ -300,8 +300,8 @@ public class UserService {
             hMessage = "정보 조회 실패";
         }
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
     }
@@ -329,8 +329,8 @@ public class UserService {
         }
         return UserResponse.builder()
                 .data(data)
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .build();
     }
 
@@ -474,8 +474,8 @@ public class UserService {
 
 
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
     }
@@ -525,8 +525,8 @@ public class UserService {
         }
 
         return UserResponse.builder()
-                .code(hCode)
-                .message(hMessage)
+                .hCode(hCode)
+                .hMessage(hMessage)
                 .data(data)
                 .build();
     }
