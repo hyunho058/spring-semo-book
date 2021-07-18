@@ -5,7 +5,6 @@ import com.semobook.notice.domain.Notice;
 import com.semobook.notice.dto.NoticeDto;
 import com.semobook.notice.dto.NoticeResponse;
 import com.semobook.notice.repository.NoticeRepository;
-import com.semobook.qa.dto.QaResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,12 +40,9 @@ public class NoticeService {
         hCode = null;
 
         try{
-            Pageable pageAndTime = PageRequest.of(pageNum, 10, Sort.Direction.DESC,"createTime");;
+            Pageable pageAndTime = PageRequest.of(pageNum, 10, Sort.Direction.DESC,"createTime");
             Page<Notice> list = noticeRepository.findAll(pageAndTime);
 
-            for (Notice notice : list) {
-                log.info(":: noticeNo :: noticeNo is {} ", notice.getNoticeNo());
-            }
             List<NoticeDto> result = list.stream()
                     .map(n -> new NoticeDto(n))
                     .collect(Collectors.toList());
