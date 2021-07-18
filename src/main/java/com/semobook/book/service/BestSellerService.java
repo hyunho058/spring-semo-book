@@ -2,6 +2,7 @@ package com.semobook.book.service;
 
 import com.semobook.book.domain.RecomBestSeller;
 import com.semobook.book.domain.RecomSteadySeller;
+import com.semobook.book.dto.BookDto;
 import com.semobook.book.repository.RecomBestSellerRepository;
 import com.semobook.book.repository.RecomSteadySellerRepository;
 import com.semobook.common.SemoConstant;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 
 @Slf4j
@@ -53,17 +55,24 @@ public class BestSellerService {
 
     }
 
+    public List<BookDto> getBestSellerSteadySellerListMix(String cate, int num){
+        List<BookDto> bookList = new ArrayList<>();
+        int divNum = num/2 +1;
+        bookList.addAll(getBestSellerList(cate,divNum));
+        bookList.addAll(getSteadySellerList(cate,divNum));
+        return bookList;
+    }
+
     /**
      * 베스트셀러 카테고리별 개수별로 가져오기
      *
      * @author hyejinzz
      * @since 2021-06-20
      **/
-    public List<RecomBestSeller> getBestSellerList(String cate, int num) {
-        List<RecomBestSeller> bookList = new ArrayList<>();
+    public List<BookDto> getBestSellerList(String cate, int num) {
+        List<BookDto> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             bookList.add(getBestSeller(cate));
-            bookList.add(getSteadySeller(cate));
         }
         return bookList;
     }
@@ -74,11 +83,10 @@ public class BestSellerService {
      * @author hyejinzz
      * @since 2021-07-15
      **/
-    public List<RecomBestSeller> getSteadySellerList(String cate, int num) {
-        int index = steadySellerCategoryIndex.get(cate);
-        List<RecomBestSeller> bookList = new ArrayList<>();
+    public List<BookDto> getSteadySellerList(String cate, int num) {
+        List<BookDto> bookList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            bookList.add(getBestSeller(cate));
+            bookList.add(getSteadySeller(cate));
         }
         return bookList;
     }
@@ -90,7 +98,7 @@ public class BestSellerService {
      * @author hyejinzz
      * @since 2021-06-20
      **/
-    public RecomBestSeller getBestSeller(String key) {
+    public BookDto getBestSeller(String key) {
         int idx = bestSellerCategoryIndex.get(key);
         int maxIdx = bestSellerMaxCategoryIndex.get(key);
         log.info(":: getBestSeller :: test is {} ", key+"_"+idx);
@@ -100,10 +108,18 @@ public class BestSellerService {
         if (bs != null) {
             log.info(":: getBestSeller :: test is {} ", bs.getIsbn());
         }
-        return bs == null ? new RecomBestSeller() : bs;
+        return bs == null ?     new BookDto() :
+                BookDto.builder()
+                        .author(bs.getAuthor())
+                        .bookName(bs.getBookName())
+                        .img(bs.getImg())
+                        .category(bs.getCategory())
+                        .isbn(bs.getIsbn())
+                        .publisher(bs.getPublisher())
+                        .build();
     }
 
-    public RecomBestSeller getSteadySeller(String key) {
+    public BookDto getSteadySeller(String key) {
 
         int idx = steadySellerCategoryIndex.get(key);
         int maxIdx = steadySellerMaxCategoryIndex.get(key);
@@ -112,20 +128,19 @@ public class BestSellerService {
         RecomSteadySeller ss = recomSteadySellerRepository.findById(key +"_"+ idx++).orElse(null);
 
         idx = idx > maxIdx ? 1 : idx;
-        bestSellerCategoryIndex.put(key, idx);
+        steadySellerCategoryIndex.put(key, idx);
         if (ss != null) {
             log.info(":: getSteadySeller :: test is {} ", ss.getIsbn());
         }
         return ss == null ?
-                new RecomBestSeller() :
-                RecomBestSeller.builder()
+                new BookDto() :
+                BookDto.builder()
                         .author(ss.getAuthor())
                         .bookName(ss.getBookName())
                         .img(ss.getImg())
                         .category(ss.getCategory())
                         .isbn(ss.getIsbn())
                         .publisher(ss.getPublisher())
-                        .rank(ss.getRank())
                         .build();
     }
 
