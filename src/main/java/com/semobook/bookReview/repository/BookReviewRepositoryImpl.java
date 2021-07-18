@@ -55,6 +55,7 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     }
 
 
+
     /**
      * 유저 월별 리뷰 조회
      *
@@ -131,5 +132,29 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .fetchCount();
 
         return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public int countfindByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate ) {
+        long result = queryFactory
+                .selectFrom(bookReview)
+                .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
+                .join(bookReview.book, book).fetchJoin()
+                .where(bookReview.createDate.between(startDate, endDate).and(userInfo.userNo.eq(userNo)))
+                .fetchCount();
+
+        return (int)result;
+    }
+
+    @Override
+    public int countReview(long userNo) {
+        long result = queryFactory
+                .selectFrom(bookReview)
+                .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
+                .join(bookReview.book, book).fetchJoin()
+                .where(userInfo.userNo.eq(userNo))
+                .fetchCount();
+
+        return (int)result;
     }
 }

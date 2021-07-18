@@ -12,6 +12,10 @@ public interface BookReviewRepositoryCustom {
 
     boolean existsByReviewNo(long reviewNo);
 
+    int countfindByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
+
+    int countReview (long userNo);
+
     List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 
     Page<BookReview> findAllByUserInfo_userNo(long userNo, Pageable pageable);
