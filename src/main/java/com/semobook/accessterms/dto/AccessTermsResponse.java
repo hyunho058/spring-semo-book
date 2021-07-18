@@ -22,4 +22,5 @@ public class AccessTermsResponse {
         this.hMessage = hMessage;
         this.data = data;
     }
+
 }
