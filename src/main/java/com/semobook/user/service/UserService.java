@@ -440,29 +440,32 @@ public class UserService {
         StatusEnum hCode = null;
         Object data = null;
 
-        try{
-
         try {
             UserInfo userInfo = userRepository.findByUserId(userId);
             log.info("UserID : {} UserPw : {}", userInfo.getUserId(), userInfo.getUserPw());
 
-            String inputPw = tmepCreatePw();
+            if (userInfo != null){
+                String inputPw = tmepCreatePw();
 
-            userInfo.changePw(SecurityTools.md5(inputPw));
-            log.info("InputPW : {}", inputPw);
-            log.info("lockingPW : {}", userInfo.getUserPw());
-            userRepository.save(userInfo);
+                userInfo.changePw(SecurityTools.md5(inputPw));
+                log.info("InputPW : {}", inputPw);
+                log.info("lockingPW : {}", userInfo.getUserPw());
+                userRepository.save(userInfo);
 
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo("hyunho058@naver.com");
-            message.setFrom("lhyun058@gmail.com");
-            message.setSubject("[SEMO BOOK]" + userInfo.getUserName() + "  님 비밀번호 변경 건.");
-            message.setText("비밀번호는" + inputPw + " 로 변경완료.");
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(userId);
+                message.setFrom("hyunho058@gmail.com");
+                message.setSubject("[SEMO BOOK]" + userInfo.getUserName() + "  님 비밀번호 변경 건.");
+                message.setText("비밀번호는" + inputPw + " 로 변경완료.");
 
-            mailSender.send(message);
+                mailSender.send(message);
 
-            hCode = StatusEnum.hd1004;
-            hMessage = "정보 조회 성공";
+                hCode = StatusEnum.hd1004;
+                hMessage = "정보 조회 성공";
+            }else {
+                hCode = StatusEnum.hd4444;
+                hMessage = "아이디를 다시 확인해주세요.";
+            }
         } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;

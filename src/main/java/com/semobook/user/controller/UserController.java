@@ -1,6 +1,5 @@
 package com.semobook.user.controller;
 
-import com.semobook.user.domain.UserInfo;
 import com.semobook.user.dto.*;
 import com.semobook.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,9 +78,9 @@ public class UserController {
 
     @Operation(description = "find pw")
     @PostMapping("/find-pw")
-    public ResponseEntity<UserResponse> findId(@Parameter @RequestBody UserInfo userInfo){
+    public ResponseEntity<UserResponse> findId(@Parameter @RequestBody FindPwRequest find){
 
-        return ResponseEntity.ok(userService.findPw(userInfo.getUserId()));
+        return ResponseEntity.ok(userService.findPw(find.getUserId()));
     }
 
 
