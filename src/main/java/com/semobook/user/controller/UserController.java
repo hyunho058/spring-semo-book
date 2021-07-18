@@ -70,6 +70,14 @@ public class UserController {
         return ResponseEntity.ok(userService.userInfoWithReviewCount(userInfoRequest));
     }
 
+    @Operation(description = "send email")
+    @PostMapping("/send-email")
+    public ResponseEntity<UserResponse> sendEmailCon(@Parameter @RequestBody MailRequest mailRequest){
+        return ResponseEntity.ok(userService.mailSend(mailRequest));
+    }
+
+
+
 
 
 

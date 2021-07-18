@@ -48,7 +48,9 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-redis')
     //Spring WebClient
     compile 'org.springframework.boot:spring-boot-starter-webflux'
-
+    //email
+//    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.2.1.RELEASE'
 
 }
 
