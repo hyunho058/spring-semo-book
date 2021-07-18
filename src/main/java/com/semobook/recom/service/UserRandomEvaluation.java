@@ -4,6 +4,9 @@ import com.semobook.book.dto.BookDto;
 import com.semobook.book.service.BestSellerService;
 import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.repository.AllReviewRepository;
+import com.semobook.bookwant.domain.BookWant;
+import com.semobook.bookwant.dto.Preference;
+import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.ReviewInfo;
@@ -11,6 +14,8 @@ import com.semobook.recom.dto.RecomResponse;
 import com.semobook.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +31,7 @@ public class UserRandomEvaluation {
     private final UserService userService;
     private final AllReviewRepository allReviewRepository;
     private final BestSellerService bestSellerService;
+    private final BookWantRepository bookWantRepository;
     private final ResultFilterService resultFilterService;
     Map<String, Integer> categoryIndex;
 
@@ -40,7 +46,7 @@ public class UserRandomEvaluation {
      * @author hyejinzz
      * @since 2021-06-19
      **/
-    public RecomResponse userRandomEvaluation(long userId) {
+    public RecomResponse userRandomEvaluation(long userNo) {
 
         List<String> userPriority = new ArrayList<>();
         List<BookDto> recomBestSellersList = new ArrayList<>();
@@ -49,7 +55,7 @@ public class UserRandomEvaluation {
         String hMessage = null;
         try {
             hCode = StatusEnum.hd1004;
-            userPriority = userService.getUserPriorityList(userId);
+            userPriority = userService.getUserPriorityList(userNo);
 
             if (userPriority.size() == 0) {
                 recomBestSellersList = basicEvaluation();
@@ -63,6 +69,8 @@ public class UserRandomEvaluation {
                 hMessage = "userRandomEvaluation fail";
             }
             if (recomBestSellersList.size() > 0 && recomBestSellersList.get(0) != null) {
+                //필터작업
+                recomBestSellersList = bookFilter(recomBestSellersList,userNo);
                 data = recomBestSellersList;
                 log.info(":: userRandomEvaluation :: data is {} ", data);
                 hMessage = "userRandomEvaluation 성공";
@@ -77,6 +85,29 @@ public class UserRandomEvaluation {
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
+    }
+
+    private List<BookDto> bookFilter(List<BookDto> recomBestSellersList, long userNo) {
+
+        //중복책 제거
+        recomBestSellersList = resultFilterService.bookDtoListDistinct(recomBestSellersList);
+
+        //유저가 보기싫어하는 책 제거
+        recomBestSellersList = resultFilterService.bookListFilter(recomBestSellersList, userNo);
+
+        //20권 안되면 추가하기
+        if(recomBestSellersList.size() < 20){
+            recomBestSellersList.addAll(basicEvaluation());
+            recomBestSellersList = resultFilterService.bookDtoListDistinct(recomBestSellersList);
+            recomBestSellersList = resultFilterService.bookListFilter(recomBestSellersList, userNo);
+        }
+
+        //20권 넘으면 셔플 후 자르기
+
+        if(recomBestSellersList.size() > 20){
+            recomBestSellersList = resultFilterService.bookDtoListCutter(recomBestSellersList);
+        }
+         return recomBestSellersList;
     }
 
     /**
@@ -110,13 +141,6 @@ public class UserRandomEvaluation {
         }
         for (String s : goalMap.keySet()) {
             list.addAll(bestSellerService.getBestSellerSteadySellerListMix(s, goalMap.get(s)));
-            list.addAll(bestSellerService.getBestSellerSteadySellerListMix(s, goalMap.get(s)));
-        }
-
-        //부족한 개수 채우기
-        if (list.size() < 20) {
-            int searchSize = 20 - list.size();
-            list.addAll(bestSellerService.getBestSellerSteadySellerListMix("A", searchSize));
         }
 
         return list;
@@ -131,16 +155,14 @@ public class UserRandomEvaluation {
         List<BookDto> bookList = new ArrayList<>();
         for (String s : SemoConstant.CATEGORY_TYPE) {
             BookDto ss = bestSellerService.getSteadySeller(s);
-            if(ss.getIsbn() != null){
+            if (ss.getIsbn() != null) {
                 bookList.add(ss);
             }
             BookDto bs = bestSellerService.getSteadySeller(s);
-            if(bs.getIsbn() != null){
+            if (bs.getIsbn() != null) {
                 bookList.add(bs);
             }
-
         }
-        bookList = resultFilterService.BookDtoListCutter(bookList);
         return bookList;
     }
 
