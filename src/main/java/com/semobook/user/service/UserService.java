@@ -15,7 +15,6 @@ import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,14 +28,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+
 public class UserService {
+
 
     private final UserRepository userRepository;
     private final BookReviewRepository bookReviewRepository;
     private final UserPriorityRedisRepository userPriorityRedisRepository;
     private final AllReviewRepository allReviewRepository;
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -434,7 +436,7 @@ public class UserService {
         String hMessage = "";
         StatusEnum hCode = null;
         Object data = null;
-        
+
         try{
             UserInfo userInfo = userRepository.findByUserId(userId);
             log.info("UserID : {} UserPw : {}", userInfo.getUserId(), userInfo.getUserPw());
@@ -466,9 +468,9 @@ public class UserService {
     }
     /**
      * 임시 비밀번호 난수생성
-     *  
+     *
      * @author juhan
-     * @since 2021-07-18 
+     * @since 2021-07-18
     **/
     public String tmepCreatePw(){
         log.info(":: UserService_tempCreatePw ::");
@@ -487,18 +489,5 @@ public class UserService {
             SecureRandom sr = new SecureRandom();
             sr.setSeed(new Date().getTime());
 
-            int idx = 0;
-            int len = charSet.length;
-            for(int i = 0; i < SemoConstant.TEMP_PW; i++){
-                idx = sr.nextInt(len);
-                sb.append(charSet[idx]);
-            }
-
-        }catch (Exception e){
-            log.info(":: userInfo err :: error is {} ", e);
-        }
-
-        return sb.toString();
-    }
 
 }
