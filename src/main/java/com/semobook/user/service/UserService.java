@@ -1,23 +1,25 @@
 package com.semobook.user.service;
 
 
+import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
-import com.semobook.bookReview.domain.AllReview;
 import com.semobook.recom.domain.ReviewInfo;
-import com.semobook.user.dto.UserPriorityRedis;
-import com.semobook.bookReview.repository.AllReviewRepository;
-import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.*;
+import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +38,8 @@ public class UserService {
     private final UserPriorityRedisRepository userPriorityRedisRepository;
     private final AllReviewRepository allReviewRepository;
 
+    @Autowired
+    private JavaMailSender mailSender;
 
     /**
      * 모든회원 조회(테스트용)
@@ -386,4 +390,40 @@ public class UserService {
 
 
     }
+
+
+
+    public UserResponse mailSend(MailRequest mailRequest) {
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data = null;
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo("hyunho058@naver.com");
+            message.setFrom("lhyun058@gmail.com");
+            message.setSubject(mailRequest.getTitle());
+            message.setText(mailRequest.getMessage());
+
+            mailSender.send(message);
+
+
+            hCode = StatusEnum.hd1004;
+            data = mailRequest;
+            hMessage = "정보 조회 성공";
+        }catch (Exception e){
+            log.info(":: userInfo err :: error is {} ", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "정보 조회 실패";
+        }
+
+
+        return UserResponse.builder()
+                .code(hCode)
+                .message(hMessage)
+                .data(data)
+                .build();
+    }
+
+
 }
