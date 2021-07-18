@@ -103,10 +103,9 @@ public class RecomService {
             recomInfoList.add(userCategoryRecomResult);
         }
 
-
         if (recomInfoList.size() < 3) {
             recomInfoList.add(bestSellerRecom());
-//        recomInfoList.add(steadySeller());
+            recomInfoList.add(steadySellerRecom());
         }
         return recomInfoList;
     }
@@ -305,6 +304,7 @@ public class RecomService {
         String userPriority;
         String userPriorityValue = "";
         List<BookDto> bestSeller = null;
+        if(userPriorityList == null) return null;
         if (userPriorityList.size() >= 1) {
             userPriority = userPriorityList.get(0);
             userPriorityValue = SemoConstant.CATEGORY_TYPE_MAP.get(userPriority);
@@ -335,7 +335,7 @@ public class RecomService {
     private RecomInfo bestSellerRecom() {
         List<BookDto> bookInfoList = new ArrayList<>();
         try {
-            bookInfoList = bestSellerService.getBestSellerList("A_", 10).stream().map(a -> BookDto.builder()
+            bookInfoList = bestSellerService.getBestSellerList("A", 10).stream().map(a -> BookDto.builder()
                     .isbn(a.getIsbn())
                     .bookName(a.getBookName())
                     .author(a.getAuthor())
@@ -360,6 +360,29 @@ public class RecomService {
      * @author hyunho
      * @since 2021/07/11
      **/
+
+    private RecomInfo steadySellerRecom() {
+        List<BookDto> bookInfoList = new ArrayList<>();
+        try {
+            bookInfoList = bestSellerService.getSteadySellerList("A", 10).stream().map(a -> BookDto.builder()
+                    .isbn(a.getIsbn())
+                    .bookName(a.getBookName())
+                    .author(a.getAuthor())
+                    .publisher(a.getPublisher())
+                    .category(a.getCategory())
+                    .img(a.getImg())
+                    .build()).collect(Collectors.toList());
+
+
+        } catch (Exception e) {
+            log.error(":: bestSellerRecom err :: error is {} ", e);
+
+        }
+        return RecomInfo.builder()
+                .title("스테디 셀러")
+                .bookInfoList(bookInfoList)
+                .build();
+    }
 
 
     /**

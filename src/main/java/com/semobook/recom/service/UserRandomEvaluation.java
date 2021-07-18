@@ -57,10 +57,10 @@ public class UserRandomEvaluation {
             hCode = StatusEnum.hd1004;
             userPriority = userService.getUserPriorityList(userNo);
 
-            if (userPriority.size() == 0) {
+            if (userPriority == null || userPriority.size() == 0) {
                 recomBestSellersList = basicEvaluation();
             }
-            if (userPriority.size() > 0) {
+            if (userPriority != null && userPriority.size() > 0) {
                 // 성향별로 가져오기
                 recomBestSellersList = userEvaluation(userPriority);
             }
