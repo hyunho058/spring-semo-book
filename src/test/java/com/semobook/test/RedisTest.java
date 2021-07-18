@@ -1,19 +1,19 @@
 package com.semobook.test;
 
 
+import com.semobook.book.domain.RecomBestSeller;
 import com.semobook.common.SemoConstant;
-import com.semobook.recom.domain.AllReview;
+import com.semobook.bookReview.domain.AllReview;
 import com.semobook.recom.domain.ReviewInfo;
-import com.semobook.recom.domain.UserPriorityRedis;
-import com.semobook.recom.repository.AllReviewRepository;
-import com.semobook.recom.repository.RecomBestSellerRepository;
-import com.semobook.recom.repository.UserPriorityRedisRepository;
+import com.semobook.user.dto.UserPriorityRedis;
+import com.semobook.bookReview.repository.AllReviewRepository;
+import com.semobook.book.repository.RecomBestSellerRepository;
+import com.semobook.user.repository.UserPriorityRedisRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +25,7 @@ public class RedisTest {
     @Autowired
     UserPriorityRedisRepository userPriorityRepository;
     @Autowired
-    RecomBestSellerRepository bestSellerRepository;
+    RecomBestSellerRepository recomBestSellerRepository;
     @Autowired
     AllReviewRepository allReviewRepository;
 
@@ -44,7 +44,7 @@ public class RedisTest {
     @DisplayName("REDIS USER_PRIOROTY GET TEST")
     void bestSeller_repository_test() {
         String value = "9788935668663";
-        bestSellerRepository.findById("A_1").ifPresent(a -> {
+        recomBestSellerRepository.findById("A_1").ifPresent(a -> {
                     System.out.println(a.getIsbn());
                     assertEquals(value, a.getIsbn());
                 }
@@ -103,6 +103,14 @@ public class RedisTest {
         assertEquals(map.get("124"),"B_");
         assertEquals(map.get("133"),"C_");
         assertEquals(map.get("134"),"C_");
+    }
+
+    @Test
+    @DisplayName("REDIS_GET_BEST_SELLER")
+    void bestseller_test(){
+        RecomBestSeller a_2 = recomBestSellerRepository.findById("A_1").orElse(null);
+        System.out.println(a_2.getBookName());
+
     }
 
 }

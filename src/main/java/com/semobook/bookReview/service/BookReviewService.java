@@ -8,6 +8,8 @@ import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
 import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
+import com.semobook.bookReview.dto.request.SearchBookReviewDto;
+import com.semobook.bookReview.dto.request.SearchBookReviewRequest;
 import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
@@ -270,10 +272,11 @@ public class BookReviewService {
             int start = request.getStartPage();
             long userNo = request.getUserNo();
 
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 10));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
             List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
+            log.info("readMyReview :: count is {}",page.getTotalElements());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
@@ -449,6 +452,7 @@ public class BookReviewService {
         try {
 //            Page<BookReview> page = bookReviewRepository.findAllByUserInfo(monthBookReviewRequest.getUserNo(), PageRequest.of(0, 100));
             List<BookReview> page = bookReviewRepository.findByBookBetweenDate(
+                    monthBookReviewRequest.getUserNo(),
                     monthBookReviewRequest.getStartDate(),
                     monthBookReviewRequest.getEndDate());
             List<BookReviewWithIsbnDto> result = page.stream()
@@ -468,6 +472,44 @@ public class BookReviewService {
 
         }
 
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
+
+    /**
+     * 내 글 보여주기
+     *
+     * @author hyejinzz
+     * @since 2021-05-29
+     **/
+    public BookReviewResponse bookReviewList(SearchBookReviewRequest request) {
+        log.info(":: readMyReview() :: request is {}", request.getIsbn());
+        String hMessage = "";
+        Object data = null;
+        StatusEnum hCode = null;
+
+        try {
+            int start = request.getStartPage();
+            String isbn = request.getIsbn();
+
+            Page<BookReview> page = bookReviewRepository.findByBookReview(isbn, PageRequest.of(start, 10));
+            List<SearchBookReviewDto> reviewList = page.getContent().stream()
+                    .map(bookReview -> new SearchBookReviewDto(bookReview))
+                    .collect(Collectors.toList());
+            log.info("readMyReview :: count is {}",page.getTotalElements());
+            hCode = StatusEnum.hd1004;
+            hMessage = "도서 리뷰 리스트";
+            data = reviewList;
+        } catch (Exception e) {
+            log.error("createReview err :: error msg : {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "리뷰 리스트 에러";
+            data = null;
+
+        }
         return BookReviewResponse.builder()
                 .data(data)
                 .hCode(hCode)

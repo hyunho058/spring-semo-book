@@ -1,11 +1,12 @@
 package com.semobook.user.service;
 
 
+import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
-import com.semobook.bookReview.domain.AllReview;
 import com.semobook.recom.domain.ReviewInfo;
 import com.semobook.user.domain.UserPriorityRedis;
 import com.semobook.bookReview.repository.AllReviewRepository;
@@ -13,11 +14,15 @@ import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.*;
+import com.semobook.user.repository.UserPriorityRedisRepository;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +41,8 @@ public class UserService {
     private final UserPriorityRedisRepository userPriorityRedisRepository;
     private final AllReviewRepository allReviewRepository;
 
+    @Autowired
+    private JavaMailSender mailSender;
 
     /**
      * 모든회원 조회(테스트용)
@@ -80,7 +87,8 @@ public class UserService {
         Object data = null;
 
         try {
-            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL));
+//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL));
+            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserId(userId));
             if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "유효하지 않은 회원정보";
@@ -114,7 +122,8 @@ public class UserService {
         StatusEnum hCode = null;
         Object data = null;
         try {
-            UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
+//            UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
+            UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
             UserInfoDto userInfoDto = new UserInfoDto(signUserInfo);
             if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
@@ -274,7 +283,7 @@ public class UserService {
         try {
             //TODO[hyunho] : 유저가 작성한 리뷰 수 조회 쿼리 수정 필요(oneToNmay 관계 collection 조회 필요)
             UserInfo userInfo = userRepository.findByUserNo(userInfoRequest.getUserNo());
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 1));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 100));
             UserInfoWithReviewCountDto userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),
                     userInfo.getUserId(),
                     userInfo.getUserName(),
@@ -384,4 +393,40 @@ public class UserService {
 
 
     }
+
+
+
+    public UserResponse mailSend(MailRequest mailRequest) {
+        String hMessage = "";
+        StatusEnum hCode = null;
+        Object data = null;
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo("hyunho058@naver.com");
+            message.setFrom("lhyun058@gmail.com");
+            message.setSubject(mailRequest.getTitle());
+            message.setText(mailRequest.getMessage());
+
+            mailSender.send(message);
+
+
+            hCode = StatusEnum.hd1004;
+            data = mailRequest;
+            hMessage = "정보 조회 성공";
+        }catch (Exception e){
+            log.info(":: userInfo err :: error is {} ", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "정보 조회 실패";
+        }
+
+
+        return UserResponse.builder()
+                .code(hCode)
+                .message(hMessage)
+                .data(data)
+                .build();
+    }
+
+
 }
