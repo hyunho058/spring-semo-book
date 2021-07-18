@@ -96,5 +96,9 @@ public class UserInfo {
         this.userBirth = userInfo.getUserBirth();
     }
 
+    public void changePw(String userPw){
+        this.userPw = userPw;
+    }
+
 
 }
