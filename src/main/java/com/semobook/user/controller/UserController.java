@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @Operation(description = "회원의 성향 가져오기")
-    @PostMapping("/priority")
+    @GetMapping("/priority")
     public ResponseEntity<UserResponse> userProiroty(@Parameter @RequestParam(name = "userNo") long userNo){
         return ResponseEntity.ok(userService.getUserReviewInfo(userNo));
     }

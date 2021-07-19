@@ -94,9 +94,8 @@ public class UserPriorityTest {
         assertFalse(chkFalse);
         assertTrue(Arrays.equals(priorityList.toArray(), resutChk.toArray()));
 
-        //final
-//        userPriorityRedisRepository.delete(UserPriorityRedis.builder().userNo(99999).build());
-//        allReviewRepository.delete(review);
+        userPriorityRedisRepository.delete(UserPriorityRedis.builder().userNo(99999).build());
+        allReviewRepository.delete(review);
 
     }
 
