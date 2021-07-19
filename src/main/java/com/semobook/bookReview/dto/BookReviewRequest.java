@@ -1,8 +1,8 @@
 package com.semobook.bookReview.dto;
 
+import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,11 +23,13 @@ public class BookReviewRequest {
     BookDto book;
 
     @Builder
-    public BookReviewRequest(long userNo, String isbn, int rating, String reviewContents, BookDto book) {
+    public BookReviewRequest(long userNo, String isbn, int rating, String reviewContents, BookDto book){
+
         this.userNo = userNo;
         this.isbn = isbn;
         this.rating = rating;
         this.reviewContents = reviewContents;
         this.book = book;
     }
+
 }
