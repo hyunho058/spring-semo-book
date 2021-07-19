@@ -3,6 +3,7 @@ package com.semobook.bookReview.dto;
 
 import com.semobook.book.dto.BookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,8 +14,13 @@ public class BookReviewRatingRequest {
     long userNo;
     @Schema(description = "평점" , example = "3")
     int rating;
-//    @Schema(description = "책isbn" , example = "9788998139766")
-//    String isbn;
     @Schema(description = "book data")
     BookDto book;
+
+    @Builder
+    public BookReviewRatingRequest(long userNo, int rating, BookDto book){
+        this.userNo = userNo;
+        this.rating = rating;
+        this.book = book;
+    }
 }
