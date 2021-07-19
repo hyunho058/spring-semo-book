@@ -93,14 +93,14 @@ public class BookReviewService {
                 UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
                 log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
                 if (book != null && resultUserInfo != null) {
-//                    bookReviewRepository.save(BookReview.builder()
-//                            .rating(request.getRating())
-//                            .reviewContents(request.getReviewContents())
-//                            .createDate(LocalDateTime.now())
-//                            .declaration(0)
-//                            .book(book)
-//                            .userInfo(resultUserInfo)
-//                            .build());
+                    bookReviewRepository.save(BookReview.builder()
+                            .rating(request.getRating())
+                            .reviewContents(request.getReviewContents())
+                            .createDate(LocalDateTime.now())
+                            .declaration(0)
+                            .book(book)
+                            .userInfo(resultUserInfo)
+                            .build());
 
                     //redis에 리뷰 업데이트
                     boolean isUpdate = updateRedisReview(request);
@@ -235,10 +235,18 @@ public class BookReviewService {
                             .book(book)
                             .userInfo(resultUserInfo)
                             .build());
-                    //평점  3점 이상이면 recom으로 추천 업뎃치기
-                    if (request.getRating() >= 3) {
-//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
+                    //redis에 리뷰 업데이트
+                    boolean isUpdate = updateRedisReview(BookReviewRequest.builder()
+                            .userNo(request.getUserNo())
+                            .rating(request.getRating())
+                            .book(request.getBook())
+                            .build());
+
+                    //userpriority 생성
+                    if(isUpdate){
+                        userService.makeUserPriority(request.getUserNo());
                     }
+
                     hCode = StatusEnum.hd1004;
                     hMessage = "저장완료";
                     data = request;
@@ -399,11 +407,6 @@ public class BookReviewService {
         try {
             BookReview bookReview = bookReviewRepository.findByReviewNo(request.getReviewNo());
             bookReview.changeBookReview(request.getRating(), request.getReviewContents());
-
-            //평점  3점 이상이면 recom으로 추천 업뎃치기
-            if (bookReview.getRating() >= 3) {
-//                recomService.updateUserReviewRecom(bookReview.getBook().getIsbn(),bookReview.getUserInfo().getUserNo());
-            }
 
             hCode = StatusEnum.hd1004;
             hMessage = "글 수정완료";
