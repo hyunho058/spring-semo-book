@@ -64,6 +64,16 @@ public class ReviewTest {
         assertTrue(first.get().getBook().getIsbn().equals("9788901214924"));
     }
 
+    @Test
+    @DisplayName("유저 리뷰리스트")
+    void readMyReviewTest(){
+        //give
+
+        //when
+
+        //then
+    }
+
 
 
 
