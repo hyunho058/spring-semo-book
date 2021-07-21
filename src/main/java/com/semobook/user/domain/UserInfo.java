@@ -4,7 +4,6 @@ import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookwant.domain.BookWant;
 import com.semobook.qa.domain.Qa;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
-import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -98,6 +97,10 @@ public class UserInfo {
 
     public void changePw(String userPw){
         this.userPw = userPw;
+    }
+
+    public void addReview(List<BookReview> reviewInfoList ){
+        this.bookReviews = reviewInfoList;
     }
 
 
