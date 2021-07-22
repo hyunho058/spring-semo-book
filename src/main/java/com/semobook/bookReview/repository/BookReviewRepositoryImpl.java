@@ -1,11 +1,13 @@
 package com.semobook.bookReview.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.bookReview.domain.BookReview;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,9 +35,19 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         Integer fetchOne = queryFactory
                 .selectOne()
                 .from(bookReview)
-                .where(bookReview.userInfo.userNo.eq(userNo).and(book.isbn.eq(isbn)))
+                .where(
+                        userNoEq(userNo)
+                                .and(isbnEq(isbn)))
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    private BooleanExpression userNoEq(Long userNo) {
+        return userNo != null ? userInfo.userNo.goe(userNo) : null;
+    }
+
+    private BooleanExpression isbnEq(String isbn) {
+        return StringUtils.hasText(isbn) ? book.isbn.eq(isbn) : null;
     }
 
     /**

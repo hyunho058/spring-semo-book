@@ -142,6 +142,16 @@ public class ReviewTest {
 
     }
 
+    @Test
+    @DisplayName("리뷰 작성")
+    void existsReviewTest(){
+        //give
+
+        //when
+
+        //then
+    }
+
 
 
 
