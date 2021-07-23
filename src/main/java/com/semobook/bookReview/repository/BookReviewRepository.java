@@ -30,7 +30,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
 //            countQuery = "select count(br.reviewNo) from BookReview  br")
 //    Page<BookReview> findAllByUserInfo_userNo(@Param(value = "userNo") long userNo, Pageable pageable);
     //querydsl
-    Page<BookReview> findAllByUserInfo_userNo(long userNo, Pageable pageable);
+//    Page<BookReview> findAllByUserInfo_userNo(long userNo, Pageable pageable);
 
     //이 책 리뷰 모두 보기
     List<BookReview> findAllByBook(Book book, Pageable pageable);
@@ -76,6 +76,6 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
     List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 
     //도서에 속한 리뷰 조회
-    Page<BookReview> findByBookReview(String isbn, Pageable pageable);
+//    Page<BookReview> findByBookReview(String isbn, Pageable pageable);
 
 }

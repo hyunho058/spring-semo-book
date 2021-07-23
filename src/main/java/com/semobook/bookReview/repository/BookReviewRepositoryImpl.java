@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,8 +21,8 @@ import static com.semobook.user.domain.QUserInfo.userInfo;
 public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public BookReviewRepositoryImpl(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
+    public BookReviewRepositoryImpl(EntityManager entityManager) {
+        this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
     /**
