@@ -1,12 +1,15 @@
 package com.semobook.bookReview.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.bookReview.domain.BookReview;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,8 +21,8 @@ import static com.semobook.user.domain.QUserInfo.userInfo;
 public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public BookReviewRepositoryImpl(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
+    public BookReviewRepositoryImpl(EntityManager entityManager) {
+        this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
     /**
@@ -33,9 +36,19 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         Integer fetchOne = queryFactory
                 .selectOne()
                 .from(bookReview)
-                .where(bookReview.userInfo.userNo.eq(userNo).and(book.isbn.eq(isbn)))
+                .where(
+                        userNoEq(userNo)
+                                .and(isbnEq(isbn)))
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    private BooleanExpression userNoEq(Long userNo) {
+        return userNo != null ? userInfo.userNo.goe(userNo) : null;
+    }
+
+    private BooleanExpression isbnEq(String isbn) {
+        return StringUtils.hasText(isbn) ? book.isbn.eq(isbn) : null;
     }
 
     /**
