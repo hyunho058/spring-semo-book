@@ -43,14 +43,6 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         return fetchOne != null;
     }
 
-    private BooleanExpression userNoEq(Long userNo) {
-        return userNo != null ? userInfo.userNo.goe(userNo) : null;
-    }
-
-    private BooleanExpression isbnEq(String isbn) {
-        return StringUtils.hasText(isbn) ? book.isbn.eq(isbn) : null;
-    }
-
     /**
      * PK(reviewNo) 를 잉용해 존재 여부 확인
      *
@@ -165,9 +157,19 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .selectFrom(bookReview)
                 .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
                 .join(bookReview.book, book).fetchJoin()
-                .where(userInfo.userNo.eq(userNo))
+                .where(userNoEq(userNo))
                 .fetchCount();
 
         return (int)result;
+    }
+
+
+
+    private BooleanExpression userNoEq(Long userNo) {
+        return userNo != null ? userInfo.userNo.goe(userNo) : null;
+    }
+
+    private BooleanExpression isbnEq(String isbn) {
+        return StringUtils.hasText(isbn) ? book.isbn.eq(isbn) : null;
     }
 }

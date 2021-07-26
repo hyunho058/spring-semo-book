@@ -1,8 +1,8 @@
 package com.semobook.bookReview.dto;
 
-import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

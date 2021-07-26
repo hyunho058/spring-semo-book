@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -100,9 +102,6 @@ public class ReviewTest {
                         .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
                         .build())
                 .build();
-        //when
-
-
 
         BookReviewRequest rq2 = BookReviewRequest.builder()
                 .userNo(99999L)
@@ -143,13 +142,56 @@ public class ReviewTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성")
-    void existsReviewTest(){
+    @DisplayName("REVIEW_TOTAL_COUNT")
+    void REVIEW_TOTAL_COUNT(){
         //give
+        UserInfo userInfo = UserInfo.builder()
+                .userNo(99999L)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        BookReviewRequest rq1 = BookReviewRequest.builder()
+                .userNo(99999L)
+                .isbn("9788901214924")
+                .rating(4)
+                .reviewContents("재미")
+                .book(BookDto.builder()
+                        .isbn("9788901214924")
+                        .bookName("한 권으로 읽는 조선왕조실록")
+                        .author("박영규")
+                        .publisher("웅진지식하우스")
+                        .kdc("900")
+                        .category("900")
+                        .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                        .build())
+                .build();
 
+        BookReviewRequest rq2 = BookReviewRequest.builder()
+                .userNo(99999L)
+                .isbn("9788901219943")
+                .rating(4)
+                .reviewContents("재미11111")
+                .book(BookDto.builder()
+                        .isbn("9788901219943")
+                        .bookName("신경 끄기의 기술")
+                        .author("마크 맨슨")
+                        .publisher("갤리온")
+                        .kdc("500")
+                        .category("900")
+                        .img("http://image.kyobobook.co.kr/images/book/large/943/l9788901219943.jpg")
+                        .build())
+                .build();
         //when
+        userRepository.save(userInfo);
+        bookReviewService.createReview(rq1);
+        bookReviewService.createReview(rq2);
 
+        int bookTotal = bookReviewRepository.countReview(99999L);
         //then
+        assertThat(bookTotal, is(2));
     }
 
 

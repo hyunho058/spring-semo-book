@@ -338,10 +338,10 @@ public class UserService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.withDayOfMonth(1);
         //이번달 읽은 책
-        int bookThisMonth = bookReviewRepositoryImpl.countfindByBookBetweenDate(userNo, start, now);
+        int bookThisMonth = bookReviewRepository.countfindByBookBetweenDate(userNo, start, now);
         log.info(":: getTotalUserReviewInfo :: bookThisMonth is {} ", bookThisMonth);
         //총 읽은 책
-        int bookTotal = bookReviewRepositoryImpl.countReview(userNo);
+        int bookTotal = bookReviewRepository.countReview(userNo);
         List<String> prioertiesList = new ArrayList<>();
         //유저의 성향
         if (list != null && list.size() > 0) {
