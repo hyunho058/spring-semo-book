@@ -62,7 +62,7 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
 
 
     /**
-     * 유저 월별 리뷰 조회
+     * 월별 유저 리뷰 조회
      *
      * @author hyunho
      * @since 2021/07/03
@@ -83,6 +83,12 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         return resultList;
     }
 
+    /**
+     * 유저별 리뷰 리스트
+     *
+     * @author hyunho
+     * @since 2021/07/14
+    **/
     @Override
     public Page<BookReview> findAllByUserInfo_userNo(long userNo, Pageable pageable) {
         // 조회 쿼리와 카운트 커리 한번에(querydsl 이 아라서 토탈카운트 쿼리를 새성) - 데이터 수가 적을때
@@ -148,7 +154,8 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .selectFrom(bookReview)
                 .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
                 .join(bookReview.book, book).fetchJoin()
-                .where(bookReview.createDate.between(startDate, endDate).and(userInfo.userNo.eq(userNo)))
+                .where(bookReview.createDate.between(startDate, endDate)
+                        .and(userInfo.userNo.eq(userNo)))
                 .fetchCount();
 
         return (int)result;

@@ -71,7 +71,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
         countQuery = "select count(br.reviewNo) from BookReview  br")
     Page<BookReview> findAllByUserInfo(@Param(value = "userNo") long userNo, Pageable pageable);
 
-    List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
+//    List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 
     //도서에 속한 리뷰 조회
 //    Page<BookReview> findByBookReview(String isbn, Pageable pageable);
