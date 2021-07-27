@@ -195,6 +195,43 @@ public class ReviewTest {
     }
 
 
+    @Test
+    @DisplayName("리뷰_작성_존재_확인")
+    void 리뷰_작성_존재_확인(){
+        //give
+        UserInfo userInfo = UserInfo.builder()
+                .userNo(99999L)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        BookReviewRequest rq1 = BookReviewRequest.builder()
+                .userNo(99999L)
+                .isbn("9788901214924")
+                .rating(4)
+                .reviewContents("재미")
+                .book(BookDto.builder()
+                        .isbn("9788901214924")
+                        .bookName("한 권으로 읽는 조선왕조실록")
+                        .author("박영규")
+                        .publisher("웅진지식하우스")
+                        .kdc("900")
+                        .category("900")
+                        .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                        .build())
+                .build();
+        //when
+        userRepository.save(userInfo);
+        bookReviewService.createReview(rq1);
+        boolean exists = bookReviewRepository.exists(99999L, "9788901214924");
+        //then
+        assertThat(true, is(exists));
+
+    }
+
+
 
 
 

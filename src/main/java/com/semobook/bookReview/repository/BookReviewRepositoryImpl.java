@@ -37,8 +37,8 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .selectOne()
                 .from(bookReview)
                 .where(
-                        userNoEq(userNo)
-                                .and(isbnEq(isbn)))
+                        userNoEq(userNo),
+                        isbnEq(isbn))
                 .fetchFirst();
         return fetchOne != null;
     }
@@ -75,7 +75,10 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .selectFrom(bookReview)
                 .join(bookReview.userInfo, userInfo).fetchJoin()    //fetchJoin
                 .join(bookReview.book, book).fetchJoin()
-                .where(userInfo.userNo.eq(userNo).and(bookReview.createDate.between(startDate, endDate).and(bookReview.reviewContents .isNotNull())))
+//                .where(userInfo.userNo.eq(userNo).and(bookReview.createDate.between(startDate, endDate).and(bookReview.reviewContents .isNotNull())))
+                .where(userNoEq(userNo),
+                        bookReview.createDate.between(startDate, endDate),
+                        bookReview.reviewContents .isNotNull())
                 .fetch();
         return resultList;
     }
