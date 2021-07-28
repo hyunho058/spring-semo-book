@@ -3,7 +3,6 @@ package com.semobook.book.repository;
 import com.semobook.book.domain.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Repository
 
-public interface BookRepository extends CrudRepository<Book, String> {
+public interface BookRepository extends CrudRepository<Book, String>, BookRepositoryCustom{
 
     //ISBN(PK) 으로 도서 종보 조회
     Book findByIsbn(@Param("isbn") String isbn);
