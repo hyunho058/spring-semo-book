@@ -15,7 +15,7 @@ import java.util.List;
 public interface BookRepository extends CrudRepository<Book, String>, BookRepositoryCustom{
 
     //ISBN(PK) 으로 도서 종보 조회
-    Book findByIsbn(@Param("isbn") String isbn);
+//    Book findByIsbn(@Param("isbn") String isbn);
 
     //ISBN(PK) 으로 도서, 도서에 포함된 리뷰 종보 조회
     @Query(value = "select b from Book b " +
