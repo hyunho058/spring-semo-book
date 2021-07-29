@@ -18,8 +18,8 @@ public interface BookRepository extends CrudRepository<Book, String>, BookReposi
 
     //ISBN(PK) 으로 도서, 도서에 포함된 리뷰 정보 조회
 //    @Query(value = "select b from Book b " +
-//            "left join fetch b.bookReviewList br " +
-//            "left join fetch br.userInfo where b.isbn = :isbn")
+//            "join fetch b.bookReviewList br " +
+//            "join fetch br.userInfo where b.isbn = :isbn")
 //    Book findByIsbnWithReview(@Param("isbn")String isbn);
 
     //책 전채 조회(패이징처리)//

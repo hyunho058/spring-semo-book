@@ -39,8 +39,8 @@ public class BookRepositoryImpl implements BookRepositoryCustom{
     public Book findByIsbnWithReview(String isbn) {
         return queryFactory
                 .selectFrom(book)
-                .leftJoin(book.bookReviewList, bookReview).fetchJoin()
-                .leftJoin(bookReview.userInfo).fetchJoin()
+                .join(book.bookReviewList, bookReview).fetchJoin()
+                .join(bookReview.userInfo).fetchJoin()
                 .where(book.isbn.eq(isbn))
                 .fetchOne();
     }
