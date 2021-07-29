@@ -2,16 +2,23 @@ package com.semobook.test;
 
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookDto;
+import com.semobook.book.dto.BookWithReviewDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.book.service.BestSellerService;
+import com.semobook.bookReview.dto.BookReviewRequest;
+import com.semobook.bookReview.repository.BookReviewRepository;
+import com.semobook.bookReview.service.BookReviewService;
+import com.semobook.user.domain.UserInfo;
+import com.semobook.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest
 public class BookTest {
@@ -19,6 +26,12 @@ public class BookTest {
     BestSellerService bestSellerService;
     @Autowired
     BookRepository bookRepository;
+    @Autowired
+    BookReviewRepository bookReviewRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    BookReviewService bookReviewService;
 
     @Test
     @DisplayName("베스트셀러를_가져온다")
@@ -72,5 +85,66 @@ public class BookTest {
 
         //then
         assertThat(bookDto.getIsbn(), is(isbn));
+    }
+
+    @Test
+    @DisplayName("도서_리뷰조회_ISBN")
+    void 도서_리뷰조회_ISBN(){
+        //give
+        String isbn = "11111111";
+        Book book = bookRepository.save(Book.builder()
+                .isbn(isbn)
+                .bookName("SEMO")
+                .author("SEMO")
+                .publisher("hDream")
+                .kdc("800")
+                .category("800")
+                .keyword("800")
+                .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                .build());
+
+        UserInfo userInfo = UserInfo.builder()
+                .userNo(99999L)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+
+        UserInfo userInfo1 = UserInfo.builder()
+                .userNo(88888L)
+                .userId("userB@semo.com")
+                .userPw("semo1234")
+                .userName("userB")
+                .userGender("M")
+                .userBirth("19920518")
+                .build();
+
+        BookReviewRequest rq1 = BookReviewRequest.builder()
+                .userNo(99999L)
+                .isbn(isbn)
+                .rating(4)
+                .reviewContents("재미")
+                .book(new BookDto(book))
+                .build();
+
+        BookReviewRequest rq2 = BookReviewRequest.builder()
+                .userNo(88888L)
+                .isbn(isbn)
+                .rating(3)
+                .reviewContents("재미11")
+                .book(new BookDto(book))
+                .build();
+        //when
+        bookRepository.save(book);
+        userRepository.save(userInfo);
+        userRepository.save(userInfo1);
+        bookReviewService.createReview(rq1);
+        bookReviewService.createReview(rq2);
+
+        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
+        //then
+        assertThat(bookWithReviewDto.getBookReviews().size(), is(2));
     }
 }
