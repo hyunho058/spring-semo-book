@@ -138,6 +138,8 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .leftJoin(bookReview.userInfo).fetchJoin()
                 .where(bookReview.book.isbn.eq(isbn))
                 .orderBy(bookReview.createDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory

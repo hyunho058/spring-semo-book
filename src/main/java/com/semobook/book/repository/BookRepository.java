@@ -1,9 +1,6 @@
 package com.semobook.book.repository;
 
 import com.semobook.book.domain.Book;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,9 +21,9 @@ public interface BookRepository extends CrudRepository<Book, String>, BookReposi
 
     //책 전채 조회(패이징처리)//
     //page
-    @Query(value = "select b from Book b left join fetch b.bookReviewList br",
-            countQuery = "select count(b.bookName) from Book b")
-    Page<Book> findAll(Pageable pageable);
+//    @Query(value = "select b from Book b left join fetch b.bookReviewList br",
+//            countQuery = "select count(b.bookName) from Book b")
+//    Page<Book> findAll(Pageable pageable);
     //slice
 //    @Query(value = "select b from Book b left join fetch b.bookReviewList br")
 //    Slice<Book> findAll(Pageable pageable);

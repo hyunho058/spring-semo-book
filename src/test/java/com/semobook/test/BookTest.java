@@ -14,6 +14,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +24,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest
+@Transactional
 public class BookTest {
     @Autowired
     BestSellerService bestSellerService;
@@ -146,5 +150,39 @@ public class BookTest {
         BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
         //then
         assertThat(bookWithReviewDto.getBookReviews().size(), is(2));
+    }
+
+    @Test
+    @DisplayName("도서_리스트")
+    void 도서_리스트(){
+        //give
+        int isbn = 11111111;
+        for (int i = 0; i < 11; i++){
+            Book book = bookRepository.save(Book.builder()
+                    .isbn(String.valueOf(isbn++))
+                    .bookName("SEMO"+i)
+                    .author("SEMO")
+                    .publisher("hDream")
+                    .kdc("800")
+                    .category("800")
+                    .keyword("800")
+                    .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                    .build());
+            bookRepository.save(book);
+        }
+        //when
+        int pageNum = 0;
+        int pageSize = 5;
+        PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
+        Page<Book> page = bookRepository.findAll(pageRequest);
+        //then
+
+        assertThat(page.getTotalElements(), is(11L));
+        assertThat(page.getTotalPages(), is(3));
+        assertThat(page.isFirst(), is(true));
+
+
+
+
     }
 }
