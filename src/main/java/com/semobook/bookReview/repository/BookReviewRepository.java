@@ -40,7 +40,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
     int deleteBookReviewByReviewNo(@Param(value = "reviewNo") long reviewNo);
 
     //리뷰 조회
-    BookReview findByReviewNo(long reviewNo);
+//    BookReview findByReviewNo(long reviewNo);
 
 
     /**

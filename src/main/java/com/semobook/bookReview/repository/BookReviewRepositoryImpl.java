@@ -151,6 +151,14 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     }
 
     @Override
+    public BookReview findByReviewNo(long reviewNo) {
+        return queryFactory
+                .selectFrom(bookReview)
+                .where(reviewNoEq(reviewNo))
+                .fetchOne();
+    }
+
+    @Override
     public int countfindByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate ) {
         long result = queryFactory
                 .selectFrom(bookReview)
@@ -178,10 +186,14 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
 
 
     private BooleanExpression userNoEq(Long userNo) {
-        return userNo != null ? userInfo.userNo.goe(userNo) : null;
+        return userNo != null ? userInfo.userNo.eq(userNo) : null;
     }
 
     private BooleanExpression isbnEq(String isbn) {
         return StringUtils.hasText(isbn) ? book.isbn.eq(isbn) : null;
+    }
+
+    private BooleanExpression reviewNoEq(Long reviewNo){
+        return reviewNo != null ? bookReview.reviewNo.eq(reviewNo) : null;
     }
 }

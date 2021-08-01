@@ -23,5 +23,7 @@ public interface BookReviewRepositoryCustom {
 
     Page<BookReview> findByBookReview(String isbn, Pageable pageable);
 
+    BookReview findByReviewNo(long reviewNo);;
+
 
 }
