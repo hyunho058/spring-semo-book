@@ -159,6 +159,31 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     }
 
     @Override
+    public Page<BookReview> findAllByUserInfoAndNotNullContents(long userNo, Pageable pageable) {
+        List<BookReview> results = queryFactory
+                .select(bookReview)
+                .from(bookReview)
+                .join(bookReview.userInfo).fetchJoin()
+                .join(bookReview.book).fetchJoin()
+                .where(bookReview.userInfo.userNo.eq(userNo)
+                        .and(bookReview.reviewContents.isNotNull()))
+                .offset(pageable.getOffset())   //N 번부터 시작
+                .limit(pageable.getPageSize()) //조회 갯수
+                .fetch();
+
+        long total = queryFactory
+                .select(bookReview)
+                .from(bookReview)
+                .join(bookReview.userInfo).fetchJoin()
+                .join(bookReview.book).fetchJoin()
+                .where(bookReview.userInfo.userNo.eq(userNo)
+                        .and(bookReview.reviewContents.isNotNull()))
+                .fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
     public int countfindByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate ) {
         long result = queryFactory
                 .selectFrom(bookReview)

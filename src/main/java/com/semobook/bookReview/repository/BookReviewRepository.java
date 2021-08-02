@@ -65,10 +65,10 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
     //------------------------------------------------------------//
 
     //리뷰 리슽 조회(리뷰 내용을 쓴것만)
-    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book " +
-            "where ui.userNo = :userNo ",
-        countQuery = "select count(br.reviewNo) from BookReview  br")
-    Page<BookReview> findAllByUserInfo(@Param(value = "userNo") long userNo, Pageable pageable);
+//    @Query(value = "select br from BookReview br left join fetch br.userInfo ui left join fetch br.book " +
+//            "where ui.userNo = :userNo ",
+//        countQuery = "select count(br.reviewNo) from BookReview  br")
+//    Page<BookReview> findAllByUserInfo(@Param(value = "userNo") long userNo, Pageable pageable);
 
 //    List<BookReview> findByBookBetweenDate(long userNo, LocalDateTime startDate, LocalDateTime endDate);
 

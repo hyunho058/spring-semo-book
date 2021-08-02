@@ -3,6 +3,7 @@ package com.semobook.test;
 import com.semobook.book.dto.BookDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.domain.BookReview;
+import com.semobook.bookReview.dto.BookReviewDto;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.dto.BookReviewWithIsbnDto;
 import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
@@ -67,12 +68,10 @@ public class ReviewTest {
         bookReviewService.createReview(rq);
 
         //then
-        Optional<BookReview> first = bookReviewRepository.findAllByUserInfo(99999, PageRequest.of(0, 999)).stream().findFirst();
+        Optional<BookReview> first = bookReviewRepository.findAllByUserInfo_userNo(99999, PageRequest.of(0, 999)).stream().findFirst();
 
         //북리뷰 조회에 유저가 쓴 리뷰가 있는지 확인해야 한다
-
-        System.out.println(first.get().getBook().getIsbn());
-        assertTrue(first.get().getBook().getIsbn().equals("9788901214924"));
+        assertThat(first.get().getBook().getIsbn(), is("9788901214924"));
     }
 
     @Test
@@ -302,8 +301,63 @@ public class ReviewTest {
 
     }
 
+    @Test
+    @DisplayName("내_리뷰_조회_리뷰_내용이있는것만")
+    void 내_리뷰_조회_리뷰_내용이있는것만(){
+        //give
+        UserInfo userInfo = UserInfo.builder()
+                .userNo(99999L)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        BookReviewRequest rq1 = BookReviewRequest.builder()
+                .userNo(99999L)
+                .isbn("9788901214924")
+                .rating(4)
+                .reviewContents("재미")
+                .book(BookDto.builder()
+                        .isbn("9788901214924")
+                        .bookName("한 권으로 읽는 조선왕조실록")
+                        .author("박영규")
+                        .publisher("웅진지식하우스")
+                        .kdc("900")
+                        .category("900")
+                        .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                        .build())
+                .build();
+        BookReviewRequest rq2 = BookReviewRequest.builder()
+                .userNo(99999L)
+                .isbn("9788901219943")
+                .rating(4)
+                .book(BookDto.builder()
+                        .isbn("9788901219943")
+                        .bookName("신경 끄기의 기술")
+                        .author("마크 맨슨")
+                        .publisher("갤리온")
+                        .kdc("500")
+                        .category("900")
+                        .img("http://image.kyobobook.co.kr/images/book/large/943/l9788901219943.jpg")
+                        .build())
+                .build();
+        //when
+        userRepository.save(userInfo);
+        bookReviewService.createReview(rq1);
+        bookReviewService.createReview(rq2);
 
+        Page<BookReview> page = bookReviewRepository.findAllByUserInfoAndNotNullContents(
+                99999L,
+                PageRequest.of(0, 10)
+        );
 
+        List<BookReviewDto> results = page.getContent().stream()
+                .map(bookReview -> new BookReviewDto(bookReview))
+                .collect(Collectors.toList());
 
+        //then
+        assertThat(page.getTotalElements(), is(1L));
+    }
 
 }
