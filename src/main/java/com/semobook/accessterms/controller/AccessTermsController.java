@@ -21,7 +21,7 @@ public class AccessTermsController {
     @Operation(description = "이용약관, 서비스 관리")
     @GetMapping("/findAllAccessTerms")
     public ResponseEntity<AccessTermsResponse> findAllAccessTerms(@Parameter @RequestParam(name = "accessNo") long accessNo){
-
+//test
         return ResponseEntity.ok(accesstermsService.findAll(accessNo));
 
     }
