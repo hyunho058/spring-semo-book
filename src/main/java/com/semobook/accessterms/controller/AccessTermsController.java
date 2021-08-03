@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccessTermsController {
     private final AccessTermsService accesstermsService;
-
+    //test
     @Operation(description = "이용약관, 서비스 관리")
     @GetMapping("/findAllAccessTerms")
     public ResponseEntity<AccessTermsResponse> findAllAccessTerms(@Parameter @RequestParam(name = "accessNo") long accessNo){
