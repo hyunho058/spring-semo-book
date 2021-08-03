@@ -34,13 +34,13 @@ public interface BookRepository extends CrudRepository<Book, String>, BookReposi
     List<Book> findAllByKeyword(String category);
 
     //책 저장
-    Book save(Book book);
+//    Book save(Book book);
 
     //책 제거
-    int deleteBookByIsbn (String isbn);
+//    long deleteBookByIsbn (String isbn);
 
     //도서 존재 여부
-    boolean existsByIsbn(String isbn);
+//    boolean existsByIsbn(String isbn);
 
 
 }

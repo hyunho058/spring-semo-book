@@ -70,7 +70,7 @@ public class BookTest {
 
     @Test
     @DisplayName("도서_검색_ISBN")
-    void 도서_검색_ISBN(){
+    void 도서_검색_ISBN() {
         //give
         String isbn = "11111111";
         Book book = bookRepository.save(Book.builder()
@@ -93,7 +93,7 @@ public class BookTest {
 
     @Test
     @DisplayName("도서_리뷰조회_ISBN")
-    void 도서_리뷰조회_ISBN(){
+    void 도서_리뷰조회_ISBN() {
         //give
         String isbn = "11111111";
         Book book = bookRepository.save(Book.builder()
@@ -154,17 +154,17 @@ public class BookTest {
 
     @Test
     @DisplayName("도서_리스트")
-    void 도서_리스트(){
+    void 도서_리스트() {
         //give
         int isbn = 11111111;
-        for (int i = 0; i < 11; i++){
+        for (int i = 0; i < 11; i++) {
             Book book = bookRepository.save(Book.builder()
                     .isbn(String.valueOf(isbn++))
-                    .bookName("SEMO"+i)
+                    .bookName("SEMO" + i)
                     .author("SEMO")
                     .publisher("hDream")
                     .kdc("800")
-                    .category("800")
+                    .category("TEST")
                     .keyword("800")
                     .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
                     .build());
@@ -174,7 +174,7 @@ public class BookTest {
         int pageNum = 0;
         int pageSize = 5;
         PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
-        Page<Book> page = bookRepository.findAll(pageRequest);
+        Page<Book> page = bookRepository.findAllByCategory(pageRequest, "TEST");
         //then
 
         assertThat(page.getTotalElements(), is(11L));
@@ -182,7 +182,34 @@ public class BookTest {
         assertThat(page.isFirst(), is(true));
 
 
+    }
+
+    @Test
+    @DisplayName("책삭제")
+    void 책_삭제() {
+        //give
+        int isbn = 11111111;
+
+        Book book = bookRepository.save(Book.builder()
+                .isbn(String.valueOf(isbn))
+                .bookName("SEMO")
+                .author("SEMO")
+                .publisher("hDream")
+                .kdc("800")
+                .category("TEST")
+                .keyword("800")
+                .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                .build());
+        bookRepository.save(book);
+
+        //then
+        assertThat(bookRepository.existsByIsbn("11111111"),is(true));
+        bookRepository.deleteBookByIsbn("11111111");
+        assertThat(bookRepository.existsByIsbn("11111111"),is(false));
+
 
 
     }
+
+
 }
