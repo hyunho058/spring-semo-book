@@ -95,7 +95,7 @@ public class BookTest {
     @DisplayName("도서_리뷰조회_ISBN")
     void 도서_리뷰조회_ISBN(){
         //give
-        String isbn = "11111111";
+        String isbn = "111111";
         Book book = bookRepository.save(Book.builder()
                 .isbn(isbn)
                 .bookName("SEMO")
@@ -126,7 +126,7 @@ public class BookTest {
                 .build();
 
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(99999)
                 .isbn(isbn)
                 .rating(4)
                 .reviewContents("재미")
@@ -134,7 +134,7 @@ public class BookTest {
                 .build();
 
         BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(88888L)
+                .userNo(198)
                 .isbn(isbn)
                 .rating(3)
                 .reviewContents("재미11")
@@ -142,14 +142,18 @@ public class BookTest {
                 .build();
         //when
         bookRepository.save(book);
-        userRepository.save(userInfo);
-        userRepository.save(userInfo1);
+//        userRepository.save(userInfo);
+//        userRepository.save(userInfo1);
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
 
+        Book bookResult = bookRepository.findByIsbnWithReview(isbn);
         BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
+//        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookResult);
         //then
+        assertThat(bookResult.getIsbn(), is(isbn));
         assertThat(bookWithReviewDto.getBookReviews().size(), is(2));
+
     }
 
     @Test
