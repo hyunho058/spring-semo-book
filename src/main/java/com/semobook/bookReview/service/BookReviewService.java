@@ -91,7 +91,7 @@ public class BookReviewService {
                             .build());
                 }
                 UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
+//                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
                 if (book != null && resultUserInfo != null) {
                     bookReviewRepository.save(BookReview.builder()
                             .rating(request.getRating())

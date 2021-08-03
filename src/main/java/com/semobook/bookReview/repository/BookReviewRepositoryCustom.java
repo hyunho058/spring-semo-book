@@ -23,5 +23,9 @@ public interface BookReviewRepositoryCustom {
 
     Page<BookReview> findByBookReview(String isbn, Pageable pageable);
 
+    BookReview findByReviewNo(long reviewNo);;
+
+    Page<BookReview> findAllByUserInfoAndNotNullContents(long userNo, Pageable pageable);
+
 
 }

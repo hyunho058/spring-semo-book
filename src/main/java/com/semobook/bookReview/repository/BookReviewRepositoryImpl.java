@@ -138,11 +138,46 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
                 .leftJoin(bookReview.userInfo).fetchJoin()
                 .where(bookReview.book.isbn.eq(isbn))
                 .orderBy(bookReview.createDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory
                 .selectFrom(bookReview)
                 .where(bookReview.book.isbn.eq(isbn))
+                .fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public BookReview findByReviewNo(long reviewNo) {
+        return queryFactory
+                .selectFrom(bookReview)
+                .where(reviewNoEq(reviewNo))
+                .fetchOne();
+    }
+
+    @Override
+    public Page<BookReview> findAllByUserInfoAndNotNullContents(long userNo, Pageable pageable) {
+        List<BookReview> results = queryFactory
+                .select(bookReview)
+                .from(bookReview)
+                .join(bookReview.userInfo).fetchJoin()
+                .join(bookReview.book).fetchJoin()
+                .where(bookReview.userInfo.userNo.eq(userNo)
+                        .and(bookReview.reviewContents.isNotNull()))
+                .offset(pageable.getOffset())   //N 번부터 시작
+                .limit(pageable.getPageSize()) //조회 갯수
+                .fetch();
+
+        long total = queryFactory
+                .select(bookReview)
+                .from(bookReview)
+                .join(bookReview.userInfo).fetchJoin()
+                .join(bookReview.book).fetchJoin()
+                .where(bookReview.userInfo.userNo.eq(userNo)
+                        .and(bookReview.reviewContents.isNotNull()))
                 .fetchCount();
 
         return new PageImpl<>(results, pageable, total);
@@ -176,10 +211,14 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
 
 
     private BooleanExpression userNoEq(Long userNo) {
-        return userNo != null ? userInfo.userNo.goe(userNo) : null;
+        return userNo != null ? userInfo.userNo.eq(userNo) : null;
     }
 
     private BooleanExpression isbnEq(String isbn) {
         return StringUtils.hasText(isbn) ? book.isbn.eq(isbn) : null;
+    }
+
+    private BooleanExpression reviewNoEq(Long reviewNo){
+        return reviewNo != null ? bookReview.reviewNo.eq(reviewNo) : null;
     }
 }

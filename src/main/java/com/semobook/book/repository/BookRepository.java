@@ -1,11 +1,7 @@
 package com.semobook.book.repository;
 
 import com.semobook.book.domain.Book;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,19 +11,19 @@ import java.util.List;
 public interface BookRepository extends CrudRepository<Book, String>, BookRepositoryCustom{
 
     //ISBN(PK) 으로 도서 종보 조회
-    Book findByIsbn(@Param("isbn") String isbn);
+//    Book findByIsbn(@Param("isbn") String isbn);
 
-    //ISBN(PK) 으로 도서, 도서에 포함된 리뷰 종보 조회
-    @Query(value = "select b from Book b " +
-            "left join fetch b.bookReviewList br " +
-            "left join fetch br.userInfo where b.isbn = :isbn")
-    Book findByIsbnWithReview(@Param("isbn")String isbn);
+    //ISBN(PK) 으로 도서, 도서에 포함된 리뷰 정보 조회
+//    @Query(value = "select b from Book b " +
+//            "join fetch b.bookReviewList br " +
+//            "join fetch br.userInfo where b.isbn = :isbn")
+//    Book findByIsbnWithReview(@Param("isbn")String isbn);
 
     //책 전채 조회(패이징처리)//
     //page
-    @Query(value = "select b from Book b left join fetch b.bookReviewList br",
-            countQuery = "select count(b.bookName) from Book b")
-    Page<Book> findAll(Pageable pageable);
+//    @Query(value = "select b from Book b left join fetch b.bookReviewList br",
+//            countQuery = "select count(b.bookName) from Book b")
+//    Page<Book> findAll(Pageable pageable);
     //slice
 //    @Query(value = "select b from Book b left join fetch b.bookReviewList br")
 //    Slice<Book> findAll(Pageable pageable);
