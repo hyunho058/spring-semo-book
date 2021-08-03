@@ -22,6 +22,6 @@ public class AccessTermsController {
     @GetMapping("/findAllAccessTerms")
     public ResponseEntity<AccessTermsResponse> findAllAccessTerms(@Parameter @RequestParam(name = "accessNo") long accessNo){
         return ResponseEntity.ok(accesstermsService.findAll(accessNo));
-
+//tsstg
     }
 }
