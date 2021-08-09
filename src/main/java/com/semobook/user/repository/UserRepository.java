@@ -24,7 +24,7 @@ public interface UserRepository extends CrudRepository<UserInfo, Long>, UserRepo
     UserInfo findByUserNoAndUserStatus(long userNo, Enum<UserStatus> status);
 
    //회원조회(모두)
-    UserInfo findByUserId(String userId);
+//    UserInfo findByUserId(String userId);
 
     //find user by userNo
     @Query("select u from UserInfo u left join fetch u.bookReviews br where u.userNo = :userNo")

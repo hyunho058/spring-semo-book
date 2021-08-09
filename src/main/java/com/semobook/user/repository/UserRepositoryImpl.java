@@ -1,5 +1,6 @@
 package com.semobook.user.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.user.domain.UserInfo;
 import org.springframework.data.domain.Page;
@@ -31,4 +32,17 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .fetchCount();
         return new PageImpl<>(results, pageable, totalCount);
     }
+
+    @Override
+    public UserInfo findByUserId(String userId) {
+        return queryFactory
+                .selectFrom(userInfo)
+                .where(userIdEq(userId))
+                .fetchOne();
+    }
+
+    private BooleanExpression userIdEq(String userId) {
+        return userId != null ? userInfo.userId.eq(userId) : null;
+    }
+
 }

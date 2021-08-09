@@ -66,4 +66,41 @@ public class UserInfoTest {
         assertThat(page.getTotalPages(), is(2));
 
     }
+
+    @Test
+    @DisplayName("사용자_아이디로_조회")
+    void 사용자_아이디로_조회(){
+        //give
+        UserInfo userA = UserInfo.builder()
+                .userNo(99999L)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        UserInfo userB = UserInfo.builder()
+                .userNo(99998L)
+                .userId("userB@semo.com")
+                .userPw("semo1234")
+                .userName("userB")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        UserInfo userC = UserInfo.builder()
+                .userNo(99997L)
+                .userId("userC@semo.com")
+                .userPw("semo1234")
+                .userName("userC")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        //when
+        userRepository.save(userA);
+        userRepository.save(userB);
+        userRepository.save(userC);
+        //then
+        UserInfo userInfo = userRepository.findByUserId("userB@semo.com");
+        assertThat(userInfo.getUserId(), is(userB.getUserId()));
+    }
 }
