@@ -27,8 +27,8 @@ public interface UserRepository extends CrudRepository<UserInfo, Long>, UserRepo
 //    UserInfo findByUserId(String userId);
 
     //find user by userNo
-    @Query("select u from UserInfo u left join fetch u.bookReviews br where u.userNo = :userNo")
-    UserInfo findByUserNo(@Param("userNo") long userNo);
+//    @Query("select u from UserInfo u left join fetch u.bookReviews br where u.userNo = :userNo")
+//    UserInfo findByUserNo(@Param("userNo") long userNo);
 
     @Query("select u from UserInfo u join fetch u.bookReviews br join fetch br.book")
     UserInfo findByUserNoWithReview(long userNo);

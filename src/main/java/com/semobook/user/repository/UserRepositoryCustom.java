@@ -13,9 +13,9 @@ public interface UserRepositoryCustom {
 
     //회원조회(모두)
     UserInfo findByUserId(String userId);
-//
-//    //find user by userNo
-//    UserInfo findByUserNo(long userNo);
+
+    //find user by userNo
+    UserInfo findByUserNo(long userNo);
 //
 //    UserInfo findByUserNoWithReview(long userNo);
 //

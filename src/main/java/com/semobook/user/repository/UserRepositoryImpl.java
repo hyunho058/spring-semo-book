@@ -41,6 +41,20 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .fetchOne();
     }
 
+    //@Query("select u from UserInfo u left join fetch u.bookReviews br where u.userNo = :userNo")
+    @Override
+    public UserInfo findByUserNo(long userNo) {
+        return queryFactory
+                .selectFrom(userInfo)
+                .leftJoin(userInfo.bookReviews).fetchJoin()
+                .where(userNoEq(userNo))
+                .fetchOne();
+    }
+
+    private BooleanExpression userNoEq(Long userNo) {
+        return userNo != null ? userInfo.userNo.eq(userNo) : null;
+    }
+
     private BooleanExpression userIdEq(String userId) {
         return userId != null ? userInfo.userId.eq(userId) : null;
     }

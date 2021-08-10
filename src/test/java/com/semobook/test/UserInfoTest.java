@@ -1,5 +1,6 @@
 package com.semobook.test;
 
+import com.semobook.bookReview.service.BookReviewService;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
@@ -21,6 +22,8 @@ public class UserInfoTest {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    BookReviewService bookReviewService;
 
     @Test
     @DisplayName("FIND_ALL_USER")
@@ -102,5 +105,33 @@ public class UserInfoTest {
         //then
         UserInfo userInfo = userRepository.findByUserId("userB@semo.com");
         assertThat(userInfo.getUserId(), is(userB.getUserId()));
+    }
+
+    @Test
+    @DisplayName("유저정보_리뷰")
+    void 유저정보_리뷰(){
+        //give
+        UserInfo userA = UserInfo.builder()
+                .userNo(11112)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        UserInfo userB = UserInfo.builder()
+                .userNo(1111)
+                .userId("userB@semo.com")
+                .userPw("semo1234")
+                .userName("userB")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        //when
+        userRepository.save(userA);
+        userRepository.save(userB);
+        //then
+        UserInfo userInfo = userRepository.findByUserNo(1L); //@GeneratedValue 확인 해야함.
+        assertThat(userInfo.getUserNo(), is(1L));
     }
 }
