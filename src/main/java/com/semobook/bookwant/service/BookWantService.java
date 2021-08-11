@@ -3,7 +3,6 @@ package com.semobook.bookwant.service;
 import com.semobook.book.domain.Book;
 import com.semobook.book.dto.BookWithReviewDto;
 import com.semobook.book.repository.BookRepository;
-import com.semobook.bookReview.dto.BookReviewResponse;
 import com.semobook.bookwant.domain.BookWant;
 import com.semobook.bookwant.dto.BookWantCreateRequest;
 import com.semobook.bookwant.dto.BookWantDto;
@@ -11,8 +10,6 @@ import com.semobook.bookwant.dto.BookWantReadRequest;
 import com.semobook.bookwant.dto.BookWantResponse;
 import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.common.StatusEnum;
-import com.semobook.user.domain.UserInfo;
-import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.BookWantListByUserDto;
 import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
@@ -20,9 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -43,7 +37,6 @@ public class BookWantService {
 
             String requestIsbn = bookWantCreateRequest.getIsbn();
             Long requestUserNo = bookWantCreateRequest.getUserNo();
-//            BookWant findbookWant =
             BookWantDto findBookWant = null;
             try {
                 BookWant bookWant = bookWantRepository.findAllByUserInfo_UserIdAndBook_Isbn(requestUserNo, requestIsbn);

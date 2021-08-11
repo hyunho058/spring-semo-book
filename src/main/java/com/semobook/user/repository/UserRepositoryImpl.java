@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+import static com.semobook.bookwant.domain.QBookWant.bookWant;
 import static com.semobook.user.domain.QUserInfo.userInfo;
 
 public class UserRepositoryImpl implements UserRepositoryCustom{
@@ -47,6 +48,16 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         return queryFactory
                 .selectFrom(userInfo)
                 .leftJoin(userInfo.bookReviews).fetchJoin()
+                .where(userNoEq(userNo))
+                .fetchOne();
+    }
+
+    @Override
+    public UserInfo findByBookWantWithReview(long userNo) {
+        return queryFactory
+                .selectFrom(userInfo)
+                .join(userInfo.bookWants, bookWant).fetchJoin()
+                .join(bookWant.book).fetchJoin()
                 .where(userNoEq(userNo))
                 .fetchOne();
     }

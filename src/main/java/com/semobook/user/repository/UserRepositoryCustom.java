@@ -16,9 +16,7 @@ public interface UserRepositoryCustom {
 
     //find user by userNo
     UserInfo findByUserNo(long userNo);
-//
-//    UserInfo findByUserNoWithReview(long userNo);
-//
-//    //유저별 원하는 책 가져오기
-//    UserInfo findByBookWantWithReview(@Param("userNo") long userNo);
+
+    //유저별 원하는 책 가져오기
+    UserInfo findByBookWantWithReview(long userNo);
 }

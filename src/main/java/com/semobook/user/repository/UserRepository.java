@@ -34,8 +34,8 @@ public interface UserRepository extends CrudRepository<UserInfo, Long>, UserRepo
     UserInfo findByUserNoWithReview(long userNo);
 
     //유저별 원하는 책 가져오기
-    @Query("select u from UserInfo u join fetch u.bookWants bw join fetch bw.book where u.userNo = :userNo")
-    UserInfo findByBookWantWithReview(@Param("userNo") long userNo);
+//    @Query("select u from UserInfo u join fetch u.bookWants bw join fetch bw.book where u.userNo = :userNo")
+//    UserInfo findByBookWantWithReview(@Param("userNo") long userNo);
 
     //회원가입
     UserInfo save(UserInfo userInfo);
