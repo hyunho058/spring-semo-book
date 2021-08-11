@@ -112,8 +112,8 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         List<BookReview> results = queryFactory
                 .select(bookReview)
                 .from(bookReview)
-                .leftJoin(bookReview.userInfo).fetchJoin()
-                .leftJoin(bookReview.book).fetchJoin()
+                .join(bookReview.userInfo).fetchJoin()
+                .join(bookReview.book).fetchJoin()
                 .where(bookReview.userInfo.userNo.eq(userNo))
                 .offset(pageable.getOffset())   //N 번부터 시작
                 .limit(pageable.getPageSize()) //조회 갯수
@@ -122,8 +122,8 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
         long total = queryFactory
                 .select(bookReview)
                 .from(bookReview)
-                .leftJoin(bookReview.userInfo).fetchJoin()
-                .leftJoin(bookReview.book).fetchJoin()
+                .join(bookReview.userInfo).fetchJoin()
+                .join(bookReview.book).fetchJoin()
                 .where(bookReview.userInfo.userNo.eq(userNo))
                 .fetchCount();
 
@@ -135,7 +135,7 @@ public class BookReviewRepositoryImpl implements BookReviewRepositoryCustom {
     public Page<BookReview> findByBookReview(String isbn, Pageable pageable) {
         List<BookReview> results = queryFactory
                 .selectFrom(bookReview)
-                .leftJoin(bookReview.userInfo).fetchJoin()
+                .join(bookReview.userInfo).fetchJoin()
                 .where(bookReview.book.isbn.eq(isbn))
                 .orderBy(bookReview.createDate.desc())
                 .offset(pageable.getOffset())

@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum StatusEnum {
-    hd1004,hd4444
+    hd1004, //success
+    hd4444, //non err
+    hd400 //empty data
 
     /**
      * todo 추가해야 할 Status
