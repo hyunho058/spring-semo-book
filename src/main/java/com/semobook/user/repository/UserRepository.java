@@ -21,7 +21,7 @@ public interface UserRepository extends CrudRepository<UserInfo, Long>, UserRepo
     UserInfo findByUserIdAndUserStatus(@Param("userId") String userId, Enum<UserStatus> status);
 
     //유저id로 회원조회 찾기 (휴먼, 정지, 탈퇴 제외)
-    UserInfo findByUserNoAndUserStatus(long userNo, Enum<UserStatus> status);
+//    UserInfo findByUserNoAndUserStatus(long userNo, Enum<UserStatus> status);
 
    //회원조회(모두)
 //    UserInfo findByUserId(String userId);

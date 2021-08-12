@@ -1,7 +1,11 @@
 package com.semobook.test;
 
+import com.semobook.book.domain.Book;
+import com.semobook.book.repository.BookRepository;
 import com.semobook.bookReview.service.BookReviewService;
+import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.domain.UserStatus;
 import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +28,10 @@ public class UserInfoTest {
     UserRepository userRepository;
     @Autowired
     BookReviewService bookReviewService;
+    @Autowired
+    BookRepository bookRepository;
+    @Autowired
+    BookWantRepository bookWantRepository;
 
     @Test
     @DisplayName("FIND_ALL_USER")
@@ -133,5 +141,67 @@ public class UserInfoTest {
         //then
         UserInfo userInfo = userRepository.findByUserNo(1L); //@GeneratedValue 확인 해야함.
         assertThat(userInfo.getUserNo(), is(1L));
+    }
+
+    @Test
+    @DisplayName("유저_도서_좋아요_리스트")
+    void 유저_도서_좋아요_리스트(){
+        //give
+        UserInfo userA = UserInfo.builder()
+                .userNo(11112)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+
+        String isbn = "11111111";
+        Book book = bookRepository.save(Book.builder()
+                .isbn(isbn)
+                .bookName("SEMO")
+                .author("SEMO")
+                .publisher("hDream")
+                .kdc("800")
+                .category("800")
+                .keyword("800")
+                .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                .build());
+
+//        BookWant bookWant = BookWant.builder()
+//                .bookDto(dto)
+//                .preference(bookWantCreateRequest.getPreference())
+//                .userInfo(userDto)
+//                .build();
+//        bookWantRepository.save(bookWant);
+
+        //when
+        userRepository.save(userA);
+        bookRepository.save(book);
+
+        //then
+        UserInfo tempUser = userRepository.findByUserId("userA@semo.com");
+        UserInfo userInfo = userRepository.findByBookWantWithReview(tempUser.getUserNo());
+        assertThat(userInfo.getUserName(), is(userA.getUserName()));
+    }
+
+    @Test
+    @DisplayName("유저_상태별_검색")
+    void 유저_상태별_검색(){
+        //give
+        UserInfo userA = UserInfo.builder()
+                .userNo(11112)
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        //when
+        userRepository.save(userA);
+        UserInfo tempUser = userRepository.findByUserNoAndUserStatus(1, UserStatus.GENERAL);
+
+        //then
+        assertThat(tempUser.getUserId(), is(userA.getUserId()));
     }
 }

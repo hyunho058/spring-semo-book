@@ -3,6 +3,7 @@ package com.semobook.user.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.user.domain.UserInfo;
+import com.semobook.user.domain.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,8 @@ import java.util.List;
 import static com.semobook.bookwant.domain.QBookWant.bookWant;
 import static com.semobook.user.domain.QUserInfo.userInfo;
 
-public class UserRepositoryImpl implements UserRepositoryCustom{
+
+public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -32,6 +34,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .selectFrom(userInfo)
                 .fetchCount();
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+
+    @Override
+    public UserInfo findByUserNoAndUserStatus(long userNo, Enum<UserStatus> status) {
+        return queryFactory
+                .selectFrom(userInfo)
+                .where(userNoEq(userNo), userInfo.userStatus.eq((UserStatus) status))
+                .fetchOne();
     }
 
     @Override
