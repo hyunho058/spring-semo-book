@@ -2,6 +2,7 @@ package com.semobook.book.domain;
 
 import com.semobook.bookReview.domain.BookReview;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicUpdate
 public class Book {
     @Id
     @Column(name = "ISBN")
@@ -54,6 +56,16 @@ public class Book {
         this.category = category;
         this.keyword = keyword;
         this.img = img;
+        this.contents = contents;
+    }
+
+    /**
+     * udpate contetns
+     *
+     * @author hyunho
+     * @since 2021/08/20
+    **/
+    public void updateContents(String contents){
         this.contents = contents;
     }
 }

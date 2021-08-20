@@ -5,6 +5,7 @@ import com.semobook.book.dto.BookDto;
 import com.semobook.book.dto.BookWithReviewDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.book.service.BestSellerService;
+import com.semobook.book.service.BookService;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.bookReview.service.BookReviewService;
@@ -36,6 +37,8 @@ public class BookTest {
     UserRepository userRepository;
     @Autowired
     BookReviewService bookReviewService;
+    @Autowired
+    BookService bookService;
 
     @Test
     @DisplayName("베스트셀러를_가져온다")
@@ -184,9 +187,29 @@ public class BookTest {
         assertThat(page.getTotalElements(), is(11L));
         assertThat(page.getTotalPages(), is(3));
         assertThat(page.isFirst(), is(true));
+    }
 
-
-
-
+    @Test
+    @DisplayName("도서_내용_수정")
+    void 도서_내용_수정(){
+        //give
+        String isbn = "11111111";
+        Book book = bookRepository.save(Book.builder()
+                .isbn(isbn)
+                .bookName("SEMO")
+                .author("SEMO")
+                .publisher("hDream")
+                .contents("semosemo")
+                .kdc("800")
+                .category("800")
+                .keyword("800")
+                .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                .build());
+        //when
+        String updateContents = "ABC";
+        bookService.updateBookContents(isbn, updateContents);
+        //then
+        Book updateBookData = bookRepository.findByIsbn(isbn);
+        assertThat(updateBookData.getContents(),is(updateContents));
     }
 }

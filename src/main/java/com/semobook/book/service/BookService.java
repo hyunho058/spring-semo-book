@@ -519,7 +519,16 @@ public class BookService {
         return isbn;
     }
 
-
-
+    /**
+     * update book contents
+     *
+     * @author hyunho
+     * @since 2021/08/20
+    **/
+    @Transactional
+    public void updateBookContents(String isbn, String contents){
+        Book book = bookRepository.findByIsbn(isbn);
+        book.updateContents(contents);
+    }
 
 }
