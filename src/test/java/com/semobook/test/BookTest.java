@@ -9,7 +9,6 @@ import com.semobook.book.service.BookService;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.bookReview.service.BookReviewService;
-import com.semobook.user.domain.UserInfo;
 import com.semobook.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SpringBootTest
 @Transactional
@@ -40,43 +39,14 @@ public class BookTest {
     @Autowired
     BookService bookService;
 
-    @Test
-    @DisplayName("베스트셀러를_가져온다")
-    void BEST_SELLSR_TEST() {
-        List<BookDto> listA = bestSellerService.getBestSellerList("A", 10);
-        listA.forEach(System.out::println);
-        List<BookDto> list100 = bestSellerService.getBestSellerList("100", 10);
-        list100.forEach(System.out::println);
-        List<BookDto> list200 = bestSellerService.getBestSellerList("200", 10);
-        list200.forEach(System.out::println);
-    }
 
-    @Test
-    @DisplayName("스테디셀러를_가져온다")
-    void STEADY_SELLER_TEST() throws Exception {
-        List<BookDto> listA = bestSellerService.getSteadySellerList("A", 10);
-        listA.forEach(System.out::println);
-        List<BookDto> list100 = bestSellerService.getSteadySellerList("100", 10);
-        list100.forEach(System.out::println);
-        List<BookDto> list200 = bestSellerService.getSteadySellerList("200", 10);
-        list200.forEach(System.out::println);
-    }
-
-    @Test
-    @DisplayName("REDIS_DB_API 순으로 가져온다")
-    void THREE_STEP_TEST() throws Exception {
-        //given
-        //when
-        //then
-
-    }
 
     @Test
     @DisplayName("도서_검색_ISBN")
     void 도서_검색_ISBN(){
         //give
         String isbn = "11111111";
-        Book book = bookRepository.save(Book.builder()
+        Book book = (Book.builder()
                 .isbn(isbn)
                 .bookName("SEMO")
                 .author("SEMO")
@@ -88,18 +58,17 @@ public class BookTest {
                 .build());
         //when
         bookRepository.save(book);
-        BookDto bookDto = new BookDto(bookRepository.findByIsbn(isbn));
-
+        Book resultBook = bookRepository.findByIsbn(isbn);
         //then
-        assertThat(bookDto.getIsbn(), is(isbn));
+        assertThat(resultBook.getIsbn()).isEqualTo(isbn);
     }
 
     @Test
     @DisplayName("도서_리뷰조회_ISBN")
     void 도서_리뷰조회_ISBN(){
         //give
-        String isbn = "111111";
-        Book book = bookRepository.save(Book.builder()
+        String isbn = "222221";
+        Book book = (Book.builder()
                 .isbn(isbn)
                 .bookName("SEMO")
                 .author("SEMO")
@@ -109,24 +78,6 @@ public class BookTest {
                 .keyword("800")
                 .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
                 .build());
-
-        UserInfo userInfo = UserInfo.builder()
-                .userNo(99999L)
-                .userId("userA@semo.com")
-                .userPw("semo1234")
-                .userName("userA")
-                .userGender("M")
-                .userBirth("19920519")
-                .build();
-
-        UserInfo userInfo1 = UserInfo.builder()
-                .userNo(88888L)
-                .userId("userB@semo.com")
-                .userPw("semo1234")
-                .userName("userB")
-                .userGender("M")
-                .userBirth("19920518")
-                .build();
 
         BookReviewRequest rq1 = BookReviewRequest.builder()
                 .userNo(99999)
@@ -145,18 +96,17 @@ public class BookTest {
                 .build();
         //when
         bookRepository.save(book);
-//        userRepository.save(userInfo);
-//        userRepository.save(userInfo1);
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
 
-        Book bookResult = bookRepository.findByIsbnWithReview(isbn);
-        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
-//        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookResult);
-        //then
-        assertThat(bookResult.getIsbn(), is(isbn));
-        assertThat(bookWithReviewDto.getBookReviews().size(), is(2));
+        Book resultBook = bookRepository.findByIsbnWithReview(isbn);
+        System.out.println("resultBook.getName = " + resultBook.getBookName());
+        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(resultBook);
+        System.out.println("bookWithReviewDto.getBookReviews().size() = " + bookWithReviewDto.getBookReviews().size());
 
+        //then
+        assertThat(bookWithReviewDto.getIsbn()).isEqualTo(isbn);
+        assertThat(bookWithReviewDto.getBookReviews().size()).isEqualTo(2);
     }
 
     @Test
@@ -165,7 +115,7 @@ public class BookTest {
         //give
         int isbn = 11111111;
         for (int i = 0; i < 11; i++){
-            Book book = bookRepository.save(Book.builder()
+            Book book = Book.builder()
                     .isbn(String.valueOf(isbn++))
                     .bookName("SEMO"+i)
                     .author("SEMO")
@@ -174,7 +124,7 @@ public class BookTest {
                     .category("800")
                     .keyword("800")
                     .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
-                    .build());
+                    .build();
             bookRepository.save(book);
         }
         //when
@@ -184,9 +134,13 @@ public class BookTest {
         Page<Book> page = bookRepository.findAll(pageRequest);
         //then
 
-        assertThat(page.getTotalElements(), is(11L));
-        assertThat(page.getTotalPages(), is(3));
-        assertThat(page.isFirst(), is(true));
+//        assertThat(page.getTotalElements(), is(11L));
+//        assertThat(page.getTotalPages(), is(3));
+//        assertThat(page.isFirst(), is(true));
+
+        assertThat(page.getTotalElements()).isEqualTo(11L);
+        assertThat(page.getTotalPages()).isEqualTo(3);
+        assertThat(page.isFirst()).isEqualTo(true);
     }
 
     @Test
@@ -210,6 +164,28 @@ public class BookTest {
         bookService.updateBookContents(isbn, updateContents);
         //then
         Book updateBookData = bookRepository.findByIsbn(isbn);
-        assertThat(updateBookData.getContents(),is(updateContents));
+        assertThat(updateBookData.getContents()).isEqualTo(updateContents);
+    }
+
+    @Test
+    @DisplayName("베스트셀러를_가져온다")
+    void BEST_SELLSR_TEST() {
+        List<BookDto> listA = bestSellerService.getBestSellerList("A", 10);
+        listA.forEach(System.out::println);
+        List<BookDto> list100 = bestSellerService.getBestSellerList("100", 10);
+        list100.forEach(System.out::println);
+        List<BookDto> list200 = bestSellerService.getBestSellerList("200", 10);
+        list200.forEach(System.out::println);
+    }
+
+    @Test
+    @DisplayName("스테디셀러를_가져온다")
+    void STEADY_SELLER_TEST() throws Exception {
+        List<BookDto> listA = bestSellerService.getSteadySellerList("A", 10);
+        listA.forEach(System.out::println);
+        List<BookDto> list100 = bestSellerService.getSteadySellerList("100", 10);
+        list100.forEach(System.out::println);
+        List<BookDto> list200 = bestSellerService.getSteadySellerList("200", 10);
+        list200.forEach(System.out::println);
     }
 }
