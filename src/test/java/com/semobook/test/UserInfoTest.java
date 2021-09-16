@@ -18,8 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SpringBootTest
 public class UserInfoTest {
@@ -71,10 +71,20 @@ public class UserInfoTest {
                 .map(r -> new UserInfoDto(r))
                 .collect(Collectors.toList());
 
-        assertThat(results.size(), is(2));
-        assertThat(results.get(0).getUserName(), is("userA"));
-        assertThat(page.getTotalElements(), is(3L));
-        assertThat(page.getTotalPages(), is(2));
+        System.out.println("results.size() = " + results.size());
+
+        assertThat(results.size()).isEqualTo(2);
+        assertThat(results.get(0).getUserName()).isEqualTo("userA");
+        assertThat(page.getTotalElements()).isEqualTo(3L);
+        assertThat(page.getTotalPages()).isEqualTo(2);
+
+//        assertThat(results.size(), is(2));
+//        assertThat(results.get(0).getUserName(), is("userA"));
+//        assertThat(page.getTotalElements(), is(3L));
+//        assertThat(page.getTotalPages(), is(2));
+
+
+
 
     }
 
@@ -112,7 +122,7 @@ public class UserInfoTest {
         userRepository.save(userC);
         //then
         UserInfo userInfo = userRepository.findByUserId("userB@semo.com");
-        assertThat(userInfo.getUserId(), is(userB.getUserId()));
+        assertThat(userInfo.getUserId()).isEqualTo(userB.getUserId());
     }
 
     @Test
@@ -140,7 +150,8 @@ public class UserInfoTest {
         userRepository.save(userB);
         //then
         UserInfo userInfo = userRepository.findByUserNo(1L); //@GeneratedValue 확인 해야함.
-        assertThat(userInfo.getUserNo(), is(1L));
+//        assertThat(userInfo.getUserNo(), is(1L));
+        assertThat(userInfo.getUserNo()).isEqualTo(1L);
     }
 
     @Test
@@ -182,7 +193,8 @@ public class UserInfoTest {
         //then
         UserInfo tempUser = userRepository.findByUserId("userA@semo.com");
         UserInfo userInfo = userRepository.findByBookWantWithReview(tempUser.getUserNo());
-        assertThat(userInfo.getUserName(), is(userA.getUserName()));
+//        assertThat(userInfo.getUserName(), is(userA.getUserName()));
+        assertThat(userInfo.getUserName()).isEqualTo(userA.getUserName());
     }
 
     @Test
@@ -199,9 +211,11 @@ public class UserInfoTest {
                 .build();
         //when
         userRepository.save(userA);
-        UserInfo tempUser = userRepository.findByUserNoAndUserStatus(1, UserStatus.GENERAL);
+        UserInfo generalUser = userRepository.findByUserNoAndUserStatus(1, UserStatus.GENERAL);
+        UserInfo userTest = userRepository.findByUserNoAndUserStatus(1, UserStatus.DELETE);
 
         //then
-        assertThat(tempUser.getUserId(), is(userA.getUserId()));
+        assertThat(generalUser.getUserId()).isEqualTo(userA.getUserId());
+        assertThat(userTest).isNull();
     }
 }
