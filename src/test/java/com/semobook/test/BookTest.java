@@ -9,6 +9,7 @@ import com.semobook.book.service.BookService;
 import com.semobook.bookReview.dto.BookReviewRequest;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.bookReview.service.BookReviewService;
+import com.semobook.user.domain.UserInfo;
 import com.semobook.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,26 @@ public class BookTest {
     @DisplayName("도서_리뷰조회_ISBN")
     void 도서_리뷰조회_ISBN(){
         //give
+        long userNoA = 1;
+        long userNoB = 2;
         String isbn = "222221";
+
+        UserInfo userA = UserInfo.builder()
+                .userId("userA@semo.com")
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+
+        UserInfo userB = UserInfo.builder()
+                .userId("userB@semo.com")
+                .userPw("semo1234")
+                .userName("userB")
+                .userGender("W")
+                .userBirth("19920519")
+                .build();
+
         Book book = (Book.builder()
                 .isbn(isbn)
                 .bookName("SEMO")
@@ -80,7 +100,7 @@ public class BookTest {
                 .build());
 
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999)
+                .userNo(userNoA)
                 .isbn(isbn)
                 .rating(4)
                 .reviewContents("재미")
@@ -88,20 +108,28 @@ public class BookTest {
                 .build();
 
         BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(198)
+                .userNo(userNoB)
                 .isbn(isbn)
                 .rating(3)
                 .reviewContents("재미11")
                 .book(new BookDto(book))
                 .build();
         //when
+        userRepository.save(userA);
+        userRepository.save(userB);
         bookRepository.save(book);
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
 
-        Book resultBook = bookRepository.findByIsbnWithReview(isbn);
-        System.out.println("resultBook.getName = " + resultBook.getBookName());
-        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(resultBook);
+        Book testBook = bookRepository.findByIsbn(isbn);
+        System.out.println("khh test testBook.getIsbn() = " + testBook.getIsbn());
+        UserInfo testUserA = userRepository.findByUserNo(userNoA);
+        System.out.println("khh test testUserA = " + testUserA.getUserNo());
+        UserInfo testUserB= userRepository.findByUserNo(userNoB);
+        System.out.println("khh test testUserB = " + testUserB.getUserNo());
+
+        BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));;
+        System.out.println("bookWithReviewDto.getBookName() = " + bookWithReviewDto.getBookName());
         System.out.println("bookWithReviewDto.getBookReviews().size() = " + bookWithReviewDto.getBookReviews().size());
 
         //then

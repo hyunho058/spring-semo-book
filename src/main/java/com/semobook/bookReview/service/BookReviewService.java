@@ -118,6 +118,7 @@ public class BookReviewService {
                     hCode = StatusEnum.hd1004;
                     hMessage = "저장완료";
                     data = request;
+                    log.info("createReview:: success create book review");
                 } else {
                     hCode = StatusEnum.hd4444;
                     hMessage = "저장실패";
