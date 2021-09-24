@@ -12,14 +12,15 @@ public interface BookRepositoryCustom {
     Book findByIsbnWithReview(String isbn);
 
     //책 전채 조회(패이징처리)//
-    Page<Book> findAll(Pageable pageable);
+    Page<Book> findAll(Pageable pageable);    //책 전채 조회(패이징처리)//
+
+
+    Page<Book> findAllByCategory(Pageable pageable,String category);
 //
-//    //책 저장
-//    Book save(Book book);
-//
-//    //책 제거
-//    int deleteBookByIsbn (String isbn);
-//
-//    //도서 존재 여부
-//    boolean existsByIsbn(String isbn);
+
+    //책 제거
+    long deleteBookByIsbn (String isbn);
+
+    //도서 존재 여부
+    boolean existsByIsbn(String isbn);
 }

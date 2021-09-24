@@ -1,5 +1,6 @@
 package com.semobook.book.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.book.domain.Book;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static com.semobook.book.domain.QBook.book;
 import static com.semobook.bookReview.domain.QBookReview.bookReview;
+import static com.semobook.user.domain.QUserInfo.userInfo;
 
 public class BookRepositoryImpl implements BookRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -64,5 +66,63 @@ public class BookRepositoryImpl implements BookRepositoryCustom{
 
         return new PageImpl<>(results, pageable, total);
     }
+
+    @Override
+    public Page<Book> findAllByCategory(Pageable pageable,String category) {
+        List<Book> results = queryFactory
+                .selectFrom(book)
+                .where(categoryEq(category))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(book)
+                .where(categoryEq(category))
+                .fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+
+    /**
+    * 책 삭제
+    * @author hyejinzz
+    * @since 2021-08-03
+    **/
+    @Override
+    public long deleteBookByIsbn(String isbn) {
+        long fetchOne = queryFactory
+                .delete(book)
+                .where(isbnEq(isbn))
+                .execute();
+
+        return fetchOne;
+
+    }
+
+    /**
+    * 책 있는지 조회
+    * @author hyejinzz
+    * @since 2021-08-03
+    **/
+    @Override
+    public boolean existsByIsbn(String isbn) {
+        Integer fetchOne = queryFactory
+                .selectOne()
+                .from(book)
+                .where(isbnEq(isbn))
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
+    private BooleanExpression isbnEq(String isbn) {
+        return isbn != null ? book.isbn.eq(isbn) : null;
+    }
+
+    private BooleanExpression categoryEq(String cate) {
+        return cate != null ? book.category.eq(cate) : null;
+    }
+
 
 }
