@@ -1,4 +1,4 @@
-package tools;
+package com.semobook.tools;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

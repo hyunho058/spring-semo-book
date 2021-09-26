@@ -25,8 +25,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.SecurityTools;
-import tools.StringTools;
+import com.semobook.tools.*;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -378,6 +377,7 @@ public class UserService {
         if (userPriorityRedis != null) {
             value = userPriorityRedis.getValue();
             userPriority = StringTools.stringConvToList(value, SemoConstant.COLON);
+
         }
         return userPriority;
     }

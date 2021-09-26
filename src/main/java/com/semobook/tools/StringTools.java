@@ -1,8 +1,10 @@
-package tools;
+package com.semobook.tools;
+
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-
+@Component
 public class StringTools {
     /**
      * 리스트를 구분자를 넣은 String으로 변환

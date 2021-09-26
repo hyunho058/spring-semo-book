@@ -1,7 +1,5 @@
 package com.semobook.recom.service;
 
-import com.semobook.book.domain.Book;
-import com.semobook.book.domain.RecomBestSeller;
 import com.semobook.book.dto.BookDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.book.service.BestSellerService;
@@ -15,7 +13,6 @@ import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.AdminRecom;
 import com.semobook.recom.domain.RecomInfo;
-import com.semobook.recom.domain.RecomUserReview;
 import com.semobook.recom.domain.ReviewInfo;
 import com.semobook.recom.dto.RecomResponse;
 import com.semobook.recom.repository.AdminRecomRepository;
@@ -24,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import tools.StringTools;
+import com.semobook.tools.*;
 
 import java.util.ArrayList;
 import java.util.List;
