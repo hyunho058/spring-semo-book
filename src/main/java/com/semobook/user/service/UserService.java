@@ -84,6 +84,7 @@ public class UserService {
      * @author hyejinzz
      * @since 2021-05-23
      **/
+    @PerformanceCheck
     public UserResponse findByUserId(String userId) {
         String hMessage = "";
         StatusEnum hCode = null;
@@ -120,6 +121,7 @@ public class UserService {
      * @author hyejinzz
      * @since 2021-05-23
      **/
+    @PerformanceCheck
     public UserResponse signIn(UserSignInRequest userSignUpRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
