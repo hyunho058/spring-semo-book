@@ -5,10 +5,12 @@ import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
-import com.semobook.bookReview.repository.BookReviewRepositoryImpl;
 import com.semobook.common.SemoConstant;
 import com.semobook.common.StatusEnum;
 import com.semobook.recom.domain.ReviewInfo;
+import com.semobook.tools.PerformanceCheck;
+import com.semobook.tools.SecurityTools;
+import com.semobook.tools.StringTools;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.domain.UserPriorityRedis;
 import com.semobook.user.domain.UserStatus;
@@ -18,14 +20,12 @@ import com.semobook.user.repository.UserRepository;
 import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.semobook.tools.*;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -38,14 +38,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final BookReviewRepositoryImpl bookReviewRepositoryImpl;
     private final UserRepository userRepository;
     private final BookReviewRepository bookReviewRepository;
     private final UserPriorityRedisRepository userPriorityRedisRepository;
     private final AllReviewRepository allReviewRepository;
-
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     /**
      * 모든회원 조회(테스트용)
@@ -89,9 +86,8 @@ public class UserService {
         String hMessage = "";
         StatusEnum hCode = null;
         Object data = null;
-
+        //TODO[refactoring] : DTO에 비밀번호 정보 제거
         try {
-//            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserIdAndUserStatus(userId, UserStatus.GENERAL));
             UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserId(userId));
             if (userInfoDto == null) {
                 hCode = StatusEnum.hd4444;
@@ -289,7 +285,7 @@ public class UserService {
         Object data = null;
 
         try {
-            //TODO[hyunho] : 유저가 작성한 리뷰 수 조회 쿼리 수정 필요(oneToNmay 관계 collection 조회 필요)
+            //TODO[refactoring] : 중복 쿼리 확인필요
             UserInfo userInfo = userRepository.findByUserNo(userInfoRequest.getUserNo());
             Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 100));
             UserInfoWithReviewCountDto userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),

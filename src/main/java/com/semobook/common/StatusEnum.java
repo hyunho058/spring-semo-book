@@ -1,7 +1,7 @@
 package com.semobook.common;
 
 import lombok.Getter;
-
+//TODO[refactoring] : hCOde 세분화
 @Getter
 public enum StatusEnum {
     hd1004, //success
