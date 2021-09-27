@@ -1,6 +1,6 @@
 
 
-![image-20210924141404889](README.assets/134832007-3daa093b-dfe9-4779-a6cb-6c15e96a2b34-20210927102129492.png)
+![image-20210924141404889](https://user-images.githubusercontent.com/58923731/134832007-3daa093b-dfe9-4779-a6cb-6c15e96a2b34.png)
 
 # SEMO BOOK
 
@@ -71,7 +71,7 @@
 
 # 서비스 화면
 
-![semo_book](README.assets/semo_book.png)
+![semo_book](https://user-images.githubusercontent.com/58923731/134832638-d2b8532c-007e-414e-99a4-0af809de5fc5.png)
 
 # DB명세서
 
