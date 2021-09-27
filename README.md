@@ -46,16 +46,16 @@
 
 # 주요 기능
 
-.....기능이 구현되어있다.
-
 ##  User
 
-* 로그인
-* 회원가입
+* SEMO BOOK 서비스를 이용하기 위해서는 회원가입을 해야한다.
+* 사용자는 도서정보에 별점, 보고싶처요, 보기싫어요를 입력 또는 리뷰 작성이 가능하다.
+* 사용자는 메인 페이지에서 추천 도서 리스트와 사용자가 선호하는 도서 카테고리를 볼 수 있다.
 
 ## QA
 
-* 유저가 문의글을 남기면 DB에 저장이 되고 이것을 관리자페이지에서 답변을 작성할 수 있고 사용자 화면에서 답변이 되었는지 아닌지 상태를 확인할수 있다.
+* 유저가 문의글을 남기면 이것을 관리자페이지에서 답변을 작성할 수 있다.
+* 문의 글을 작성하면 사용 화면에서 답변이 되었는지 상태를 확인할수 있다.
 
 ## Book want
 
@@ -63,27 +63,39 @@
 
 ## Book Review
 
+* 사용자는 도서정보에 최소 1점부터 최대5점 까지 별점을 입력할 수 있다.
+* 사용자는 읽은 도서에 간단한 리뷰를 작성하고, 이미 작성한 리뷰는 수정을 할 수 있다.
+
 ## Book
+
+* 사용자가 도서를 검색하면 해당하는 도서 정보를 노출한다.
+  * Spring Batch 를 이용해  Best Seller, Steady Seller정보를 저장
+  * 사용자가 검색한 도서 정보가 DB에 없으면 Kakao도서 검색 API를 통해 해당 도서 정보를 사용자에게 보여준다. 
 
 ## Recom
 
+* 
+
 ## Notice
+
+* 관리자 페이지를 통해 공지사항을 작성할 수 있다.
+* 사용자는 설정에 공지사항 화면에서 공지사항을 볼 수 있다.
 
 # 서비스 화면
 
 ![semo_book](https://user-images.githubusercontent.com/58923731/134832638-d2b8532c-007e-414e-99a4-0af809de5fc5.png)
 
-# DB명세서
+# ERD
 
-![Untitled](README.assets/Untitled.png)
+![Untitled](https://user-images.githubusercontent.com/58923731/134832848-dd168719-310e-4ccd-8e9b-9ca24937cfe1.png)
 
 # 프로젝트 관리 - jira
 
-![jira](README.assets/jira.png)
+![jira](https://user-images.githubusercontent.com/58923731/134832864-7c3014e2-33cb-4eae-89dd-5312457f6502.png)
 
 # 추천 흐름
 
-![추천](README.assets/추천.png)
+![추천](https://user-images.githubusercontent.com/58923731/134832894-4557f05c-1c6d-470a-b1ed-2eca7db77e05.png)
 
 
 
