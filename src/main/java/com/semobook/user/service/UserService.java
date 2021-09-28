@@ -126,13 +126,13 @@ public class UserService {
 //            UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
             UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
             UserInfoDto userInfoDto = new UserInfoDto(signUserInfo);
-            if (userInfoDto == null) {
+            if (signUserInfo == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "없는 USER";
             }
             //id가 있을 때
 
-            else if (!(userSignUpRequest.getUserPassword().equals(userInfoDto.getUserPw()))) {
+            else if (!(userSignUpRequest.getUserPassword().equals(signUserInfo.getUserPw()))) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "로그인 실패";
                 data = null;
@@ -167,6 +167,7 @@ public class UserService {
         StatusEnum hCode = null;
         Object data = null;
         UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
+//        validateDuplicateMember(userSignUpRequest);
         if (signUserInfo == null) {
             UserInfo userInfo = userRepository.save(UserInfo.builder()
                     .userId(userSignUpRequest.getUserId())
@@ -191,6 +192,13 @@ public class UserService {
                 .data(data)
                 .build();
 
+    }
+
+    private void validateDuplicateMember(UserSignUpRequest userSignUpRequest){
+        UserInfo findUsers = userRepository.findByUserId(userSignUpRequest.getUserId());
+        if (findUsers != null){
+            throw new IllegalStateException("이미 존재하는 회원입니다.");
+        }
     }
 
 

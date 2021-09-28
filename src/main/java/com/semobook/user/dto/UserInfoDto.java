@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public class UserInfoDto {
     private long userNo;
     private String userId;
-    private String userPw;
     private UserStatus userStatus;
     private String userName;
     private String userGender;
@@ -21,7 +20,6 @@ public class UserInfoDto {
     public UserInfoDto(UserInfo userInfo) {
         this.userNo = userInfo.getUserNo();
         this.userId = userInfo.getUserId();
-        this.userPw = userInfo.getUserPw();
         this.userStatus = userInfo.getUserStatus();
         this.userName = userInfo.getUserName();
         this.userGender = userInfo.getUserGender();
