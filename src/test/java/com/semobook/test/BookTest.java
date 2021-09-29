@@ -216,4 +216,18 @@ public class BookTest {
         List<BookDto> list200 = bestSellerService.getSteadySellerList("200", 10);
         list200.forEach(System.out::println);
     }
+
+    @Test
+    @DisplayName("test_exists")
+    void test_exists(){
+        long count = bookRepository.existCount("9791163719144");
+        System.out.println("----------------------------------------------------------------------------------------");
+        boolean checkBook = bookRepository.existsByIsbn("9791163719144");
+
+
+        assertThat(checkBook).isEqualTo(true);
+        assertThat(count).isEqualTo(1);
+
+    }
+
 }

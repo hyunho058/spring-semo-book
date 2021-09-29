@@ -55,7 +55,6 @@ public class UserService {
         StatusEnum hCode = null;
         Object data = null;
         try {
-            //TODO[hyunho]: cascade 적용 또는 페이지 처리 해야함. => 현재 조회를 하면 리스트가 중복되서 보여짐(@oneToMany를 호출시 흔히 발생하는 현상)
             Page<UserInfo> page = userRepository.findAll(PageRequest.of(pageNum, 5));
             List<UserInfoDto> result = page.getContent().stream()
                     .map(r -> new UserInfoDto(r))

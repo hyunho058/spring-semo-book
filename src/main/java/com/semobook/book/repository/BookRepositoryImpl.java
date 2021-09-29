@@ -3,17 +3,16 @@ package com.semobook.book.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.semobook.book.domain.Book;
+import com.semobook.tools.PerformanceCheck;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
-
 import java.util.List;
 
 import static com.semobook.book.domain.QBook.book;
 import static com.semobook.bookReview.domain.QBookReview.bookReview;
-import static com.semobook.user.domain.QUserInfo.userInfo;
 
 public class BookRepositoryImpl implements BookRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -107,6 +106,7 @@ public class BookRepositoryImpl implements BookRepositoryCustom{
     * @since 2021-08-03
     **/
     @Override
+    @PerformanceCheck
     public boolean existsByIsbn(String isbn) {
         Integer fetchOne = queryFactory
                 .selectOne()
@@ -114,6 +114,17 @@ public class BookRepositoryImpl implements BookRepositoryCustom{
                 .where(isbnEq(isbn))
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    @Override
+    @PerformanceCheck
+    public long existCount(String isbn) {
+        long total = queryFactory
+                .select()
+                .from(book)
+                .where(isbnEq(isbn))
+                .fetchCount();
+        return total;
     }
 
     private BooleanExpression isbnEq(String isbn) {

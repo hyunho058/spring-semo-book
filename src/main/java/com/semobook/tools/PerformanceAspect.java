@@ -19,7 +19,7 @@ public class PerformanceAspect {
             long start = System.currentTimeMillis();
             result = proceedingJoinPoint.proceed();
             long end = System.currentTimeMillis();
-            log.info("{} ms", end - start);
+            log.info("수행 시간 {} ms", end - start);
         } catch (Throwable throwable) {
             log.info("Exception");
             throwable.printStackTrace();
