@@ -18,6 +18,7 @@ bin/
 !**/src/test/**/bin/
 src/main/resources/application.yml
 src/main/resources/application-dev.yml
+application-oauth.properties
 
 ### IntelliJ IDEA ###
 .idea
