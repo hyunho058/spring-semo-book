@@ -259,7 +259,6 @@ public class UserService {
                 hMessage = "조회되는 회원이 없음";
             } else {
                 userInfo.changeUserInfo(updateUser);
-                userRepository.save(userInfo);
                 UserInfoDto userInfoDto = new UserInfoDto(userInfo);
 
                 hCode = StatusEnum.hd1004;
