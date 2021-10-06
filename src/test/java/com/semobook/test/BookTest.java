@@ -45,7 +45,7 @@ public class BookTest {
     @Test
     @DisplayName("도서_검색_ISBN")
     void 도서_검색_ISBN(){
-        //give
+        //given
         String isbn = "11111111";
         Book book = (Book.builder()
                 .isbn(isbn)
@@ -67,7 +67,7 @@ public class BookTest {
     @Test
     @DisplayName("도서_리뷰조회_ISBN")
     void 도서_리뷰조회_ISBN(){
-        //give
+        //given
         long userNoA = 1;
         long userNoB = 2;
         String isbn = "222221";
@@ -140,7 +140,7 @@ public class BookTest {
     @Test
     @DisplayName("도서_리스트")
     void 도서_리스트(){
-        //give
+        //given
         int isbn = 11111111;
         for (int i = 0; i < 11; i++){
             Book book = Book.builder()
@@ -174,7 +174,7 @@ public class BookTest {
     @Test
     @DisplayName("도서_내용_수정")
     void 도서_내용_수정(){
-        //give
+        //given
         String isbn = "11111111";
         Book book = bookRepository.save(Book.builder()
                 .isbn(isbn)

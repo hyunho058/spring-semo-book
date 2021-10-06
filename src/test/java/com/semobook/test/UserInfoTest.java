@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
+@Transactional
 public class UserInfoTest {
 
     @Autowired
@@ -36,7 +38,7 @@ public class UserInfoTest {
     @Test
     @DisplayName("FIND_ALL_USER")
     void FIND_ALL_USER(){
-        //give
+        //given
         UserInfo userA = UserInfo.builder()
                 .userNo(99999L)
                 .userId("userA@semo.com")
@@ -91,7 +93,7 @@ public class UserInfoTest {
     @Test
     @DisplayName("사용자_아이디로_조회")
     void 사용자_아이디로_조회(){
-        //give
+        //given
         UserInfo userA = UserInfo.builder()
                 .userNo(99999L)
                 .userId("userA@semo.com")
@@ -128,7 +130,7 @@ public class UserInfoTest {
     @Test
     @DisplayName("유저정보_리뷰")
     void 유저정보_리뷰(){
-        //give
+        //given
         UserInfo userA = UserInfo.builder()
                 .userNo(11112)
                 .userId("userA@semo.com")
@@ -157,7 +159,7 @@ public class UserInfoTest {
     @Test
     @DisplayName("유저_도서_좋아요_리스트")
     void 유저_도서_좋아요_리스트(){
-        //give
+        //given
         UserInfo userA = UserInfo.builder()
                 .userNo(11112)
                 .userId("userA@semo.com")
@@ -200,7 +202,7 @@ public class UserInfoTest {
     @Test
     @DisplayName("유저_상태별_검색")
     void 유저_상태별_검색(){
-        //give
+        //given
         UserInfo userA = UserInfo.builder()
                 .userNo(11112)
                 .userId("userA@semo.com")
@@ -217,5 +219,15 @@ public class UserInfoTest {
         //then
         assertThat(generalUser.getUserId()).isEqualTo(userA.getUserId());
         assertThat(userTest).isNull();
+    }
+
+    @Test
+    @DisplayName("유정_정보_수정")
+    void 유정_정보_수정(){
+        //given
+
+        //when
+
+        //then
     }
 }

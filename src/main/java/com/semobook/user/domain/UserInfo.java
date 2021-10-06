@@ -3,6 +3,7 @@ package com.semobook.user.domain;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookwant.domain.BookWant;
 import com.semobook.qa.domain.Qa;
+import com.semobook.tools.BaseTimeEntity;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class UserInfo {
+public class UserInfo extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

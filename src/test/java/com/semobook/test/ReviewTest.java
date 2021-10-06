@@ -47,7 +47,7 @@ public class ReviewTest {
     @Test
     @DisplayName("리뷰가 저장되야한다")
     void createReviewTest(){
-        //give
+        //given
 
         BookReviewRequest rq = BookReviewRequest.builder()
                 .userNo(99999L)
@@ -77,7 +77,7 @@ public class ReviewTest {
     @Test
     @DisplayName("유저 리뷰리스트")
     void readMyReviewTest(){
-        //give
+        //given
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
                 .userId("userA@semo.com")
@@ -145,7 +145,7 @@ public class ReviewTest {
     @Test
     @DisplayName("REVIEW_TOTAL_COUNT")
     void REVIEW_TOTAL_COUNT(){
-        //give
+        //given
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
                 .userId("userA@semo.com")
@@ -199,7 +199,7 @@ public class ReviewTest {
     @Test
     @DisplayName("리뷰_작성_존재_확인")
     void 리뷰_작성_존재_확인(){
-        //give
+        //given
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
                 .userId("userA@semo.com")
@@ -235,7 +235,7 @@ public class ReviewTest {
     @Test
     @DisplayName("유저_월별_리뷰")
     void 유저_월별_리뷰(){
-        //give
+        //given
 
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
@@ -304,7 +304,7 @@ public class ReviewTest {
     @Test
     @DisplayName("내_리뷰_조회_리뷰_내용이있는것만")
     void 내_리뷰_조회_리뷰_내용이있는것만(){
-        //give
+        //given
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
                 .userId("userA@semo.com")
