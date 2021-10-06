@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
-@Transactional
 public class UserInfoTest {
 
     @Autowired
@@ -222,12 +221,55 @@ public class UserInfoTest {
     }
 
     @Test
+    @DisplayName("BaseTimeEntity_등록")
+    void BaseTimeEntity_등록(){
+        //given
+        LocalDateTime now = LocalDateTime.of(2021,10,06,0,0,0);
+        long userNo = 989898;
+        String userId = "userQ@semo.com";
+        UserInfo userQ = UserInfo.builder()
+                .userNo(userNo)
+                .userId("userQ@semo.com")
+                .userPw("semo1234")
+                .userName("userQ")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        //when
+        userRepository.save(userQ);
+        UserInfo resultUser = userRepository.findByUserId(userId);
+        //then
+        System.out.println("now = " + now);
+        System.out.println("------------->>> createDate="+resultUser.getModifiedDate()+", modifiedDate="+resultUser.getModifiedDate());
+
+        assertThat(resultUser.getCreateDate()).isAfter(now);
+        assertThat(resultUser.getModifiedDate()).isAfter(now);
+    }
+
+
+    @Test
     @DisplayName("유정_정보_수정")
     void 유정_정보_수정(){
         //given
-
+        LocalDateTime now = LocalDateTime.of(2021,10,06,0,0,0);
+        long userNo = 989898;
+        String userId = "userQ@semo.com";
+        UserInfo userQ = UserInfo.builder()
+                .userNo(userNo)
+                .userId("userQ@semo.com")
+                .userPw("semo0000")
+                .userName("userQ")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
         //when
-
+        userRepository.save(userQ);
+        UserInfo resultUser = userRepository.findByUserId(userId);
         //then
+        System.out.println("now = " + now);
+        System.out.println("Create------------->>> createDate="+resultUser.getModifiedDate()+", modifiedDate="+resultUser.getModifiedDate());
+
+        assertThat(resultUser.getCreateDate()).isAfter(now);
+        assertThat(resultUser.getModifiedDate()).isAfter(now);
     }
 }
