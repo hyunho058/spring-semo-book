@@ -29,7 +29,7 @@ public class BookController {
      **/
     @Operation(description = "책 등록")
     @PostMapping("/book")
-    public ResponseEntity<BookResponse> addBook(@Parameter @RequestBody BookRequest bookRequest) {
+    public ResponseEntity<BookResponse> addBookCon(@Parameter @RequestBody BookRequest bookRequest) {
         log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", bookRequest.getIsbn(), bookRequest.getBookName(), bookRequest.getAuthor());
         return ResponseEntity.ok(bookService.addBook(bookRequest));
     }
@@ -49,8 +49,8 @@ public class BookController {
 
 
     @Operation(description = "도서 검색(검색어)")
-    @GetMapping("/books")
-    public ResponseEntity<BookResponse> searchBook(@Parameter @RequestBody BookSearchRequest bookSearchRequest){
+    @PostMapping("/books")
+    public ResponseEntity<BookResponse> searchBookCon(@Parameter @RequestBody BookSearchRequest bookSearchRequest){
         log.info("/search :: keyword : {} :: pageNum : {} ===", bookSearchRequest.getKeyword(), bookSearchRequest.getPageNum());
         return ResponseEntity.ok(bookService.searchBook(bookSearchRequest));
     }
@@ -63,7 +63,7 @@ public class BookController {
      **/
     @Operation(description = "책 조회")
     @GetMapping(value = "/book/{isbn}")
-    public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable String isbn) {
+    public ResponseEntity<BookResponse> findBookCon(@Parameter @PathVariable String isbn) {
         log.info("==/findBook {}", isbn);
         return ResponseEntity.ok(bookService.findBook(isbn));
     }
@@ -77,7 +77,7 @@ public class BookController {
      **/
     @Operation(description = "책 조회(리뷰 포함)")
     @GetMapping(value = "/book/review/{isbn}")
-    public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn) {
+    public ResponseEntity<BookResponse> findBookWithReviewCon(@Parameter @PathVariable String isbn) {
         log.info("==/findBookWithReview {}", isbn);
         return ResponseEntity.ok(bookService.findBookWithReview(isbn));
     }
@@ -90,7 +90,7 @@ public class BookController {
      **/
     @Operation(description = "모든 책 조회")
     @GetMapping("/all/{page}")
-    public ResponseEntity<BookResponse> findAll(@Parameter @PathVariable int page) {
+    public ResponseEntity<BookResponse> findAllCon(@Parameter @PathVariable int page) {
         log.info("==/findAll");
         return ResponseEntity.ok(bookService.findAll(page));
     }
