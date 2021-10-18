@@ -285,15 +285,15 @@ public class UserService {
      * @author hyunho
      * @since 2021/06/24
      **/
-    public UserResponse userInfoWithReviewCount(UserInfoRequest userInfoRequest) {
+    public UserResponse userInfoWithReviewCount(long userNo) {
         String hMessage = "";
         StatusEnum hCode = null;
         Object data = null;
 
         try {
             //TODO[refactoring] : 중복 쿼리 확인필요
-            UserInfo userInfo = userRepository.findByUserNo(userInfoRequest.getUserNo());
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userInfoRequest.getUserNo(), PageRequest.of(0, 100));
+            UserInfo userInfo = userRepository.findByUserNo(userNo);
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(0, 100));
             UserInfoWithReviewCountDto userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),
                     userInfo.getUserId(),
                     userInfo.getUserName(),
@@ -475,11 +475,11 @@ public class UserService {
 
             hCode = StatusEnum.hd1004;
             data = mailRequest;
-            hMessage = "정보 조회 성공";
+            hMessage = "메일 전송 성공";
         } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
-            hMessage = "정보 조회 실패";
+            hMessage = "메일 전송 실패";
         }
 
 
