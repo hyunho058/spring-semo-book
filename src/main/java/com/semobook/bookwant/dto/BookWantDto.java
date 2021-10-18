@@ -12,6 +12,7 @@ public class BookWantDto {
     private Preference preference;
     private String isbn;
 
+
     @Builder
     public BookWantDto(BookWant bookWant){
         wantNo = bookWant.getWantNo();

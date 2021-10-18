@@ -2,6 +2,7 @@ package com.semobook.book.domain;
 
 import com.semobook.bookReview.domain.BookReview;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicUpdate
 public class Book {
     @Id
     @Column(name = "ISBN")
@@ -23,6 +25,9 @@ public class Book {
 
     @Column(name = "PUBLISHER")
     private String publisher;
+
+    @Column(name = "contents")
+    private String contents;
 
     @Column(name = "KDC")
     private String kdc;
@@ -41,7 +46,8 @@ public class Book {
     private List<BookReview> bookReviewList = new ArrayList<>();
 
     @Builder
-    public Book(String isbn, String bookName, String author, String publisher, String kdc, String category, String keyword, String img) {
+    public Book(String isbn, String bookName, String author, String publisher,
+                String kdc, String category, String keyword, String img, String contents) {
         this.isbn = isbn;
         this.bookName = bookName;
         this.author = author;
@@ -50,5 +56,16 @@ public class Book {
         this.category = category;
         this.keyword = keyword;
         this.img = img;
+        this.contents = contents;
+    }
+
+    /**
+     * udpate contetns
+     *
+     * @author hyunho
+     * @since 2021/08/20
+    **/
+    public void updateContents(String contents){
+        this.contents = contents;
     }
 }

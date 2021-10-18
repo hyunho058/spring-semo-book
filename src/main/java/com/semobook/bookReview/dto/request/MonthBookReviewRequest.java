@@ -1,6 +1,7 @@
 package com.semobook.bookReview.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,4 +16,11 @@ public class MonthBookReviewRequest {
     LocalDateTime startDate;
     @Schema(description = "end date" , example = "2021-06-30T23:59:59")
     LocalDateTime endDate;
+
+    @Builder
+    public MonthBookReviewRequest(long userNo, LocalDateTime startDate, LocalDateTime endDate) {
+        this.userNo = userNo;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

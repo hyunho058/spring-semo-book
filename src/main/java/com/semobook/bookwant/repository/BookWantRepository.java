@@ -1,13 +1,13 @@
 package com.semobook.bookwant.repository;
 
-import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookwant.domain.BookWant;
+import com.semobook.bookwant.dto.Preference;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface BookWantRepository extends JpaRepository<BookWant,Long> {
@@ -26,6 +26,11 @@ public interface BookWantRepository extends JpaRepository<BookWant,Long> {
             "where u.userNo = :userNo and b.isbn = :isbn")
     BookWant findAllByUserInfo_UserIdAndBook_Isbn (@Param("userNo") long userNo, @Param("isbn") String isbn);
 
+    @Query(value = "select bw from BookWant bw " +
+            "left join fetch bw.userInfo ui " +
+            "where ui.userNo = :userNo and bw.preference = :preference"
+            ,countQuery = "select count (bw.wantNo) from BookWant bw")
+    Page<BookWant> findLikeAllByUserInfo(@Param(value = "userNo") long userNo , Preference preference, Pageable pageable);
 
     //선호 등록
     BookWant save(BookWant bookWant);

@@ -1,27 +1,21 @@
 package com.semobook.book.controller;
 
-import com.semobook.book.domain.Book;
-import com.semobook.book.dto.BookDeleteRequest;
 import com.semobook.book.dto.BookRequest;
 import com.semobook.book.dto.BookResponse;
 import com.semobook.book.dto.BookSearchRequest;
 import com.semobook.book.service.BookService;
-import com.semobook.user.dto.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
 @Tag(name = "BookController")
-@RequestMapping("/book")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
@@ -34,8 +28,8 @@ public class BookController {
      * @since 2021/04/25 +
      **/
     @Operation(description = "책 등록")
-    @PostMapping("/addBook")
-    public ResponseEntity<BookResponse> addBook(@Parameter @RequestBody BookRequest bookRequest) {
+    @PostMapping("/book")
+    public ResponseEntity<BookResponse> addBookCon(@Parameter @RequestBody BookRequest bookRequest) {
         log.info("/signup :: userId : {} :: userPw : {} :: userName : {} ===", bookRequest.getIsbn(), bookRequest.getBookName(), bookRequest.getAuthor());
         return ResponseEntity.ok(bookService.addBook(bookRequest));
     }
@@ -47,7 +41,7 @@ public class BookController {
      * @since 2021/05/27
      **/
     @Operation(description = "도서 삭제")
-    @PostMapping("/delete")
+    @DeleteMapping("/book")
     public ResponseEntity<BookResponse> deleteBookCon(@Parameter @RequestParam String isbn) {
         log.info(":: deleteBookCon  :: isbn is {}", isbn);
         return ResponseEntity.ok(bookService.deleteBook(isbn));
@@ -55,8 +49,8 @@ public class BookController {
 
 
     @Operation(description = "도서 검색(검색어)")
-    @PostMapping("/searchBook")
-    public ResponseEntity<BookResponse> searchBook(@Parameter @RequestBody BookSearchRequest bookSearchRequest){
+    @PostMapping("/books")
+    public ResponseEntity<BookResponse> searchBookCon(@Parameter @RequestBody BookSearchRequest bookSearchRequest){
         log.info("/search :: keyword : {} :: pageNum : {} ===", bookSearchRequest.getKeyword(), bookSearchRequest.getPageNum());
         return ResponseEntity.ok(bookService.searchBook(bookSearchRequest));
     }
@@ -68,8 +62,8 @@ public class BookController {
      * @since 2021/04/25
      **/
     @Operation(description = "책 조회")
-    @GetMapping(value = "/{isbn}")
-    public ResponseEntity<BookResponse> findBook(@Parameter @PathVariable String isbn) {
+    @GetMapping(value = "/book/{isbn}")
+    public ResponseEntity<BookResponse> findBookCon(@Parameter @PathVariable String isbn) {
         log.info("==/findBook {}", isbn);
         return ResponseEntity.ok(bookService.findBook(isbn));
     }
@@ -82,8 +76,8 @@ public class BookController {
      * @since 2021/06/05
      **/
     @Operation(description = "책 조회(리뷰 포함)")
-    @GetMapping(value = "/bookWithReview/{isbn}")
-    public ResponseEntity<BookResponse> findBookWithReview(@Parameter @PathVariable String isbn) {
+    @GetMapping(value = "/book/review/{isbn}")
+    public ResponseEntity<BookResponse> findBookWithReviewCon(@Parameter @PathVariable String isbn) {
         log.info("==/findBookWithReview {}", isbn);
         return ResponseEntity.ok(bookService.findBookWithReview(isbn));
     }
@@ -96,9 +90,8 @@ public class BookController {
      **/
     @Operation(description = "모든 책 조회")
     @GetMapping("/all/{page}")
-    public ResponseEntity<BookResponse> findAll(@Parameter @PathVariable int page) {
+    public ResponseEntity<BookResponse> findAllCon(@Parameter @PathVariable int page) {
         log.info("==/findAll");
-        //TODO[hyunho]:패이지 처리
         return ResponseEntity.ok(bookService.findAll(page));
     }
 

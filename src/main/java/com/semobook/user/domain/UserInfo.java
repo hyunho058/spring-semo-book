@@ -2,8 +2,9 @@ package com.semobook.user.domain;
 
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookwant.domain.BookWant;
+import com.semobook.qa.domain.Qa;
+import com.semobook.tools.BaseTimeEntity;
 import com.semobook.user.dto.UserChangeUserInfoRequest;
-import com.semobook.user.dto.UserInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class UserInfo {
-
+public class UserInfo extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -44,6 +44,9 @@ public class UserInfo {
 
     @OneToMany(mappedBy = "userInfo",cascade = CascadeType.ALL)
     private List<BookWant> bookWants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL)
+    private List<Qa> qaList = new ArrayList<>();
 
     private String deleteReason;
 
@@ -91,6 +94,14 @@ public class UserInfo {
         this.userName = userInfo.getUserName();
         this.userGender = userInfo.getUserGender();
         this.userBirth = userInfo.getUserBirth();
+    }
+
+    public void changePw(String userPw){
+        this.userPw = userPw;
+    }
+
+    public void addReview(List<BookReview> reviewInfoList ){
+        this.bookReviews = reviewInfoList;
     }
 
 

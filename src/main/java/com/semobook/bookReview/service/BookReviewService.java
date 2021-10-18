@@ -1,15 +1,22 @@
 package com.semobook.bookReview.service;
 
 import com.semobook.book.domain.Book;
+import com.semobook.book.dto.BookDto;
 import com.semobook.book.repository.BookRepository;
+import com.semobook.book.service.BookService;
+import com.semobook.bookReview.domain.AllReview;
 import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
 import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
+import com.semobook.bookReview.dto.request.SearchBookReviewDto;
+import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
-import com.semobook.recom.service.RecomService;
+import com.semobook.recom.domain.ReviewInfo;
+import com.semobook.recom.service.UserRandomEvaluation;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.repository.UserRepository;
+import com.semobook.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +42,10 @@ import java.util.stream.Collectors;
 public class BookReviewService {
 
     private final BookReviewRepository bookReviewRepository;
-    private final RecomService recomService;
+    private final UserRandomEvaluation userRandomEvaluation;
+    private final BookService bookService;
+    private final UserService userService;
+    private final AllReviewRepository allReviewRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
@@ -56,51 +67,62 @@ public class BookReviewService {
         try {
             if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
                 log.info("createReview:: review is existence");
-//                hCode = StatusEnum.hd4444;
-//                hMessage = "이미 리뷰를 등록하였습니다.";
-//                data = null;
+                hCode = StatusEnum.hd4444;
+                hMessage = "이미 리뷰를 등록하였습니다.";
+                data = null;
             } else {
                 log.info("createReview:: review is not existence");
-//                Book book;
-//                if (bookRepository.existsByIsbn(request.getBook().getIsbn())){
-//                    log.info("createReview:: book is existence");
-//                    book = bookRepository.findByIsbn(request.getBook().getIsbn());
-//                }else {
-//                    log.info("createReview:: book is not existence");
-//                    book = bookRepository.save(Book.builder()
-//                            .isbn(request.getBook().getIsbn())
-//                            .bookName(request.getBook().getBookName())
-//                            .author(request.getBook().getAuthor())
-//                            .publisher(request.getBook().getPublisher())
-//                            .kdc(request.getBook().getKdc())
-//                            .category(request.getBook().getCategory())
-//                            .keyword(request.getBook().getKeyword())
-//                            .img(request.getBook().getImg())
-//                            .build());
-//                }
-//                UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
+                Book book;
+                if (bookRepository.existsByIsbn(request.getBook().getIsbn())) {
+                    log.info("createReview:: book is existence");
+                    book = bookRepository.findByIsbn(request.getBook().getIsbn());
+                } else {
+                    log.info("createReview:: book is not existence");
+                    book = bookRepository.save(Book.builder()
+                            .isbn(request.getBook().getIsbn())
+                            .bookName(request.getBook().getBookName())
+                            .author(request.getBook().getAuthor())
+                            .publisher(request.getBook().getPublisher())
+                            .kdc(request.getBook().getKdc())
+                            .category(request.getBook().getCategory())
+                            .keyword(request.getBook().getKeyword())
+                            .img(request.getBook().getImg())
+                            .build());
+                }
+                UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
 //                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
-//                if (book != null && resultUserInfo != null) {
-//                    bookReviewRepository.save(BookReview.builder()
-//                            .rating(request.getRating())
-//                            .reviewContents(request.getReviewContents())
-//                            .createDate(LocalDateTime.now())
-//                            .declaration(0)
-//                            .book(book)
-//                            .userInfo(resultUserInfo)
-//                            .build());
-//                    //평점  3점 이상이면 recom으로 추천 업뎃치기
+                if (book != null && resultUserInfo != null) {
+                    bookReviewRepository.save(BookReview.builder()
+                            .rating(request.getRating())
+                            .reviewContents(request.getReviewContents())
+                            .createDate(LocalDateTime.now())
+                            .declaration(0)
+                            .book(book)
+                            .userInfo(resultUserInfo)
+                            .build());
+
+                    //redis에 리뷰 업데이트
+                    boolean isUpdate = updateRedisReview(request);
+
+                    //userpriority 생성
+                    if(isUpdate){
+                        userService.makeUserPriority(request.getUserNo());
+                    }
+
+                    //평점  3점 이상이면 recom으로 추천 업뎃치기
 //                    if (request.getRating() >= 3) {
-////                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
+//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
 //                    }
-//                    hCode = StatusEnum.hd1004;
-//                    hMessage = "저장완료";
-//                    data = request;
-//                } else {
-//                    hCode = StatusEnum.hd4444;
-//                    hMessage = "저장실패";
-//                    data = null;
-//                }
+                    //레디스에
+                    hCode = StatusEnum.hd1004;
+                    hMessage = "저장완료";
+                    data = request;
+                    log.info("createReview:: success create book review");
+                } else {
+                    hCode = StatusEnum.hd4444;
+                    hMessage = "저장실패";
+                    data = null;
+                }
 
             }
 
@@ -119,6 +141,55 @@ public class BookReviewService {
                 .build();
     }
 
+    /**
+     * redis에 리뷰 update
+     *
+     * @author hyejinzz
+     * @since 2021/07/11
+     **/
+    private boolean updateRedisReview(BookReviewRequest request) {
+        //책정보 조회
+        try {
+            BookDto bookDto = bookService.findBook3Step(request.getBook().getIsbn());
+            List<ReviewInfo> reviewInfoList = new ArrayList<>();
+            //카테고리 정보가 없으면 업데이트하지 못함
+            if (bookDto.getCategory() == null) return false;
+            //redis에서 기존 리뷰데이터 꺼내서 새로 setting
+            AllReview allReviewList = allReviewRepository.findById(request.getUserNo()).orElse(null);
+            if (allReviewList != null) {
+                reviewInfoList = allReviewList.getValue();
+
+            }
+            //redis값이 없으면 db에서 가져오기
+            if (allReviewList == null) {
+                reviewInfoList = bookReviewRepository.findAllByUserInfo_userNo(request.getUserNo(), PageRequest.of(0, 100))
+                        .stream().filter(a-> !(a.getBook().getCategory().isEmpty() || a.getBook().getCategory() == "A"))
+                        .map(a -> ReviewInfo.builder()
+                                .point(a.getRating())
+                                .isbn(a.getBook().getIsbn())
+                                .category(a.getBook().getCategory())
+                                .build()).collect(Collectors.toList());
+
+            }
+            //redis에 저장
+            reviewInfoList.add(ReviewInfo.builder()
+                    .category(bookDto.getCategory())
+                    .isbn(bookDto.getIsbn())
+                    .point(request.getRating())
+                    .build());
+
+            if(reviewInfoList.size()>0) {
+                AllReview saveData = AllReview.builder().userId(request.getUserNo()).value(reviewInfoList).build();
+                allReviewRepository.save(saveData);
+
+            }
+        }catch (Exception e){
+            log.error(":: updateRedisReview err :: error is {} ", e);
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * 도서 별점 주기
@@ -128,8 +199,8 @@ public class BookReviewService {
      **/
     @Transactional
     public BookReviewResponse bookReviewRating(BookReviewRatingRequest request) {
-        log.info("bookReviewRating ::");
         String hMessage = null;
+        log.info("bookReviewRating ::");
         Object data = null;
         StatusEnum hCode = null;
         try {
@@ -164,10 +235,18 @@ public class BookReviewService {
                             .book(book)
                             .userInfo(resultUserInfo)
                             .build());
-                    //평점  3점 이상이면 recom으로 추천 업뎃치기
-                    if (request.getRating() >= 3) {
-//                    recomService.updateUserReviewRecom(request.getIsbn(),request.getUserNo());
+                    //redis에 리뷰 업데이트
+                    boolean isUpdate = updateRedisReview(BookReviewRequest.builder()
+                            .userNo(request.getUserNo())
+                            .rating(request.getRating())
+                            .book(request.getBook())
+                            .build());
+
+                    //userpriority 생성
+                    if(isUpdate){
+                        userService.makeUserPriority(request.getUserNo());
                     }
+
                     hCode = StatusEnum.hd1004;
                     hMessage = "저장완료";
                     data = request;
@@ -200,20 +279,19 @@ public class BookReviewService {
      * @author hyejinzz
      * @since 2021-05-29
      **/
-    public BookReviewResponse readMyReview(BookSearchRequest request) {
-        log.info(":: readMyReview() :: request is {}", request.getUserNo());
+    public BookReviewResponse readMyReview(long userNo, int pageNum) {
+        log.info(":: readMyReview() :: userNo is {}", userNo);
         String hMessage = "";
         Object data = null;
         StatusEnum hCode = null;
 
         try {
-            int start = request.getStartPage();
-            long userNo = request.getUserNo();
 
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 10));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(pageNum, 5));
             List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
+            log.info("readMyReview :: count is {}",page.getTotalElements());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
@@ -328,11 +406,6 @@ public class BookReviewService {
             BookReview bookReview = bookReviewRepository.findByReviewNo(request.getReviewNo());
             bookReview.changeBookReview(request.getRating(), request.getReviewContents());
 
-            //평점  3점 이상이면 recom으로 추천 업뎃치기
-            if (bookReview.getRating() >= 3) {
-//                recomService.updateUserReviewRecom(bookReview.getBook().getIsbn(),bookReview.getUserInfo().getUserNo());
-            }
-
             hCode = StatusEnum.hd1004;
             hMessage = "글 수정완료";
             data = request;
@@ -389,6 +462,7 @@ public class BookReviewService {
         try {
 //            Page<BookReview> page = bookReviewRepository.findAllByUserInfo(monthBookReviewRequest.getUserNo(), PageRequest.of(0, 100));
             List<BookReview> page = bookReviewRepository.findByBookBetweenDate(
+                    monthBookReviewRequest.getUserNo(),
                     monthBookReviewRequest.getStartDate(),
                     monthBookReviewRequest.getEndDate());
             List<BookReviewWithIsbnDto> result = page.stream()
@@ -415,15 +489,40 @@ public class BookReviewService {
                 .build();
     }
 
-    //평가 등록
+    /**
+     * 내 글 보여주기
+     *
+     * @author hyejinzz
+     * @since 2021-05-29
+     **/
+    public BookReviewResponse bookReviewList(String isbn, int pageNum) {
+        log.info(":: readMyReview() :: isbn is {}", isbn);
+        String hMessage = "";
+        Object data = null;
+        StatusEnum hCode = null;
 
+        try {
+            Page<BookReview> page = bookReviewRepository.findByBookReview(isbn, PageRequest.of(pageNum, 10));
+            List<SearchBookReviewDto> reviewList = page.getContent().stream()
+                    .map(bookReview -> new SearchBookReviewDto(bookReview))
+                    .collect(Collectors.toList());
+            log.info("readMyReview :: count is {}",page.getTotalElements());
+            hCode = StatusEnum.hd1004;
+            hMessage = "도서 리뷰 리스트";
+            data = reviewList;
+        } catch (Exception e) {
+            log.error("createReview err :: error msg : {}", e);
+            hCode = StatusEnum.hd4444;
+            hMessage = "리뷰 리스트 에러";
+            data = null;
 
-    //1. db에서 관련도서 항목꺼내기
-    //2. null 이면 카테고리 꺼내기
-    //   2-1 카테고리가 일치하고
-    //        평균 평점이 높은 순, 최신순으로 50개 가져옴
-    //  이용자가 보기싫다고 한 데이터 삭제작업
-    //  20개 이상이면 추천 업데이트
+        }
+        return BookReviewResponse.builder()
+                .data(data)
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .build();
+    }
 
 
 }

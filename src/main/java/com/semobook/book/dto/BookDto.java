@@ -21,6 +21,7 @@ public class BookDto {
     private String category;
     private String keyword;
     private String img;
+    private String contents;
 
     public BookDto(Book book){
         isbn = book.getIsbn();
@@ -31,19 +32,21 @@ public class BookDto {
         category = book.getCategory();
         keyword = book.getKeyword();
         img = book.getImg();
+
     }
 
        @Builder
         public BookDto(String isbn, String bookName, String author, String publisher,
-                       String kdc, String category, String keyword, String img){
+                       String kdc, String category, String keyword, String img, String contents){
         this.isbn = isbn;
         this.bookName = bookName;
         this.author = author;
         this.publisher = publisher;
         this.kdc = kdc;
-        this. category = category;
+        this.category = category;
         this.keyword = keyword;
         this.img = img;
+        this.contents = contents;
     }
 
 
