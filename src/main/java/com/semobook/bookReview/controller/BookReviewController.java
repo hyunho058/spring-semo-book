@@ -2,7 +2,6 @@ package com.semobook.bookReview.controller;
 
 import com.semobook.bookReview.dto.*;
 import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
-import com.semobook.bookReview.dto.request.SearchBookReviewRequest;
 import com.semobook.bookReview.service.BookReviewService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,61 +21,59 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "BookReview Controller")
-@RequestMapping("/bookreview")
+@RequestMapping("/api")
 @RestController
 public class BookReviewController {
 
     private final BookReviewService boardService;
 
     //create
-    @PostMapping("/create")
+    @PostMapping("/bookreview/new")
     public ResponseEntity<BookReviewResponse> createBookReviewCon(@Parameter @RequestBody BookReviewRequest boardRequest){
         return ResponseEntity.ok(boardService.createReview(boardRequest));
     }
 
     //update
-    @PostMapping("/update")
+    @PutMapping("/bookreview")
     public ResponseEntity<BookReviewResponse> updateBookReviewCon(@Parameter @RequestBody BookUpdateRequest request){
         return ResponseEntity.ok(boardService.updateReview(request));
     }
 
-    //도서 별점만 주기(도서 선소도)
-    @PostMapping("/update/rating")
+    //도서 별점만 주기(도서 선호도)
+    @PutMapping("/bookreview/rating")
     public ResponseEntity<BookReviewResponse> readRatingBookReviewCon(@Parameter @RequestBody BookReviewRatingRequest request){
         return ResponseEntity.ok(boardService.bookReviewRating(request));
     }
 
     //리뷰 조회
-    @PostMapping("/read")
-    public ResponseEntity<BookReviewResponse> allBookReviewCon(@Parameter @RequestBody BookSearchRequest boardRequest){
-        log.info(":: AllBookReview() :: boardRequest is {}", boardRequest.getUserNo());
-        return ResponseEntity.ok(boardService.readMyReview(boardRequest));
+    @GetMapping("/bookreview")
+    public ResponseEntity<BookReviewResponse> allBookReviewCon(@Parameter @RequestParam(name = "userNo") long userNo, @RequestParam(name = "page") int pageNum){
+        log.info(":: AllBookReview() :: userNo is {}", userNo);
+        return ResponseEntity.ok(boardService.readMyReview(userNo, pageNum));
     }
 
     //리뷰 전체 조회(패이징 적용)
-    @GetMapping("/all/{page}")
+    @GetMapping("/bookreviews/{page}")
     public ResponseEntity<BookReviewResponse> readBookReviewCon(@Parameter @PathVariable int page){
         return ResponseEntity.ok(boardService.readReviewAll(page));
     }
 
     //리뷰 삭제
-    @PostMapping("/delete")
+    @DeleteMapping("/bookreview")
     public ResponseEntity<BookReviewResponse> deleteBookReviewCon(@Parameter @RequestBody DeleteBookReviewRequest deleteBookReviewRequest){
         return ResponseEntity.ok(boardService.deleteReview(deleteBookReviewRequest));
     }
 
     //월별 리뷰 조회
-    @PostMapping("/month/review")
+    @PostMapping("/bookreview/month")
     public ResponseEntity<BookReviewResponse> monthReviewCon(@Parameter @RequestBody MonthBookReviewRequest monthBookReviewRequest){
         return ResponseEntity.ok(boardService.monthReview(monthBookReviewRequest));
     }
 
-    //도서 리뷰리스트
-    @PostMapping("/review-list")
-    public ResponseEntity<BookReviewResponse> bookReviewListCon(@Parameter @RequestBody SearchBookReviewRequest request){
-        return ResponseEntity.ok(boardService.bookReviewList(request));
+    //유저별 도서 리뷰리스트
+    @GetMapping("/bookreview/review-list")
+    public ResponseEntity<BookReviewResponse> bookReviewListCon(@Parameter @RequestParam(name = "isbn") String isbn, @RequestParam(name = "page") int pageNum){
+        return ResponseEntity.ok(boardService.bookReviewList(isbn, pageNum));
     }
-
-    // TODO: 2021-05-29 신고하기 기능 추가 필요
 
 }

@@ -9,7 +9,6 @@ import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.dto.*;
 import com.semobook.bookReview.dto.request.MonthBookReviewRequest;
 import com.semobook.bookReview.dto.request.SearchBookReviewDto;
-import com.semobook.bookReview.dto.request.SearchBookReviewRequest;
 import com.semobook.bookReview.repository.AllReviewRepository;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
@@ -280,17 +279,15 @@ public class BookReviewService {
      * @author hyejinzz
      * @since 2021-05-29
      **/
-    public BookReviewResponse readMyReview(BookSearchRequest request) {
-        log.info(":: readMyReview() :: request is {}", request.getUserNo());
+    public BookReviewResponse readMyReview(long userNo, int pageNum) {
+        log.info(":: readMyReview() :: userNo is {}", userNo);
         String hMessage = "";
         Object data = null;
         StatusEnum hCode = null;
 
         try {
-            int start = request.getStartPage();
-            long userNo = request.getUserNo();
 
-            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(start, 5));
+            Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(pageNum, 5));
             List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
@@ -498,17 +495,14 @@ public class BookReviewService {
      * @author hyejinzz
      * @since 2021-05-29
      **/
-    public BookReviewResponse bookReviewList(SearchBookReviewRequest request) {
-        log.info(":: readMyReview() :: request is {}", request.getIsbn());
+    public BookReviewResponse bookReviewList(String isbn, int pageNum) {
+        log.info(":: readMyReview() :: isbn is {}", isbn);
         String hMessage = "";
         Object data = null;
         StatusEnum hCode = null;
 
         try {
-            int start = request.getStartPage();
-            String isbn = request.getIsbn();
-
-            Page<BookReview> page = bookReviewRepository.findByBookReview(isbn, PageRequest.of(start, 10));
+            Page<BookReview> page = bookReviewRepository.findByBookReview(isbn, PageRequest.of(pageNum, 10));
             List<SearchBookReviewDto> reviewList = page.getContent().stream()
                     .map(bookReview -> new SearchBookReviewDto(bookReview))
                     .collect(Collectors.toList());
