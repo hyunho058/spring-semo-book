@@ -18,19 +18,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest //스프링이 시작될때야만 실행되는 조건
+@Transactional
 public class ReviewTest {
     @Autowired
     BookReviewRepository bookReviewRepository;
@@ -45,17 +44,29 @@ public class ReviewTest {
     BookReviewService bookReviewService;
 
     @Test
-    @DisplayName("리뷰가 저장되야한다")
-    void createReviewTest(){
+    @DisplayName("리뷰_저장")
+    void 리뷰_저장(){
         //given
+        String isbn = "9788901214924";
+        String userId = "userA@semo.com";
+
+        UserInfo userInfo = UserInfo.builder()
+                .userId(userId)
+                .userPw("semo1234")
+                .userName("userA")
+                .userGender("M")
+                .userBirth("19920519")
+                .build();
+        userRepository.save(userInfo);
+        UserInfo userData = userRepository.findByUserId(userId);
 
         BookReviewRequest rq = BookReviewRequest.builder()
-                .userNo(99999L)
-                .isbn("9788901214924")
+                .userNo(userData.getUserNo())
+                .isbn(isbn)
                 .rating(4)
                 .reviewContents("재미")
                 .book(BookDto.builder()
-                        .isbn("9788901214924")
+                        .isbn(isbn)
                         .bookName("한 권으로 읽는 조선왕조실록")
                         .author("박영규")
                         .publisher("웅진지식하우스")
@@ -66,30 +77,27 @@ public class ReviewTest {
                 .build();
         //when
         bookReviewService.createReview(rq);
-
+        Optional<BookReview> first = bookReviewRepository.findAllByUserInfo_userNo(userData.getUserNo(), PageRequest.of(0, 100)).stream().findFirst();
         //then
-        Optional<BookReview> first = bookReviewRepository.findAllByUserInfo_userNo(99999, PageRequest.of(0, 999)).stream().findFirst();
-
-        //북리뷰 조회에 유저가 쓴 리뷰가 있는지 확인해야 한다
-        assertThat(first.get().getBook().getIsbn(), is("9788901214924"));
+        assertThat(first.get().getBook().getIsbn()).isEqualTo(isbn);
     }
 
     @Test
-    @DisplayName("유저 리뷰리스트")
-    void readMyReviewTest(){
+    @DisplayName("유저별_리뷰_리스트")
+    void 유저별_리뷰_리스트(){
         //given
+        String userId = "userA@semo.com";
         UserInfo userInfo = UserInfo.builder()
-                .userNo(99999L)
-                .userId("userA@semo.com")
+                .userId(userId)
                 .userPw("semo1234")
                 .userName("userA")
                 .userGender("M")
                 .userBirth("19920519")
                 .build();
-
-
+        userRepository.save(userInfo);
+        UserInfo userData = userRepository.findByUserId("userA@semo.com");
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901214924")
                 .rating(4)
                 .reviewContents("재미")
@@ -105,40 +113,39 @@ public class ReviewTest {
                 .build();
 
         BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(99999L)
-                .isbn("9788901214924")
+                .userNo(userData.getUserNo())
+                .isbn("9788901219943")
                 .rating(4)
                 .reviewContents("재미")
                 .book(BookDto.builder()
-                        .isbn("9788901214925")
-                        .bookName("한 권으로 읽는 조선왕조실록")
-                        .author("박영규")
-                        .publisher("웅진지식하우스")
-                        .kdc("900")
+                        .isbn("9788901219943")
+                        .bookName("신경 끄기의 기술")
+                        .author("마크 맨슨")
+                        .publisher("갤리온")
+                        .kdc("500")
                         .category("900")
-                        .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                        .img("http://image.kyobobook.co.kr/images/book/large/943/l9788901219943.jpg")
                         .build())
                 .build();
         //when
-        userRepository.save(userInfo);
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
 
 
         //then
-        Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(99999L, PageRequest.of(0, 5));
-        List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
+        Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userData.getUserNo(), PageRequest.of(0, 5));
+        List<BookReviewWithIsbnDto> reviews = page.getContent().stream()
                 .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                 .collect(Collectors.toList());
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(reviews.get(0).getBookDto().getIsbn()).isEqualTo("9788901214924");
+        assertThat(reviews.get(0).getBookDto().getIsbn()).isEqualTo("9788901219943");
 
-        List<String> resutChk = Arrays.asList(new String[]{"800", "300"});
-
-        List<String> result = allReview.stream().map(a-> a.getBookDto().getIsbn()).collect(Collectors.toList());
-
-        assertTrue(resutChk.containsAll(result));
-        //사이즈 확인
-
-        //데이터 값 확인
+//        List<String> resultChk = Arrays.asList(new String[]{"800", "300"});
+//
+//        List<String> result = allReview.stream().map(a-> a.getBookDto().getIsbn()).collect(Collectors.toList());
+//
+//        assertTrue(resultChk.containsAll(result));
 
     }
 
@@ -146,16 +153,19 @@ public class ReviewTest {
     @DisplayName("REVIEW_TOTAL_COUNT")
     void REVIEW_TOTAL_COUNT(){
         //given
+        String userId = "userA@semo.com";
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
-                .userId("userA@semo.com")
+                .userId(userId)
                 .userPw("semo1234")
                 .userName("userA")
                 .userGender("M")
                 .userBirth("19920519")
                 .build();
+        userRepository.save(userInfo);
+        UserInfo userData = userRepository.findByUserId(userId);
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901214924")
                 .rating(4)
                 .reviewContents("재미")
@@ -171,7 +181,7 @@ public class ReviewTest {
                 .build();
 
         BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901219943")
                 .rating(4)
                 .reviewContents("재미11111")
@@ -186,13 +196,11 @@ public class ReviewTest {
                         .build())
                 .build();
         //when
-        userRepository.save(userInfo);
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
-
-        int bookTotal = bookReviewRepository.countReview(99999L);
+        int bookTotal = bookReviewRepository.countReview(userData.getUserNo());
         //then
-        assertThat(bookTotal, is(2));
+        assertThat(bookTotal).isEqualTo(2);
     }
 
 
@@ -200,16 +208,20 @@ public class ReviewTest {
     @DisplayName("리뷰_작성_존재_확인")
     void 리뷰_작성_존재_확인(){
         //given
+        String userId = "userA@semo.com";
+        long userNo = 0;
         UserInfo userInfo = UserInfo.builder()
-                .userNo(99999L)
-                .userId("userA@semo.com")
+                .userNo(userNo)
+                .userId(userId)
                 .userPw("semo1234")
                 .userName("userA")
                 .userGender("M")
                 .userBirth("19920519")
                 .build();
+        userRepository.save(userInfo);
+        UserInfo userData = userRepository.findByUserId(userId);
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901214924")
                 .rating(4)
                 .reviewContents("재미")
@@ -224,11 +236,10 @@ public class ReviewTest {
                         .build())
                 .build();
         //when
-        userRepository.save(userInfo);
         bookReviewService.createReview(rq1);
-        boolean exists = bookReviewRepository.exists(99999L, "9788901214924");
+        boolean exists = bookReviewRepository.exists(userData.getUserNo(), "9788901214924");
         //then
-        assertThat(true, is(exists));
+        assertThat(exists).isEqualTo(true);
 
     }
 
@@ -236,17 +247,19 @@ public class ReviewTest {
     @DisplayName("유저_월별_리뷰")
     void 유저_월별_리뷰(){
         //given
-
+        String userId = "userA@semo.com";
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
-                .userId("userA@semo.com")
+                .userId(userId)
                 .userPw("semo1234")
                 .userName("userA")
                 .userGender("M")
                 .userBirth("19920519")
                 .build();
+        userRepository.save(userInfo);
+        UserInfo userData = userRepository.findByUserId(userId);
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901214924")
                 .rating(4)
                 .reviewContents("재미")
@@ -262,7 +275,7 @@ public class ReviewTest {
                 .build();
 
         BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901219943")
                 .rating(4)
                 .reviewContents("재미11111")
@@ -277,17 +290,15 @@ public class ReviewTest {
                         .build())
                 .build();
 
-
-
         MonthBookReviewRequest monthBookReviewRequest = MonthBookReviewRequest.builder()
-                .userNo(99999L)
-                .startDate(LocalDateTime.of(2021,07,01,00,00))
-                .endDate(LocalDateTime.of(2021,07,31,23,59))
+                .userNo(userData.getUserNo())
+                .startDate(LocalDateTime.of(2021,10,01,00,00))
+                .endDate(LocalDateTime.of(2021,10,31,23,59))
                 .build();
 
 
         //when
-        userRepository.save(userInfo);
+
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
 
@@ -297,27 +308,33 @@ public class ReviewTest {
                 monthBookReviewRequest.getEndDate());
 
         //then
-        assertThat(page.size(), is(2));
+        assertThat(page.size()).isEqualTo(2);
+//        assertThat(page.size(), is(2));
 
     }
 
     @Test
-    @DisplayName("내_리뷰_조회_리뷰_내용이있는것만")
-    void 내_리뷰_조회_리뷰_내용이있는것만(){
+    @DisplayName("리뷰_내용이_작성된것만_조회")
+    void 리뷰_내용이_작성된것만_조회(){
         //given
+        String userId = "userA@semo.com";
         UserInfo userInfo = UserInfo.builder()
                 .userNo(99999L)
-                .userId("userA@semo.com")
+                .userId(userId)
                 .userPw("semo1234")
                 .userName("userA")
                 .userGender("M")
                 .userBirth("19920519")
                 .build();
+        userRepository.save(userInfo);
+        UserInfo userData = userRepository.findByUserId(userId);
+
+        String reviewContents = "재미";
         BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901214924")
                 .rating(4)
-                .reviewContents("재미")
+                .reviewContents(reviewContents)
                 .book(BookDto.builder()
                         .isbn("9788901214924")
                         .bookName("한 권으로 읽는 조선왕조실록")
@@ -329,7 +346,7 @@ public class ReviewTest {
                         .build())
                 .build();
         BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(99999L)
+                .userNo(userData.getUserNo())
                 .isbn("9788901219943")
                 .rating(4)
                 .book(BookDto.builder()
@@ -343,21 +360,20 @@ public class ReviewTest {
                         .build())
                 .build();
         //when
-        userRepository.save(userInfo);
         bookReviewService.createReview(rq1);
         bookReviewService.createReview(rq2);
 
         Page<BookReview> page = bookReviewRepository.findAllByUserInfoAndNotNullContents(
-                99999L,
+                userData.getUserNo(),
                 PageRequest.of(0, 10)
         );
 
         List<BookReviewDto> results = page.getContent().stream()
                 .map(bookReview -> new BookReviewDto(bookReview))
                 .collect(Collectors.toList());
-
         //then
-        assertThat(page.getTotalElements(), is(1L));
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(results.get(0).getReviewContents()).isEqualTo(reviewContents);
     }
 
 }
