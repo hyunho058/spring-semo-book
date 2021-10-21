@@ -62,8 +62,8 @@ public class BookController {
      * @since 2021/04/25
      **/
     @Operation(description = "책 조회")
-    @GetMapping(value = "/book/{isbn}")
-    public ResponseEntity<BookResponse> findBookCon(@Parameter @PathVariable String isbn) {
+    @GetMapping(value = "/book")
+    public ResponseEntity<BookResponse> findBookCon(@Parameter @RequestParam(name = "isbn") String isbn) {
         log.info("==/findBook {}", isbn);
         return ResponseEntity.ok(bookService.findBook(isbn));
     }

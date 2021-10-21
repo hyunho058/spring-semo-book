@@ -139,7 +139,7 @@ public class ReviewTest {
                 .collect(Collectors.toList());
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(reviews.get(0).getBookDto().getIsbn()).isEqualTo("9788901214924");
-        assertThat(reviews.get(0).getBookDto().getIsbn()).isEqualTo("9788901219943");
+        assertThat(reviews.get(1).getBookDto().getIsbn()).isEqualTo("9788901219943");
 
 //        List<String> resultChk = Arrays.asList(new String[]{"800", "300"});
 //
