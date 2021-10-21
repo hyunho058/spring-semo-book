@@ -81,7 +81,7 @@ public class UserController {
 
     @Operation(description = "find pw")
     @GetMapping("/user/help/pwInquiry")
-    public ResponseEntity<UserResponse> findIdCon(@Parameter @RequestParam(name = "userId") String userId){
+    public ResponseEntity<UserResponse> findPwCon(@Parameter @RequestParam(name = "userId") String userId){
         return ResponseEntity.ok(userService.findPw(userId));
     }
 

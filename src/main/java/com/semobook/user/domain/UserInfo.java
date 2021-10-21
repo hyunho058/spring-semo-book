@@ -104,5 +104,9 @@ public class UserInfo extends BaseTimeEntity {
         this.bookReviews = reviewInfoList;
     }
 
+    public void addBoonWand(BookWant bookWant){
+        bookWants.add(bookWant);
+    }
+
 
 }

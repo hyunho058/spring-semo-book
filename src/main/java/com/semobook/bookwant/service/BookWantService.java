@@ -10,8 +10,8 @@ import com.semobook.bookwant.dto.BookWantReadRequest;
 import com.semobook.bookwant.dto.BookWantResponse;
 import com.semobook.bookwant.repository.BookWantRepository;
 import com.semobook.common.StatusEnum;
+import com.semobook.user.domain.UserInfo;
 import com.semobook.user.dto.BookWantListByUserDto;
-import com.semobook.user.dto.UserInfoDto;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,18 +62,23 @@ public class BookWantService {
                  dto = new BookWithReviewDto(book);
             }
             if (book == null){
-                //todo 이때 api에서 책정보 가져와야함 ㅎㅎ
+                //todo 이때 api에서 책정보 가져와야함
             }
 
-            UserInfoDto userDto = new UserInfoDto(userRepository.findByUserNo(requestUserNo));
-
+//            UserInfoDto userDto = new UserInfoDto(userRepository.findByUserNo(requestUserNo));
+            UserInfo userInfo = userRepository.findByUserNo(requestUserNo);
             if (findBookWant == null) {
 
                 BookWant bookWant = BookWant.builder()
-                        .bookDto(dto)
+                        .book(book)
                         .preference(bookWantCreateRequest.getPreference())
-                        .userInfo(userDto)
+                        .userInfo(userInfo)
                         .build();
+//                BookWant bookWant = BookWant.builder()
+//                        .bookDto(dto)
+//                        .preference(bookWantCreateRequest.getPreference())
+//                        .userInfo(userDto)
+//                        .build();
                 bookWantRepository.save(bookWant);
                 hCode = StatusEnum.hd1004;
                 hMessage = "createPreference 생성 성공";
