@@ -68,4 +68,8 @@ public class Book {
     public void updateContents(String contents){
         this.contents = contents;
     }
+
+    public void addBookReview(BookReview bookReview){
+        bookReviewList.add(bookReview);
+    }
 }

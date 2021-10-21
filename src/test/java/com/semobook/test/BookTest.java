@@ -6,7 +6,7 @@ import com.semobook.book.dto.BookWithReviewDto;
 import com.semobook.book.repository.BookRepository;
 import com.semobook.book.service.BestSellerService;
 import com.semobook.book.service.BookService;
-import com.semobook.bookReview.dto.BookReviewRequest;
+import com.semobook.bookReview.domain.BookReview;
 import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.bookReview.service.BookReviewService;
 import com.semobook.user.domain.UserInfo;
@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +40,6 @@ public class BookTest {
     BookReviewService bookReviewService;
     @Autowired
     BookService bookService;
-
 
 
     @Test
@@ -68,25 +68,27 @@ public class BookTest {
     @DisplayName("도서_리뷰조회_ISBN")
     void 도서_리뷰조회_ISBN(){
         //given
-        long userNoA = 1;
-        long userNoB = 2;
         String isbn = "222221";
-
+        String userIdA = "userA@semo.com";
+        String userIdB = "userB@semo.com";
         UserInfo userA = UserInfo.builder()
-                .userId("userA@semo.com")
+                .userId(userIdA)
                 .userPw("semo1234")
                 .userName("userA")
                 .userGender("M")
                 .userBirth("19920519")
                 .build();
-
         UserInfo userB = UserInfo.builder()
-                .userId("userB@semo.com")
+                .userId(userIdB)
                 .userPw("semo1234")
                 .userName("userB")
                 .userGender("W")
                 .userBirth("19920519")
                 .build();
+        userRepository.save(userA);
+        userRepository.save(userB);
+        UserInfo userDataA = userRepository.findByUserId(userIdA);
+        UserInfo userDataB = userRepository.findByUserId(userIdB);
 
         Book book = (Book.builder()
                 .isbn(isbn)
@@ -98,42 +100,35 @@ public class BookTest {
                 .keyword("800")
                 .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
                 .build());
+        bookRepository.save(book);
 
-        BookReviewRequest rq1 = BookReviewRequest.builder()
-                .userNo(userNoA)
-                .isbn(isbn)
+        BookReview bookReviewA = BookReview.builder()
                 .rating(4)
                 .reviewContents("재미")
-                .book(new BookDto(book))
+                .createDate(LocalDateTime.now())
+                .declaration(0)
+                .book(book)
+                .userInfo(userDataA)
                 .build();
-
-        BookReviewRequest rq2 = BookReviewRequest.builder()
-                .userNo(userNoB)
-                .isbn(isbn)
-                .rating(3)
+        BookReview bookReviewB = BookReview.builder()
+                .rating(4)
                 .reviewContents("재미11")
-                .book(new BookDto(book))
+                .createDate(LocalDateTime.now())
+                .declaration(0)
+                .book(book)
+                .userInfo(userDataB)
                 .build();
+        Book bookData = bookRepository.findByIsbn(isbn);
+        bookData.addBookReview(bookReviewA);
+        bookData.addBookReview(bookReviewB);
+        bookReviewRepository.save(bookReviewA);
+        bookReviewRepository.save(bookReviewB);
+
         //when
-        userRepository.save(userA);
-        userRepository.save(userB);
-        bookRepository.save(book);
-        bookReviewService.createReview(rq1);
-        bookReviewService.createReview(rq2);
-
-        Book testBook = bookRepository.findByIsbn(isbn);
-        System.out.println("khh test testBook.getIsbn() = " + testBook.getIsbn());
-        UserInfo testUserA = userRepository.findByUserNo(userNoA);
-        System.out.println("khh test testUserA = " + testUserA.getUserNo());
-        UserInfo testUserB= userRepository.findByUserNo(userNoB);
-        System.out.println("khh test testUserB = " + testUserB.getUserNo());
-
         BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));;
-        System.out.println("bookWithReviewDto.getBookName() = " + bookWithReviewDto.getBookName());
-        System.out.println("bookWithReviewDto.getBookReviews().size() = " + bookWithReviewDto.getBookReviews().size());
-
         //then
         assertThat(bookWithReviewDto.getIsbn()).isEqualTo(isbn);
+        System.out.println("bookWithReviewDto = " + bookWithReviewDto);
         assertThat(bookWithReviewDto.getBookReviews().size()).isEqualTo(2);
     }
 
@@ -141,7 +136,7 @@ public class BookTest {
     @DisplayName("도서_리스트")
     void 도서_리스트(){
         //given
-        int isbn = 11111111;
+        int isbn = 91111111;
         for (int i = 0; i < 11; i++){
             Book book = Book.builder()
                     .isbn(String.valueOf(isbn++))
@@ -161,12 +156,7 @@ public class BookTest {
         PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
         Page<Book> page = bookRepository.findAll(pageRequest);
         //then
-
-//        assertThat(page.getTotalElements(), is(11L));
-//        assertThat(page.getTotalPages(), is(3));
-//        assertThat(page.isFirst(), is(true));
-
-        assertThat(page.getTotalElements()).isEqualTo(11L);
+        assertThat(page.getTotalElements()).isEqualTo(11);
         assertThat(page.getTotalPages()).isEqualTo(3);
         assertThat(page.isFirst()).isEqualTo(true);
     }
@@ -218,12 +208,23 @@ public class BookTest {
     }
 
     @Test
-    @DisplayName("test_exists")
-    void test_exists(){
-        long count = bookRepository.existCount("9791163719144");
+    @DisplayName("exists_성능_테스트")
+    void exists_성능_테스트(){
+        String isbn = "9791163719144";
+        Book book = bookRepository.save(Book.builder()
+                .isbn(isbn)
+                .bookName("SEMO")
+                .author("SEMO")
+                .publisher("hDream")
+                .contents("semosemo")
+                .kdc("800")
+                .category("800")
+                .keyword("800")
+                .img("http://image.kyobobook.co.kr/images/book/large/924/l9788901214924.jpg")
+                .build());
+        long count = bookRepository.existUsingCount(isbn);
         System.out.println("----------------------------------------------------------------------------------------");
-        boolean checkBook = bookRepository.existsByIsbn("9791163719144");
-
+        boolean checkBook = bookRepository.existsByIsbn(isbn);
 
         assertThat(checkBook).isEqualTo(true);
         assertThat(count).isEqualTo(1);

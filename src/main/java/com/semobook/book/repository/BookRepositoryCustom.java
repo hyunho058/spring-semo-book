@@ -24,5 +24,5 @@ public interface BookRepositoryCustom {
     //도서 존재 여부
     boolean existsByIsbn(String isbn);
 
-    long existCount(String isbn);
+    long existUsingCount(String isbn);
 }

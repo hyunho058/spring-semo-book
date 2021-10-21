@@ -118,7 +118,7 @@ public class BookRepositoryImpl implements BookRepositoryCustom{
 
     @Override
     @PerformanceCheck
-    public long existCount(String isbn) {
+    public long existUsingCount(String isbn) {
         long total = queryFactory
                 .select()
                 .from(book)

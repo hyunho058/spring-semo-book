@@ -66,18 +66,18 @@ public class BookReviewService {
         log.info("createReview():: request.getBook().getIsbn() is {}", request.getBook().getIsbn());
         try {
             if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
-                log.info("createReview:: review is existence");
+                log.info("createReview():: review is existence");
                 hCode = StatusEnum.hd4444;
                 hMessage = "이미 리뷰를 등록하였습니다.";
                 data = null;
             } else {
-                log.info("createReview:: review is not existence");
+                log.info("createReview():: review is not existence");
                 Book book;
                 if (bookRepository.existsByIsbn(request.getBook().getIsbn())) {
-                    log.info("createReview:: book is existence");
+                    log.info("createReview():: book is existence");
                     book = bookRepository.findByIsbn(request.getBook().getIsbn());
                 } else {
-                    log.info("createReview:: book is not existence");
+                    log.info("createReview():: book is not existence");
                     book = bookRepository.save(Book.builder()
                             .isbn(request.getBook().getIsbn())
                             .bookName(request.getBook().getBookName())

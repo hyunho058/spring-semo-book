@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface BookReviewRepository extends CrudRepository<BookReview, String>, BookReviewRepositoryCustom {
     //저장
-    BookReview save(BookReview board);
+//    BookReview save(BookReview board);
     /**
      * 연관관계 설정하면서 findAllByUserInfo(), findAllByBook()수정 하였습니다.
      * JPA 쿼리 요청문에서 FK값 들고오는 부분
