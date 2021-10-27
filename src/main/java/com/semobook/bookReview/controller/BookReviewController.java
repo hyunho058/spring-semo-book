@@ -28,25 +28,25 @@ public class BookReviewController {
     private final BookReviewService boardService;
 
     //create
-    @PostMapping("/bookreview/new")
+    @PostMapping("/bookreviews/new")
     public ResponseEntity<BookReviewResponse> createBookReviewCon(@Parameter @RequestBody BookReviewRequest boardRequest){
         return ResponseEntity.ok(boardService.createReview(boardRequest));
     }
 
     //update
-    @PutMapping("/bookreview")
+    @PutMapping("/bookreviews")
     public ResponseEntity<BookReviewResponse> updateBookReviewCon(@Parameter @RequestBody BookUpdateRequest request){
         return ResponseEntity.ok(boardService.updateReview(request));
     }
 
     //도서 별점만 주기(도서 선호도)
-    @PutMapping("/bookreview/rating")
+    @PutMapping("/bookreviews/rating")
     public ResponseEntity<BookReviewResponse> readRatingBookReviewCon(@Parameter @RequestBody BookReviewRatingRequest request){
         return ResponseEntity.ok(boardService.bookReviewRating(request));
     }
 
     //리뷰 조회
-    @GetMapping("/bookreview")
+    @GetMapping("/bookreviews")
     public ResponseEntity<BookReviewResponse> allBookReviewCon(@Parameter @RequestParam(name = "userNo") long userNo, @RequestParam(name = "page") int pageNum){
         log.info(":: AllBookReview() :: userNo is {}", userNo);
         return ResponseEntity.ok(boardService.readMyReview(userNo, pageNum));
@@ -59,19 +59,19 @@ public class BookReviewController {
     }
 
     //리뷰 삭제
-    @DeleteMapping("/bookreview")
-    public ResponseEntity<BookReviewResponse> deleteBookReviewCon(@Parameter @RequestBody DeleteBookReviewRequest deleteBookReviewRequest){
-        return ResponseEntity.ok(boardService.deleteReview(deleteBookReviewRequest));
+    @DeleteMapping("/bookreviews/{reviewNo}")
+    public ResponseEntity<BookReviewResponse> deleteBookReviewCon(@Parameter @PathVariable long reviewNo){
+        return ResponseEntity.ok(boardService.deleteReview(reviewNo));
     }
 
     //월별 리뷰 조회
-    @PostMapping("/bookreview/month")
+    @PostMapping("/bookreviews/month")
     public ResponseEntity<BookReviewResponse> monthReviewCon(@Parameter @RequestBody MonthBookReviewRequest monthBookReviewRequest){
         return ResponseEntity.ok(boardService.monthReview(monthBookReviewRequest));
     }
 
     //유저별 도서 리뷰리스트
-    @GetMapping("/bookreview/review-list")
+    @GetMapping("/bookreviews/list")
     public ResponseEntity<BookReviewResponse> bookReviewListCon(@Parameter @RequestParam(name = "isbn") String isbn, @RequestParam(name = "page") int pageNum){
         return ResponseEntity.ok(boardService.bookReviewList(isbn, pageNum));
     }

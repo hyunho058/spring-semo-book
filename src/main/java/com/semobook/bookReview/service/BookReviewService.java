@@ -432,19 +432,19 @@ public class BookReviewService {
      * @since 2021/05/30
      **/
     @Transactional
-    public BookReviewResponse deleteReview(DeleteBookReviewRequest deleteBookReviewRequest) {
+    public BookReviewResponse deleteReview(long reviewNo) {
         String hMessage = null;
         Object data = null;
         StatusEnum hCode = null;
         try {
-            bookReviewRepository.deleteBookReviewByReviewNo(deleteBookReviewRequest.getReviewNo());
+            bookReviewRepository.deleteBookReviewByReviewNo(reviewNo);
 //            data = resultCode;
             hCode = StatusEnum.hd1004;
             hMessage = "삭제 완료";
         } catch (Exception e) {
             log.error("addBoard err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
-            hMessage = "삭제 중 오류";
+            hMessage = "삭제중 오류";
         }
         return BookReviewResponse.builder()
                 .data(data)

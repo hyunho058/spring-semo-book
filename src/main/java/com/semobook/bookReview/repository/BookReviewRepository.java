@@ -36,7 +36,7 @@ public interface BookReviewRepository extends CrudRepository<BookReview, String>
     List<BookReview> findAllByCreateDateBefore(LocalDateTime createDate, Pageable pageable);
 
     //삭제
-    @Query(value = "select br FROM BookReview br where br.reviewNo = :reviewNo")
+    @Query(value = "select br from BookReview br where br.reviewNo = :reviewNo")
     int deleteBookReviewByReviewNo(@Param(value = "reviewNo") long reviewNo);
 
     //리뷰 조회
