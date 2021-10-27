@@ -20,7 +20,7 @@ public class UserController {
 
     //모든 회원 조회
     @Operation(description = "모든 회원조회")
-    @GetMapping(value = "/users{page}")
+    @GetMapping(value = "/users/list/{page}")
     public ResponseEntity<UserResponse> getUserAllCon(@Parameter @PathVariable int page) {
         return ResponseEntity.ok(userService.findAllUser(page));
     }
@@ -28,47 +28,47 @@ public class UserController {
 
     //id로 회원조회
     @Operation(description = "회원조회")
-    @GetMapping(value = "/user/{id}")
+    @GetMapping(value = "/users/{id}")
     public ResponseEntity<UserResponse> getUserByUserIdCon(@Parameter @PathVariable String id) {
         return ResponseEntity.ok(userService.findByUserId(id));
     }
 
     //회원가입
     @Operation(description = "회원가입")
-    @PostMapping("/user/new")
+    @PostMapping("/users/new")
     public ResponseEntity<UserResponse> signUpCon(@Parameter @RequestBody UserSignUpRequest userSignUpRequest) {
         return ResponseEntity.ok(userService.signUp(userSignUpRequest));
     }
 
     //회원탈퇴
     @Operation(description = "회원탈퇴")
-    @DeleteMapping("/user")
+    @DeleteMapping("/users")
     public ResponseEntity<UserResponse> deleteUserCon(@Parameter @RequestBody UserDeleteRequest userDeleteRequest) {
         return ResponseEntity.ok(userService.deleteUser(userDeleteRequest));
     }
 
     //회원정보 수정
     @Operation(description = "회원정보수정")
-    @PutMapping("/user")
+    @PutMapping("/users")
     public ResponseEntity<UserResponse> updateUserCon(@Parameter @RequestBody UserChangeUserInfoRequest updateUser) {
         return ResponseEntity.ok(userService.updateUser(updateUser));
     }
 
     //로그인
     @Operation(description = "로그인")
-    @PostMapping(value = "/signin")
+    @PostMapping(value = "/users/signin")
     public ResponseEntity<UserResponse> signInCon(@Parameter @RequestBody UserSignInRequest userSignInRequest) {
         return ResponseEntity.ok(userService.signIn(userSignInRequest));
     }
 
     @Operation(description = "회원 정보")
-    @GetMapping("/user/info/{userNo}")
+    @GetMapping("/users/info/{userNo}")
     public ResponseEntity<UserResponse> userInfoWithReviewCountCon(@Parameter @PathVariable long userNo){
         return ResponseEntity.ok(userService.userInfoWithReviewCount(userNo));
     }
 
     @Operation(description = "send email")
-    @PostMapping("/user/help/email")
+    @PostMapping("/users/help/email")
     public ResponseEntity<UserResponse> sendEmailCon(@Parameter @RequestBody MailRequest mailRequest){
         return ResponseEntity.ok(userService.mailSend(mailRequest));
     }
@@ -80,7 +80,7 @@ public class UserController {
     }
 
     @Operation(description = "find pw")
-    @GetMapping("/user/help/pwInquiry")
+    @GetMapping("/users/help/pwInquiry")
     public ResponseEntity<UserResponse> findPwCon(@Parameter @RequestParam(name = "userId") String userId){
         return ResponseEntity.ok(userService.findPw(userId));
     }
