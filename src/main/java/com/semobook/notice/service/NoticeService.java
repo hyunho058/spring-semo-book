@@ -25,7 +25,6 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
 
     private String hMessage = null;
-    private Object data = null;
     private StatusEnum hCode = null;
     /**
      * Notice findAll(전체 데이터 검색)
@@ -36,28 +35,25 @@ public class NoticeService {
     public NoticeResponse findAll(int pageNum){
         log.info(":: NoticeService_findAll :: pageNum is {} ", pageNum);
         hMessage = null;
-        data = null;
         hCode = null;
-
+        List<NoticeDto> result = null;
         try{
             Pageable pageAndTime = PageRequest.of(pageNum, 10, Sort.Direction.DESC,"createTime");
             Page<Notice> list = noticeRepository.findAll(pageAndTime);
 
-            List<NoticeDto> result = list.stream()
+            result = list.stream()
                     .map(n -> new NoticeDto(n))
                     .collect(Collectors.toList());
             hCode = StatusEnum.hd1004;
-            hMessage = "저장완료";
-            data = result;
+            hMessage = "공지사항 조회 성공";
 
         }catch (Exception e){
             hCode = StatusEnum.hd4444;
-            hMessage = "저장실패";
-            data = null;
+            hMessage = "공지사항 조회 실패";
         }
 
         return NoticeResponse.builder()
-                .data(data)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();

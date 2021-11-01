@@ -12,16 +12,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Notice Controller")
-@RequestMapping("/notice")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class NoticeController {
 
     private  final NoticeService noticeService;
 
     @Operation(description = "공지사항 리스트 5개씩")
-    @GetMapping("/findAllNotice")
+    @GetMapping("/notices")
     public ResponseEntity<NoticeResponse> findAllNotice(@Parameter @RequestParam(name = "pageNum") int pageNum){
-
         return ResponseEntity.ok(noticeService.findAll(pageNum));
 
     }
