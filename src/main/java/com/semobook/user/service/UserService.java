@@ -53,21 +53,19 @@ public class UserService {
     public UserResponse findAllUser(int pageNum) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
+        List<UserInfoDto> result = null;
         try {
             Page<UserInfo> page = userRepository.findAll(PageRequest.of(pageNum, 5));
-            List<UserInfoDto> result = page.getContent().stream()
+            result = page.getContent().stream()
                     .map(r -> new UserInfoDto(r))
                     .collect(Collectors.toList());
-
-            data = result;
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;
             hMessage = "회원조회 실패";
             log.info(":: findAllUser err :: error is {} ", e);
         }
         return UserResponse.builder()
-                .data(data)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -84,17 +82,15 @@ public class UserService {
     public UserResponse findByUserId(String userId) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
-        //TODO[refactoring] : DTO에 비밀번호 정보 제거
+        UserInfoDto userInfoDto = null;
         try {
-            UserInfoDto userInfoDto = new UserInfoDto(userRepository.findByUserId(userId));
+            userInfoDto = new UserInfoDto(userRepository.findByUserId(userId));
             if (userInfoDto == null) {
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "유효하지 않은 회원정보";
             } else {
                 hCode = StatusEnum.hd1004;
                 hMessage = userId;
-                data = userInfoDto;
             }
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;
@@ -103,7 +99,7 @@ public class UserService {
         }
 
         return UserResponse.builder()
-                .data(data)
+                .data(userInfoDto)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -120,24 +116,22 @@ public class UserService {
     public UserResponse signIn(UserSignInRequest userSignUpRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
+        UserInfoDto userInfoDto = null;
         try {
 //            UserInfo signUserInfo = userRepository.findByUserIdAndUserStatus(userSignUpRequest.getUserId(), UserStatus.GENERAL);
             UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
-            UserInfoDto userInfoDto = new UserInfoDto(signUserInfo);
+            userInfoDto = new UserInfoDto(signUserInfo);
             if (signUserInfo == null) {
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "없는 USER";
             }
             //id가 있을 때
 
             else if (!(userSignUpRequest.getUserPassword().equals(signUserInfo.getUserPw()))) {
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "로그인 실패";
-                data = null;
             } else {
                 hCode = StatusEnum.hd1004;
-                data = userInfoDto;
                 hMessage = "로그인 성공";
             }
         } catch (Exception e) {
@@ -149,7 +143,7 @@ public class UserService {
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
+                .data(userInfoDto)
                 .build();
     }
 
@@ -164,11 +158,10 @@ public class UserService {
     public UserResponse signUp(UserSignUpRequest userSignUpRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
+        UserInfo userInfo = null;
         UserInfo signUserInfo = userRepository.findByUserId(userSignUpRequest.getUserId());
-//        validateDuplicateMember(userSignUpRequest);
         if (signUserInfo == null) {
-            UserInfo userInfo = userRepository.save(UserInfo.builder()
+            userInfo = userRepository.save(UserInfo.builder()
                     .userId(userSignUpRequest.getUserId())
                     .userPw(userSignUpRequest.getUserPassword())
                     .userName(userSignUpRequest.getUserName())
@@ -178,17 +171,15 @@ public class UserService {
 
             hMessage = "생성완료";
             hCode = StatusEnum.hd1004;
-            data = userInfo;
         } else {
             hMessage = "이미 있는 아이디";
             hCode = StatusEnum.hd4444;
-            data = null;
         }
 
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
+                .data(userInfo)
                 .build();
 
     }
@@ -211,22 +202,19 @@ public class UserService {
     public UserResponse deleteUser(UserDeleteRequest userDeleteRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
         try {
             //기존 유저
             UserInfo user = userRepository.findByUserNoAndUserStatus(userDeleteRequest.getUserNo(), UserStatus.GENERAL);
 
             if (user == null) {
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "조회되는 회원이 없음";
             } else {
                 user.delUser(userDeleteRequest.getDeleteReason(), LocalDateTime.now());
                 userRepository.save(user);
                 hCode = StatusEnum.hd1004;
-                data = user;
                 hMessage = "탈퇴 성공";
             }
-
         } catch (Exception e) {
             log.info(":: deleteUser err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
@@ -235,7 +223,6 @@ public class UserService {
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
                 .build();
     }
 
@@ -250,19 +237,18 @@ public class UserService {
     public UserResponse updateUser(UserChangeUserInfoRequest updateUser) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
+        UserInfoDto userInfoDto = null;
         try {
             //기존 유저
             UserInfo userInfo = userRepository.findByUserNoAndUserStatus(updateUser.getUserNo(), UserStatus.GENERAL);
             if (userInfo == null) {
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "조회되는 회원이 없음";
             } else {
                 userInfo.changeUserInfo(updateUser);
-                UserInfoDto userInfoDto = new UserInfoDto(userInfo);
+                userInfoDto = new UserInfoDto(userInfo);
 
                 hCode = StatusEnum.hd1004;
-                data = userInfoDto;
                 hMessage = "정보 수정 성공";
             }
 
@@ -274,7 +260,7 @@ public class UserService {
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
+                .data(userInfoDto)
                 .build();
     }
 
@@ -288,19 +274,16 @@ public class UserService {
     public UserResponse userInfoWithReviewCount(long userNo) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
-
+        UserInfoWithReviewCountDto userInfoWithReviewCountDto = null;
         try {
-            //TODO[refactoring] : 중복 쿼리 확인필요
             UserInfo userInfo = userRepository.findByUserNo(userNo);
             Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(0, 100));
-            UserInfoWithReviewCountDto userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),
+            userInfoWithReviewCountDto = new UserInfoWithReviewCountDto(userInfo.getUserNo(),
                     userInfo.getUserId(),
                     userInfo.getUserName(),
                     page.getTotalElements());
 
             hCode = StatusEnum.hd1004;
-            data = userInfoWithReviewCountDto;
             hMessage = "정보 조회 성공";
         } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
@@ -310,17 +293,16 @@ public class UserService {
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
+                .data(userInfoWithReviewCountDto)
                 .build();
     }
 
 
     public UserResponse getUserReviewInfo(long userNo) {
-        Object data = null;
         StatusEnum hCode = null;
         String hMessage = null;
+        UserReviewInfo userReviewInfo = null;
         try {
-
             List<String> list = getUserPriorityList(userNo);
             if (list == null || list.size() < 1) {
                 if (makeUserPriority(userNo)) {
@@ -329,16 +311,16 @@ public class UserService {
             }
             hCode = StatusEnum.hd1004;
             hMessage = "getUserPriority 성공";
-            data = getTotalUserReviewInfo(list, userNo);
+            userReviewInfo = getTotalUserReviewInfo(list, userNo);
         } catch (Exception e) {
             hCode = StatusEnum.hd4444;
             hMessage = "getUserPriority 에러";
             log.error(":: getUserPriority err :: error is {} ", e);
         }
         return UserResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
+                .data(userReviewInfo)
                 .build();
     }
 
@@ -459,8 +441,6 @@ public class UserService {
     public UserResponse mailSend(MailRequest mailRequest) {
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
-
         try {
 
             log.info("test dsata ---- {}", SecurityTools.md5("semo1234"));
@@ -472,21 +452,17 @@ public class UserService {
 
             mailSender.send(message);
 
-
             hCode = StatusEnum.hd1004;
-            data = mailRequest;
             hMessage = "메일 전송 성공";
         } catch (Exception e) {
             log.info(":: userInfo err :: error is {} ", e);
             hCode = StatusEnum.hd4444;
             hMessage = "메일 전송 실패";
         }
-
-
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
+                .data(mailRequest)
                 .build();
     }
 
@@ -500,7 +476,6 @@ public class UserService {
         log.info(":: UserService_findId :: userId is {} ", userId);
         String hMessage = "";
         StatusEnum hCode = null;
-        Object data = null;
 
         try {
             UserInfo userInfo = userRepository.findByUserId(userId);
@@ -525,7 +500,7 @@ public class UserService {
                 hCode = StatusEnum.hd1004;
                 hMessage = "정보 조회 성공";
             }else {
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "아이디를 다시 확인해주세요.";
             }
         } catch (Exception e) {
@@ -537,7 +512,6 @@ public class UserService {
         return UserResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
                 .build();
     }
 
