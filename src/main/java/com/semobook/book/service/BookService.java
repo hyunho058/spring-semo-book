@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 public class BookService {
     String hMessage;
     StatusEnum hCode;
-    Object data;
 
     private final BookRepository bookRepository;
     private final RedisBookRepository redisBookRepository;
@@ -48,9 +47,9 @@ public class BookService {
     public BookResponse addBook(BookRequest bookRequest) {
         hMessage = null;
         hCode = null;
-        data = null;
+        Book book = null;
         try {
-            Book book = bookRepository.save(Book.builder()
+            book = bookRepository.save(Book.builder()
                     .isbn(bookRequest.getIsbn())
                     .bookName(bookRequest.getBookName())
                     .author(bookRequest.getAuthor())
@@ -63,7 +62,6 @@ public class BookService {
 
             hMessage = "생성완료";
             hCode = StatusEnum.hd1004;
-            data = book;
         } catch (Exception e) {
             log.info(":: addBook err :: error is {}", e);
             hMessage = "책 저장 실패";
@@ -73,7 +71,7 @@ public class BookService {
         return BookResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
+                .data(book)
                 .build();
     }
 
@@ -89,7 +87,7 @@ public class BookService {
 
         hMessage = null;
         hCode = null;
-        data = null;
+        BookDto bookDto = null;
 
         try {
             Book book = bookRepository.findByIsbn(isbn);
@@ -97,8 +95,7 @@ public class BookService {
                 hCode = StatusEnum.hd4444;
                 hMessage = "검색된 도서가 없습니다.";
             } else {
-                BookDto bookDto = new BookDto(book);
-                data = bookDto;
+                bookDto = new BookDto(book);
                 hCode = StatusEnum.hd1004;
                 hMessage = "도서 조회 성공";
             }
@@ -108,9 +105,9 @@ public class BookService {
             hMessage = "검색 실패";
         }
         return BookResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
+                .data(bookDto)
                 .build();
     }
 
@@ -123,16 +120,15 @@ public class BookService {
         log.info(":: findBookWithReview  :: book is {}", isbn);
         hMessage = null;
         hCode = null;
-        data = null;
+        BookWithReviewDto bookWithReviewDto = null;
         try {
 //            Book book = bookRepository.findByIsbnWithReview(isbn);
-            BookWithReviewDto bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
+            bookWithReviewDto = new BookWithReviewDto(bookRepository.findByIsbnWithReview(isbn));
 
             if (bookWithReviewDto == null) {
                 hCode = StatusEnum.hd4444;
                 hMessage = "검색된 도서가 없습니다.";
             } else {
-                data = bookWithReviewDto;
                 hCode = StatusEnum.hd1004;
                 hMessage = "도서 조회 성공";
             }
@@ -142,9 +138,9 @@ public class BookService {
             hMessage = "검색 실패";
         }
         return BookResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
+                .data(bookWithReviewDto)
                 .build();
     }
 
@@ -159,7 +155,6 @@ public class BookService {
 
         hMessage = null;
         hCode = null;
-        data = null;
 
         //page처리 적용
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
@@ -188,9 +183,9 @@ public class BookService {
 
 
         return BookResponse.builder()
-                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
+                .data(result)
                 .build();
     }
 
@@ -229,7 +224,6 @@ public class BookService {
 
         hMessage = null;
         hCode = null;
-        data = null;
 
         try {
             log.info(":: deleteBook  :: book is {}", isbn);
@@ -244,7 +238,6 @@ public class BookService {
         return BookResponse.builder()
                 .hCode(hCode)
                 .hMessage(hMessage)
-                .data(data)
                 .build();
     }
 
@@ -252,8 +245,7 @@ public class BookService {
 
         hMessage = null;
         hCode = null;
-        data = null;
-        Mono<DocumentListDto> responseJson;
+        Mono<DocumentListDto> responseJson = null;
 
         try {
             log.info(":: searchBook  :: keyword is {}", bookSearchRequest.getKeyword());
@@ -285,22 +277,17 @@ public class BookService {
             hCode = StatusEnum.hd1004;
             hMessage = "검색 성공";
 
-            return BookResponse.builder()
-                    .hCode(hCode)
-                    .hMessage(hMessage)
-                    .data(responseJson.block())
-                    .build();
+           
         } catch (Exception e) {
             log.info(":: searchBook err :: error is {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "검색 실패";
-
-            return BookResponse.builder()
-                    .hCode(hCode)
-                    .hMessage(hMessage)
-                    .data(null)
-                    .build();
         }
+        return BookResponse.builder()
+                .hCode(hCode)
+                .hMessage(hMessage)
+                .data(responseJson.block())
+                .build();
     }
 
 
