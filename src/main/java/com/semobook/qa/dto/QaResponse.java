@@ -10,16 +10,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class QaResponse {
+public class QaResponse<T> {
     @Schema(description = "성공 코드" , example = "성공 : hd1004")
     StatusEnum hCode;
     @Schema(description = "메시지")
     String hMessage;
     @Schema(description = "데이터")
-    Object data;
+    T data;
 
     @Builder
-    public QaResponse(StatusEnum hCode, String hMessage, Object data) {
+    public QaResponse(StatusEnum hCode, String hMessage, T data) {
         this.hCode = hCode;
         this.hMessage = hMessage;
         this.data = data;

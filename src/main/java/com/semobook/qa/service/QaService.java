@@ -1,14 +1,11 @@
 package com.semobook.qa.service;
 
-import com.semobook.bookReview.repository.BookReviewRepository;
 import com.semobook.common.StatusEnum;
 import com.semobook.qa.domain.Qa;
 import com.semobook.qa.dto.QaListDto;
-import com.semobook.qa.dto.QaListRequest;
 import com.semobook.qa.dto.QaRequest;
 import com.semobook.qa.dto.QaResponse;
 import com.semobook.qa.repository.QaRepository;
-import com.semobook.qa.repository.QaRepositoryImpl;
 import com.semobook.user.domain.UserInfo;
 import com.semobook.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +27,7 @@ public class QaService {
     private final QaRepository qaRepository;
     private final UserRepository userRepository;
     private String hMessage = null;
-    private Object data = null;
     private StatusEnum hCode = null;
-
 
     /**
      * create qa
@@ -44,14 +39,12 @@ public class QaService {
     public QaResponse createQa(QaRequest request) {
         log.info(":: createQa ::");
         hMessage = null;
-        data = null;
         hCode = null;
-
+        Qa qa = null;
         log.info(":: createQa :: request is {} ", request);
         try {
             UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-
-            Qa qa = qaRepository.save(Qa.builder()
+            qa = qaRepository.save(Qa.builder()
                     .title(request.getTitle())
                     .requestContents(request.getRequestContents())
                     .userInfo(resultUserInfo)
@@ -60,15 +53,13 @@ public class QaService {
 
             hCode = StatusEnum.hd1004;
             hMessage = "저장완료";
-            data = qa.getQaNo();
         }catch (Exception e){
             hCode = StatusEnum.hd4444;
             hMessage = "저장실패";
-            data = null;
         }
 
         return QaResponse.builder()
-                .data(data)
+                .data(qa.getQaNo())
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -80,31 +71,27 @@ public class QaService {
      * @author hyunho
      * @since 2021-07-10
      **/
-    public QaResponse findAllQa(QaListRequest request){
+    public QaResponse findAllQa(long userNo, int pageNum){
         log.info(":: findAllQa ::");
         hMessage = null;
-        data = null;
         hCode = null;
-
-        log.info(":: findAllQa :: request is {} ", request);
+        List<QaListDto> result = null;
         try {
-            Page<Qa> page = qaRepository.qaList(request.getUserNo(),
-                    PageRequest.of(Integer.parseInt(request.getPageNum()), 10));
-            List<QaListDto> result = page.getContent().stream()
+            Page<Qa> page = qaRepository.qaList(userNo,
+                    PageRequest.of(pageNum, 10));
+            result = page.getContent().stream()
                     .map(qa -> new QaListDto(qa))
                     .collect(Collectors.toList());
 
             hCode = StatusEnum.hd1004;
-            hMessage = "저장완료";
-            data =result;
+            hMessage = "qa조회 성공";
         }catch (Exception e){
             hCode = StatusEnum.hd4444;
-            hMessage = "저장실패";
-            data = null;
+            hMessage = "qa조회 실패";
         }
 
         return QaResponse.builder()
-                .data(data)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
