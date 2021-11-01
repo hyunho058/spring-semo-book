@@ -60,16 +60,14 @@ public class BookReviewService {
     public BookReviewResponse createReview(BookReviewRequest request) {
         log.info("createReview ::");
         String hMessage = null;
-        Object data = null;
         StatusEnum hCode = null;
         log.info("createReview():: request.getUserNo() is {}", request.getUserNo());
         log.info("createReview():: request.getBook().getIsbn() is {}", request.getBook().getIsbn());
         try {
             if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
                 log.info("createReview():: review is existence");
-                hCode = StatusEnum.hd4444;
+                hCode = StatusEnum.hd1004;
                 hMessage = "이미 리뷰를 등록하였습니다.";
-                data = null;
             } else {
                 log.info("createReview():: review is not existence");
                 Book book;
@@ -90,7 +88,6 @@ public class BookReviewService {
                             .build());
                 }
                 UserInfo resultUserInfo = userRepository.findByUserNo(request.getUserNo());
-//                log.info("createReview :: resultUserInfo is {}", resultUserInfo.getUserName());
                 if (book != null && resultUserInfo != null) {
                     bookReviewRepository.save(BookReview.builder()
                             .rating(request.getRating())
@@ -105,7 +102,7 @@ public class BookReviewService {
                     boolean isUpdate = updateRedisReview(request);
 
                     //userpriority 생성
-                    if(isUpdate){
+                    if (isUpdate) {
                         userService.makeUserPriority(request.getUserNo());
                     }
 
@@ -116,12 +113,10 @@ public class BookReviewService {
                     //레디스에
                     hCode = StatusEnum.hd1004;
                     hMessage = "저장완료";
-                    data = request;
                     log.info("createReview:: success create book review");
                 } else {
                     hCode = StatusEnum.hd4444;
                     hMessage = "저장실패";
-                    data = null;
                 }
 
             }
@@ -130,12 +125,9 @@ public class BookReviewService {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "createReview 에러";
-            data = null;
-
         }
 
         return BookReviewResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -163,7 +155,7 @@ public class BookReviewService {
             //redis값이 없으면 db에서 가져오기
             if (allReviewList == null) {
                 reviewInfoList = bookReviewRepository.findAllByUserInfo_userNo(request.getUserNo(), PageRequest.of(0, 100))
-                        .stream().filter(a-> !(a.getBook().getCategory().isEmpty() || a.getBook().getCategory() == "A"))
+                        .stream().filter(a -> !(a.getBook().getCategory().isEmpty() || a.getBook().getCategory() == "A"))
                         .map(a -> ReviewInfo.builder()
                                 .point(a.getRating())
                                 .isbn(a.getBook().getIsbn())
@@ -178,12 +170,12 @@ public class BookReviewService {
                     .point(request.getRating())
                     .build());
 
-            if(reviewInfoList.size()>0) {
+            if (reviewInfoList.size() > 0) {
                 AllReview saveData = AllReview.builder().userId(request.getUserNo()).value(reviewInfoList).build();
                 allReviewRepository.save(saveData);
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(":: updateRedisReview err :: error is {} ", e);
             return false;
         }
@@ -200,8 +192,6 @@ public class BookReviewService {
     @Transactional
     public BookReviewResponse bookReviewRating(BookReviewRatingRequest request) {
         String hMessage = null;
-        log.info("bookReviewRating ::");
-        Object data = null;
         StatusEnum hCode = null;
         try {
             if (bookReviewRepository.exists(request.getUserNo(), request.getBook().getIsbn())) {
@@ -243,17 +233,15 @@ public class BookReviewService {
                             .build());
 
                     //userpriority 생성
-                    if(isUpdate){
+                    if (isUpdate) {
                         userService.makeUserPriority(request.getUserNo());
                     }
 
                     hCode = StatusEnum.hd1004;
                     hMessage = "저장완료";
-                    data = request;
                 } else {
                     hCode = StatusEnum.hd4444;
                     hMessage = "저장실패";
-                    data = null;
                 }
             }
 
@@ -262,12 +250,9 @@ public class BookReviewService {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "createReview 에러";
-            data = null;
-
         }
 
         return BookReviewResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -282,31 +267,29 @@ public class BookReviewService {
     public BookReviewResponse readMyReview(long userNo, int pageNum) {
         log.info(":: readMyReview() :: userNo is {}", userNo);
         String hMessage = "";
-        Object data = null;
         StatusEnum hCode = null;
+        List<BookReviewWithIsbnDto> allReview = null;
 
         try {
 
             Page<BookReview> page = bookReviewRepository.findAllByUserInfo_userNo(userNo, PageRequest.of(pageNum, 5));
-            List<BookReviewWithIsbnDto> allReview = page.getContent().stream()
+            allReview = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
-            log.info("readMyReview :: count is {}",page.getTotalElements());
+            log.info("readMyReview :: count is {}", page.getTotalElements());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = allReview;
 
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "readMyReview 에러";
-            data = null;
 
         }
 
         return BookReviewResponse.builder()
-                .data(data)
+                .data(allReview)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -323,30 +306,26 @@ public class BookReviewService {
     public BookReviewResponse readReviewAll(int pageNum) {
         log.info("showReview");
         String hMessage = null;
-        Object data = null;
         StatusEnum hCode = null;
-
+        List<BookReviewWithBookDto> result = null;
         try {
             Page<BookReview> page = bookReviewRepository.findAll(PageRequest.of(pageNum, 5));
-            List<BookReviewWithBookDto> result = page.getContent().stream()
+            result = page.getContent().stream()
                     .map(bookReview -> new BookReviewWithBookDto(bookReview))
                     .collect(Collectors.toList());
             log.info("bookReviewList : {}", result.toString());
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = result;
 
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "readReview 에러";
-            data = null;
-
         }
 
         return BookReviewResponse.builder()
-                .data(data)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -361,28 +340,23 @@ public class BookReviewService {
     public BookReviewResponse readRatingReview(BookSearchRequest request) {
         log.info("readRatingReview");
         String hMessage = null;
-        Object data = null;
         StatusEnum hCode = null;
-
+        List<BookReview> bookReviewList = null;
         try {
             LocalDateTime today = LocalDateTime.now();
-            List<BookReview> bookReviewList = bookReviewRepository.findAllByCreateDateBefore(today, PageRequest.of(request.getStartPage(), 5));
+            bookReviewList = bookReviewRepository.findAllByCreateDateBefore(today, PageRequest.of(request.getStartPage(), 5));
             log.info("bookReviewList : {}", bookReviewList.toString());
 
             hCode = StatusEnum.hd1004;
             hMessage = "모든 사람 글 가져오기";
-            data = bookReviewList;
-
         } catch (Exception e) {
             log.error("readRatingReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "readRatingReview 에러";
-            data = null;
-
         }
 
         return BookReviewResponse.builder()
-                .data(data)
+                .data(bookReviewList)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -397,7 +371,6 @@ public class BookReviewService {
     @Transactional
     public BookReviewResponse updateReview(BookUpdateRequest request) {
         String hMessage = null;
-        Object data = null;
         StatusEnum hCode = null;
 
         log.info("updateReview");
@@ -408,18 +381,14 @@ public class BookReviewService {
 
             hCode = StatusEnum.hd1004;
             hMessage = "글 수정완료";
-            data = request;
 
         } catch (Exception e) {
             log.error("updateReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "updateReview 에러";
-            data = null;
-
         }
 
         return BookReviewResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -434,7 +403,6 @@ public class BookReviewService {
     @Transactional
     public BookReviewResponse deleteReview(long reviewNo) {
         String hMessage = null;
-        Object data = null;
         StatusEnum hCode = null;
         try {
             bookReviewRepository.deleteBookReviewByReviewNo(reviewNo);
@@ -447,7 +415,6 @@ public class BookReviewService {
             hMessage = "삭제중 오류";
         }
         return BookReviewResponse.builder()
-                .data(data)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -456,34 +423,29 @@ public class BookReviewService {
     public BookReviewResponse monthReview(MonthBookReviewRequest monthBookReviewRequest) {
         log.info("monthReview()");
         String hMessage = null;
-        Object data = null;
         StatusEnum hCode = null;
-
+        List<BookReviewWithIsbnDto> result = null;
         try {
-//            Page<BookReview> page = bookReviewRepository.findAllByUserInfo(monthBookReviewRequest.getUserNo(), PageRequest.of(0, 100));
             List<BookReview> page = bookReviewRepository.findByBookBetweenDate(
                     monthBookReviewRequest.getUserNo(),
                     monthBookReviewRequest.getStartDate(),
                     monthBookReviewRequest.getEndDate());
-            List<BookReviewWithIsbnDto> result = page.stream()
+            result = page.stream()
                     .map(bookReview -> new BookReviewWithIsbnDto(bookReview))
                     .collect(Collectors.toList());
             log.info("BookReview list : {}", page);
 
             hCode = StatusEnum.hd1004;
             hMessage = "가져오기";
-            data = result;
 
         } catch (Exception e) {
             log.error("monthReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "monthReview 에러";
-            data = null;
-
         }
 
         return BookReviewResponse.builder()
-                .data(data)
+                .data(result)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
@@ -498,27 +460,23 @@ public class BookReviewService {
     public BookReviewResponse bookReviewList(String isbn, int pageNum) {
         log.info(":: readMyReview() :: isbn is {}", isbn);
         String hMessage = "";
-        Object data = null;
         StatusEnum hCode = null;
-
+        List<SearchBookReviewDto> reviewList = null;
         try {
             Page<BookReview> page = bookReviewRepository.findByBookReview(isbn, PageRequest.of(pageNum, 10));
-            List<SearchBookReviewDto> reviewList = page.getContent().stream()
+            reviewList = page.getContent().stream()
                     .map(bookReview -> new SearchBookReviewDto(bookReview))
                     .collect(Collectors.toList());
-            log.info("readMyReview :: count is {}",page.getTotalElements());
+            log.info("readMyReview :: count is {}", page.getTotalElements());
             hCode = StatusEnum.hd1004;
             hMessage = "도서 리뷰 리스트";
-            data = reviewList;
         } catch (Exception e) {
             log.error("createReview err :: error msg : {}", e);
             hCode = StatusEnum.hd4444;
             hMessage = "리뷰 리스트 에러";
-            data = null;
-
         }
         return BookReviewResponse.builder()
-                .data(data)
+                .data(reviewList)
                 .hCode(hCode)
                 .hMessage(hMessage)
                 .build();
